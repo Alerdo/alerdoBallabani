@@ -1,0 +1,83 @@
+<!doctype html>
+
+<html lang="en">
+
+	<head>
+
+		<meta charset="utf-8">
+
+		<title>AJAX/PHP/CURL/JSON example</title>
+		<meta name="description" content="AJAX/PHP/CURL/JSON example">
+		<meta name="author" content="Paddy Evans">
+
+		<link rel="stylesheet" type="text/css" href="./libs/css/style.css">
+
+	</head>
+
+	<body>
+
+		<select id="selCountry">
+			<option value="GB">Great Britain</option>
+			<option value="FR">France</option>
+			<option value="DE">Germany</option>
+			<option value="US">USA</option>
+		</select>
+
+		<select id="selLanguage">
+			<option value="en">English</option>
+			<option value="fr">Francais</option>
+			<option value="de">Deutsche</option>
+		</select>
+
+		<button id="btnRun">Run</button>
+
+		<br><br>
+
+		<div id="divResults">
+			
+			<h3>APIs Table</h3>
+
+<table border="1">
+    <thead>
+        <tr>
+            <th>No.</th>
+            <th>API Name</th>
+            <th>Description</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>1</td>
+            <td>‹name›</td>
+            <td>‹description›</td>
+            <td><button data-api-id="api1" >Submit</button ></td>
+        </tr>
+        <tr>
+            <td>2</td>
+            <td>‹name›</td>
+            <td>«description»</td>
+            <td><button data-api-id="api2" >Submit</button></td>
+        </tr>
+        <tr>
+            <td>3</td>
+            <td><name></td>
+            <td>‹description›</td>
+            <td><button data-api-id="api3" >Submit</button></td>
+        </tr>
+    </tbody>
+</table>
+
+<h3>RESULTS:</h3>
+<div id="apiResults">
+    [Here will be the results after submitting the APIs]
+</div>
+
+		</div>
+
+		<script type="application/javascript" src="libs/js/jquery-2.2.3.min.js"></script>
+		<script type="application/javascript" src="libs/js/script.js"></script>
+
+	</body>
+
+</html>
