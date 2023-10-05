@@ -1,49 +1,66 @@
+let countryInfo = null;
+
 $(document).ready(function() {
 
-    // Common function to fetch country info
-    function fetchCountryInfo(apiId, country, language) {
-        let infoType = "";
+    $('#btnRun').click(function() {
+        const country = $('#selCountry').val();
+        const language = $('#selLanguage').val();
+        
+        // Make the initial API call on "Run" button click
+        makeAPICall('getCountryInfo', { country, lang: language }, function(result) {
+            countryInfo = result;
+            console.log("Initial Country Info:", countryInfo);
+            // Optionally, you can display the result here or anywhere you need
+            $('#apiResults').html(JSON.stringify(result.data));
+        });
+    });
 
-        // Determine the infoType based on the apiId
-        switch (apiId) {
-            case "api1":
-                infoType = "type1"; // Modify with actual type or additional parameters as needed
-                break;
-            case "api2":
-                infoType = "type2"; 
-                break;
-            case "api3":
-                infoType = "type3";
-                break;
-            default:
-                console.error('Invalid API ID');
-                return;
+    $('button[data-api-id="api1"]').click(function() {
+        if (countryInfo) {
+            $('#apiResults').html(JSON.stringify(countryInfo.data));
         }
+    });
 
+    $('button[data-api-id="api2"]').click(function() {
+        if (countryInfo) {
+            const params = {
+                lat: countryInfo.data[0].latitude,
+                lng: countryInfo.data[0].longitude
+            };
+            makeAPICall('getWeatherInfo', params);
+        }
+    });
+
+    $('button[data-api-id="api3"]').click(function() {
+        if (countryInfo) {
+            const params = {
+                north: countryInfo.data[0].north,
+                south: countryInfo.data[0].south,
+                east: countryInfo.data[0].east,
+                west: countryInfo.data[0].west,
+                lang: $('#selLanguage').val()
+            };
+            makeAPICall('getCitiesInfo', params);
+        }
+    });
+
+    function makeAPICall(action, params, callback = null) {
+        params.action = action;
         $.ajax({
             url: "libs/php/getCountryInfo.php",
             type: 'POST',
             dataType: 'json',
-            data: {
-                country: country,
-                lang: language,
-                infoType: infoType
-            },
+            data: params,
             success: function(result) {
-                // Display the results in the apiResults div
-                $('#apiResults').html(JSON.stringify(result));
+                if(callback) {
+                    callback(result);
+                } else {
+                    $('#apiResults').html(JSON.stringify(result.data));
+                }
             },
-            error: function(error) {
-                console.error('API call failed:', error);
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.error('API call failed:', textStatus, errorThrown);
             }
         });
     }
-
-    // Action for API Submit buttons
-    $('button[data-api-id]').click(function() {
-        let apiId = $(this).attr('data-api-id');
-        const selectedCountry = $('#selCountry').val();
-        const selectedLanguage = $('#selLanguage').val();
-        fetchCountryInfo(apiId, selectedCountry, selectedLanguage);
-    });
 });
