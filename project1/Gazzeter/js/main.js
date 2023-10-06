@@ -117,6 +117,7 @@ L.marker([51.7, -0.09], {icon: redMarker}).addTo(map);
 
 
 // --------------------------------------------
+//Populating the select menu
 $.ajax({
     url: '../Gazzeter/php/getCountryInfo.php',  // Adjusted path
     method: 'GET',
@@ -125,7 +126,7 @@ $.ajax({
         let dropdown = $('#countrySelect');
         dropdown.empty();
 
-        // If you want a default option
+        // Here I will put  a default option
         dropdown.append('<option selected="true" disabled>Select Country</option>');
         dropdown.prop('selectedIndex', 0);
 
@@ -138,3 +139,65 @@ $.ajax({
     }
 });
 
+
+//mapping the area of the selected country
+
+$('#countrySelect').on('change', function() {
+    let isoCode = $(this).val();
+    fetchCountryBorder(isoCode);
+});
+
+function fetchCountryBorder(isoCode) {
+    $.ajax({
+        url: '../Gazzeter/php/getCountryInfo.php',  // You might need to adjust the path
+        data: {
+            isoCode: isoCode
+        },
+        method: 'GET',
+        dataType: 'json',
+        success: function(data) {
+            // Clear previous layers
+            if (typeof countryLayer !== 'undefined') {
+                map.removeLayer(countryLayer);
+            }
+
+            // Draw the country border using L.geoJSON
+            countryLayer = L.geoJSON(data).addTo(map);
+            map.fitBounds(countryLayer.getBounds());
+        },
+        error: function(err) {
+            console.error("Error fetching country border:", err);
+        }
+    });
+}
+
+
+
+
+/// GETING THE USER'S LOCATION 
+if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(function(position) {
+        var lat = position.coords.latitude;
+        var lon = position.coords.longitude;
+        
+        // Call the PHP script to get the country ISO based on lat and lon
+        $.ajax({
+            url: '../Gazzeter/php/getIsoCode.php',
+            data: {
+                lat: lat,
+                lon: lon
+            },
+            method: 'GET',
+            dataType: 'json',
+            success: function(data) {
+                if (data && data.countryCode) {
+                    $('#countrySelect').val(data.countryCode);
+                    fetchCountryBorder(data.countryCode);
+                }
+            },
+            error: function(err) {
+                console.error("Error fetching country ISO:", err);
+            }
+        });
+    });
+}
