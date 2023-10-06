@@ -10,7 +10,17 @@
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="./css/style.css">
+
+
+   
+    <!-- jQuery -->
+    <script src="js/jquery-3.7.1.min.js"></script>
+
+     <!-- Bootstrap -->
+     <link rel="stylesheet" href="css/bootstrap.min.css">
+     <script src="js/bootstrap.min.js"></script>
+ 
 
   
     <!-- Leaflet CSS & JS -->
@@ -32,12 +42,23 @@
 
 </head>
 <body>
-    <span id="selectContainer">
-        <select id="countrySelect" class="form-select shadow-sm">
-          <!-- populate from PHP call that returns only the codes and names from the countryborder GeoJSON file -->
-          <option value="AF">Albania</option>
-        </select>
-      </span>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">Your App Name</a>
+        
+        <!-- Using ml-auto to push select to the right but not to the edge, and px-2 for padding -->
+        <div class="ml-auto px-2">
+            <select id="countrySelect" class="form-control">
+                <!-- Options will be populated using JavaScript -->
+            </select>
+        </div>
+    </div>
+ </nav>
+
+   
+
+  
+  
       
       <div id="map"></div>
       
@@ -388,6 +409,6 @@
           </div>
         </div>
       </div>
-    <script src="main.js" async defer></script>
+    <script src="./js/main.js" async defer></script>
 </body>
 </html>

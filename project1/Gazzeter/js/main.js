@@ -1,7 +1,7 @@
 // Set initial map view
 var map = L.map('map', {
     center: [51.505, -0.09],
-    zoom: 13,
+    zoom: 12,
     layers: [] // We'll initialize without any default layer, then add it based on user preference or default to one.
 });
 
@@ -16,10 +16,23 @@ var satellite = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/service
 });
 
 
+// national geoagrphic 
+var natGeoWorldMap = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}', {
+    attribution: 'Tiles &copy; Esri &mdash; Source: National Geographic, Esri, DeLorme, NAVTEQ, UNEP-WCMC, USGS, NASA, ESA, METI, NRCAN, GEBCO, NOAA, iPC'
+});
+
+//Topographic
+
+var esriTopographic = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+    attribution: 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri Korea, Esri (Thailand), NGCC, (c) OpenStreetMap contributors, and the GIS User Community'
+});
+
 // Define base maps for layer control
 var baseMaps = {
     "Streets": streets,
-    "Satellite": satellite
+    "Satellite": satellite,
+    "National Geographic": natGeoWorldMap ,
+    "Topographic": esriTopographic
 };
 
 // Add control to switch between layers
@@ -27,6 +40,19 @@ L.control.layers(baseMaps).addTo(map);
 
 // Setting 'streets' as default layer
 satellite.addTo(map);
+
+
+//INFO BUTTON 
+
+
+L.easyButton("fa-info fa-lg", function (btn, map) {
+  $("#exampleModal").modal("show");
+}).addTo(map);
+
+
+
+//FINISH INFO BUTTON 
+
 
 // !IMPORTANT Create a FeatureGroup to hold multiple markers and polylines
 var featureGroup = L.featureGroup().addTo(map);
@@ -91,3 +117,24 @@ L.marker([51.7, -0.09], {icon: redMarker}).addTo(map);
 
 
 // --------------------------------------------
+$.ajax({
+    url: '../Gazzeter/php/getCountryInfo.php',  // Adjusted path
+    method: 'GET',
+    dataType: 'json',
+    success: function(data) {
+        let dropdown = $('#countrySelect');
+        dropdown.empty();
+
+        // If you want a default option
+        dropdown.append('<option selected="true" disabled>Select Country</option>');
+        dropdown.prop('selectedIndex', 0);
+
+        $.each(data, function (key, entry) {
+            dropdown.append($('<option></option>').attr('value', entry.isoCode).text(entry.countryName));
+        });
+    },
+    error: function(err) {
+        console.error("Error fetching countries:", err);
+    }
+});
+
