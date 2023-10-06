@@ -5,9 +5,9 @@ $(document).ready(function() {
         const country = $('#selCountry').val();
         const language = $('#selLanguage').val();
         
-        // Make the initial API call on "Run" button click
+       
         makeAPICall('getCountryInfo', { country, lang: language }, function(result) {
-            // Add latitude and longitude to the response data
+            // latitude and longitude to the response data
             result.data[0].latitude = parseFloat(result.data[0].north) + parseFloat(result.data[0].south) / 2;
             result.data[0].longitude = parseFloat(result.data[0].east) + parseFloat(result.data[0].west) / 2;
     
@@ -29,14 +29,14 @@ $(document).ready(function() {
 
     $('button[data-api-id="api2"]').click(function() {
         if (countryInfo) {
-            const country = $('#selCountry').val(); // Get the selected country from the HTML
+            const country = $('#selCountry').val(); 
     
             const params = {
-                country: country, // Use the selected country for nearby countries
-                username: 'AlerdoBallabani' // Replace with your actual username
+                country: country, 
+                username: 'AlerdoBallabani' 
             };
     
-            console.log("Nearby Countries Params:", params); // Debugging statement
+            console.log("Nearby Countries Params:", params); 
     
             makeAPICall('getNearbyCountries', params);
         }
@@ -54,9 +54,24 @@ $(document).ready(function() {
                 lang: $('#selLanguage').val()
             };
     
+           
             console.log("Cities Info Params:", params); // Debugging statement
     
             makeAPICall('getCitiesInfo', params);
+        }
+    });
+
+    $('button[data-api-id="api4"]').click(function(result) {
+        if (countryInfo) {
+            const params = {
+                continent: countryInfo.data[0].continent,
+                lang: $('#selLanguage').val()
+            };
+            
+            console.log("Continent Info Params:", params);
+    
+            makeAPICall('getContinentInfo', params);
+            console.log(result)
         }
     });
     

@@ -12,20 +12,24 @@ switch ($action) {
         $url = "http://api.geonames.org/countryInfoJSON?formatted=true&lang=" . $_REQUEST['lang'] . "&country=" . $_REQUEST['country'] . "&username=" . $username . "&style=full";
         break;
 
-        case 'getNearbyCountries':
-            // Include the country code and username in the URL
-            $url = "http://api.geonames.org/neighboursJSON?country=" . $_REQUEST['country'] . "&username=" . $username;
-            break;
-        
-    case 'getCitiesInfo':
+        case 'getNearbyCountries':  
+         $url = "http://api.geonames.org/neighboursJSON?country=" . $_REQUEST['country'] . "&username=" . $username;
+         break;
+
+        case 'getCitiesInfo':
         $url = "http://api.geonames.org/citiesJSON?north=" . $_REQUEST['north'] . "&south=" . $_REQUEST['south'] . "&east=" . $_REQUEST['east'] . "&west=" . $_REQUEST['west'] . "&lang=" . $_REQUEST['lang'] . "&username=" . $username;
         break;
+        
+        case 'getContinentInfo':
+        $url = "http://api.geonames.org/searchJSON?continentCode=" . $_REQUEST['continent'] . "&lang=" . $_REQUEST['lang'] . "&username=" . $username;
+        break;
+    
 
-    default:
+         default:
         echo json_encode(['status' => ['name' => 'error', 'description' => 'Invalid action']]);
         exit;
 }
-
+ 
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
