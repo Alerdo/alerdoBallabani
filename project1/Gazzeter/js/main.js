@@ -173,7 +173,6 @@ function fetchCountryBorder(isoCode) {
 
 
 
-
 /// GETING THE USER'S LOCATION 
 if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(function(position) {
@@ -181,6 +180,7 @@ if (navigator.geolocation) {
         var lon = position.coords.longitude;
         
         // Call the PHP script to get the country ISO based on lat and lon
+        //Using the geonames api becasue I can not get the country just by geting the coordinates
         $.ajax({
             url: '../Gazzeter/php/getIsoCode.php',
             data: {
