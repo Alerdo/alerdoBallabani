@@ -216,7 +216,7 @@ if (navigator.geolocation) {
  // Example, this can be dynamic based on user's selection.
 
  //Make a call to get basic info so I can use it for subsequent calls.
-
+ let currentBoundingBox ={}
  function fetchCountryInfo(countryCode) {
     $.ajax({
         url: '../Gazzeter/php/baseCountryInfo.php',
@@ -230,20 +230,20 @@ if (navigator.geolocation) {
                 let countryDetails = data.country;
                 let countryName = countryDetails.countryName;
                 let population = countryDetails.population;
-                let boundingBox = {
+                let area = countryDetails.areaInSqKm;
+                let currencyCode = countryDetails.currencyCode;
+                
+                // Updating the currentBoundingBox object
+                currentBoundingBox = {
                     north: countryDetails.north,
                     south: countryDetails.south,
                     east: countryDetails.east,
                     west: countryDetails.west
                 };
-                
-                console.log("Country Name:", countryName);
-                console.log("Population:", population);
-                console.log("Bounding Box:", boundingBox);
 
-                // If you wish to make a subsequent call to getCitiesWithinBoundingBox
-                // You can use the bounding box data
-                // fetchCitiesWithinBoundingBox(boundingBox.north, boundingBox.south, boundingBox.east, boundingBox.west);
+                // Fetch cities now after updating the bounding box
+                fetchCitiesWithinBoundingBox();
+
             } else {
                 console.error("Invalid data returned from API:", data);
             }
@@ -254,29 +254,53 @@ if (navigator.geolocation) {
     });
 }
 
+// Moved AJAX call for cities into its own function
+function fetchCitiesWithinBoundingBox() {
+    $.ajax({
+        url: '../Gazzeter/php/getCitiesInfo.php',
+        data: { 
+            north: currentBoundingBox.north,
+            south: currentBoundingBox.south,
+            east: currentBoundingBox.east,
+            west: currentBoundingBox.west
+        },
+        method: 'GET',
+        dataType: 'json',
+        success: function(data) {
+            populateMap(data.geonames);
+        },
+        error: function(err) {
+            console.error("Error fetching cities:", err);
+        }
+    });
+}
+function populateMap(cities) {
+    // If you have previously added markers or layers to the map, clear them
+    if (typeof markers !== 'undefined') {
+        map.removeLayer(markers);
+    }
 
+    var markers = L.markerClusterGroup();  // Create a marker cluster group
 
- //This neds north south west east parameters;
+    cities.forEach(city => {
+        let circleMarker = L.circleMarker([city.lat, city.lng], {
+            radius: 4,  // Adjust the size if necessary
+            color: 'blue',  // Circle color
+            fillOpacity: 1  // Fill the circle
+        });
 
-// $.ajax({
-//     url: '../Gazzeter/php/getCitiesInfo.php', // The path to your PHP file.
-//     data: { countryCode: isoCode },
-//     method: 'GET',
-//     dataType: 'json',
-//     success: function(data) {
-//         console.log(data)
-//         populateMap(data.geonames);
-//     },
-//     error: function(err) {
-//         console.error("Error fetching cities:", err);
-//     }
-// });
+        circleMarker.bindTooltip(`
+            <strong>${city.name}</strong>
+            <br>
+            Population: ${city.population}
+        `, {
+            permanent: true,  // This means the tooltip will only show on hover
+            direction: 'right'
+        });
 
-// //Here I populate the map 
-// function populateMap(cities) {
-//     cities.forEach(city => {
-//         L.marker([city.lat, city.lng])
-//           .addTo(map)
-//           .bindPopup(`<strong>${city.name}</strong><br>Population: ${city.population}`);
-//     });
-// }
+        markers.addLayer(circleMarker);  // Add each marker to the cluster group
+    });
+
+    map.addLayer(markers);  // Add the marker cluster group to the map
+}
+
