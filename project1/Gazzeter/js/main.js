@@ -245,22 +245,9 @@ if (navigator.geolocation) {
                     west: countryDetails.west
                 };
               
-               // 1-  Fetch cities now after updating the bounding box
-                fetchCitiesWithinBoundingBox(currentBoundingBox);
-
-              // 2- Fetch data about the country 
-              L.easyButton("fa-info fa-lg", function (btn, map) {
-                fetchAndDisplayExchangeRate(countryInfo.currencyCode);  
-                 }).addTo(map);
-
-              // 3- FetchAndDisplayExchangeRate(countryInfo.currencyCode)
-                L.easyButton("fa-info fa-lg", function (btn, map) {
-                    fetchAndDisplayExchangeRate(countryInfo.currencyCode);
-                }).addTo(map);
-
-              // 4- Fetch and display other data about weather
-              createButtons(countryInfo);
-              // 5- Fetch and display other data about flags
+         
+            //   createButtons(countryInfo);
+             
             } else {
                 console.error("Invalid data returned from API:", data);
             }
@@ -358,20 +345,30 @@ function fetchAndDisplayExchangeRate(currencyCode) {
 
 
 
-//This function will create all the buttons on the left of the mapp , and will require to be called inside a function 
-// where it can get it nesecary parameters 
-function createButtons(countryInfo) {
-    
-    // Example: creating button for displaying exchange rate
-    L.easyButton('fa-money-bill-alt', function (btn, map) {
-        fetchAndDisplayExchangeRate(countryInfo.currencyCode);  
-    }, 'View Exchange Rate').addTo(map);
 
-   
-    L.easyButton('fa-info-circle', function (btn, map) {
-       
-        fetchAndDisplayCountryInfo(countryInfo, someOtherData, anotherPieceOfData);
-    }, 'View Country Info').addTo(map);
+$(".btn-info").click(function() {
+    // This is where you fetch the data and populate the modal
+    fetchCountryData('info');
+});
 
-    // And so on for other buttons...
+// Similarly for other buttons:
+$(".btn-warning").click(function() {
+    fetchCountryData('exchange');
+});
+// ... Do this for all buttons
+
+
+function fetchCountryData(type) {
+    // Based on 'type', you can determine what kind of data you need.
+    let data;
+    // switch (type) {
+    //     case 'info':
+    //       data ="hello"
+    // }
+
+    // After fetching the data, populate the modal:
+    populateModal(data);
+
+    // Then, show the modal
+    $("#exampleModal").modal("show");
 }

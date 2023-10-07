@@ -27,18 +27,73 @@ html, body {
 /* 
 
   ---------------------------------------------------------- */
-/* Existing Styles */
-/* #my-button .leaflet-bar-part:before {
-  width: auto !important;  
-  padding: 10px 10px !important; 
-  text-align: center!important;
-  white-space: nowrap!important;  
-  background-color: #4CAF50!important;  
-  color: white!important;  
-  transition: all 0.3s ease!important; 
+  #map {
+    width: 100%;
+    height: 600px;
+    position: relative;
 }
 
-#my-button .leaflet-bar-part:hover:before {
-  background-color: white !important; 
-  color: #4CAF50 !important;  
-} */
+.custom-buttons {
+    position: absolute;
+    top: 35%;
+    left: 1%;
+    z-index: 1000;
+}
+
+
+
+.custom-buttons .btn {
+    display: block;
+    margin-bottom: 13px;
+    color: white; /* Set the text color to white */ 
+    transition: background-color 0.3s; /* Smooth transition for hover effect */
+    width: 130px;
+    display: flex;
+    justify-content: space-evenly;
+}
+
+.custom-buttons .btn i { 
+    font-size: 1.5em; /* Make icons bigger */
+}
+
+.custom-buttons .btn-info {
+    background-color: rgba(70, 130, 180, 0.7); /* Blue with transparency */
+}
+
+.custom-buttons .btn-warning {
+    background-color: rgba(255, 165, 0, 0.7); /* Orange with transparency */
+}
+
+.custom-buttons .btn-primary {
+    background-color: rgba(0, 123, 255, 0.7); /* Light blue with transparency */
+}
+
+.custom-buttons .btn-dark {
+    background-color: rgba(52, 58, 64, 0.7); /* Dark gray with transparency */
+}
+
+.custom-buttons .btn-success {
+    background-color: rgba(40, 167, 69, 0.7); /* Green with transparency */
+}
+
+/* Hover effects to make buttons slightly darker on hover */
+.custom-buttons .btn:hover {
+    background-color: rgba(132, 128, 128, 0.8);
+}
+
+
+
+/* Media queries for small devices */
+@media (max-width: 676px) {
+
+
+  .custom-buttons .btn {
+      width: 50px; 
+      justify-content: center;
+  }
+
+  /* Hide text on small devices */
+  .custom-buttons .btn span {
+      display: none;
+  }
+}
