@@ -45,9 +45,9 @@ satellite.addTo(map);
 //INFO BUTTON 
 
 
-L.easyButton("fa-info fa-lg", function (btn, map) {
-  $("#exampleModal").modal("show");
-}).addTo(map);
+// L.easyButton("fa-info fa-lg", function (btn, map) {
+//   $("#exampleModal").modal("show");
+// }).addTo(map);
 
 
 
@@ -81,7 +81,7 @@ map.fitBounds(featureGroup.getBounds());  //IMPORTANT: You will use this to disp
 
 
 
-// Create a cluster group
+// Create a cluster group //SO THAT THE ICONS CHANGE SIZE BASED ON ZOOM-IN AND ZOOM-OUT
 var markers = L.markerClusterGroup();
 
 // Example markers with adjusted coordinates
@@ -143,19 +143,19 @@ $.ajax({
 
 //mapping the area of the selected country
 
-let isoCode; //  Global variable to store the country code
+
 
 $('#countrySelect').on('change', function() {
-    isoCode = $(this).val();
+   let isoCode = $(this).val();
 
-    fetchCountryBorder(isoCode);
+    fetchCountryBorder(isoCode); //calling the function here so we make sure isoCode has an value
 });
 
 
 
 function fetchCountryBorder(isoCode) {
     $.ajax({
-        url: '../Gazzeter/php/getCountryInfo.php',  // You might need to adjust the path
+        url: '../Gazzeter/php/getCountryInfo.php',  // relative path 
         data: {
             isoCode: isoCode
         },
@@ -185,7 +185,7 @@ if (navigator.geolocation) {
         var lat = position.coords.latitude;
         var lon = position.coords.longitude;
         
-        // Call the PHP script to get the country ISO based on lat and lon
+        // Call the PHP script to get the country ISO based on lat and lon (navigator brings back lat and lon)
         //Using the geonames api becasue I can not get the country code just by geting the coordinates
         $.ajax({
             url: '../Gazzeter/php/getIsoCode.php',
@@ -197,6 +197,7 @@ if (navigator.geolocation) {
             dataType: 'json',
             success: function(data) {
                 if (data && data.countryCode) {
+                    //selecting the country for hte menu based on countryCode
                     $('#countrySelect').val(data.countryCode);
                      // Fetch country info here after setting isoCode becasue if I call it outsite isoCode its not setup yet
                      fetchCountryInfo(data.countryCode);
@@ -211,12 +212,11 @@ if (navigator.geolocation) {
 }
 
 
-// -------------Adding information and pins about diffrent developments on the selected country ---------------------
+// --------------Adding information and pins about diffrent developments on the selected country ---------------------
 
- // Example, this can be dynamic based on user's selection.
 
  //Make a call to get basic info so I can use it for subsequent calls.
- let currentBoundingBox ={}
+
  function fetchCountryInfo(countryCode) {
     $.ajax({
         url: '../Gazzeter/php/baseCountryInfo.php',
@@ -227,23 +227,40 @@ if (navigator.geolocation) {
         },
         success: function(data) {
             if (data && data.country) {
-                let countryDetails = data.country;
-                let countryName = countryDetails.countryName;
-                let population = countryDetails.population;
-                let area = countryDetails.areaInSqKm;
-                let currencyCode = countryDetails.currencyCode;
-                
+                const   countryDetails = data.country;
+
+               let countryInfo  = { //use this to display these information.
+                    countryDetails: data.country,
+                    countryName : countryDetails.countryName,
+                    population: countryDetails.population,
+                    area: countryDetails.areaInSqKm,
+                    currencyCode: countryDetails.currencyCode,
+                    iso: countryCode,
+             }
                 // Updating the currentBoundingBox object
-                currentBoundingBox = {
+               let currentBoundingBox = {
                     north: countryDetails.north,
                     south: countryDetails.south,
                     east: countryDetails.east,
                     west: countryDetails.west
                 };
+              
+               // 1-  Fetch cities now after updating the bounding box
+                fetchCitiesWithinBoundingBox(currentBoundingBox);
 
-                // Fetch cities now after updating the bounding box
-                fetchCitiesWithinBoundingBox();
+              // 2- Fetch data about the country 
+              L.easyButton("fa-info fa-lg", function (btn, map) {
+                fetchAndDisplayExchangeRate(countryInfo.currencyCode);  
+                 }).addTo(map);
 
+              // 3- FetchAndDisplayExchangeRate(countryInfo.currencyCode)
+                L.easyButton("fa-info fa-lg", function (btn, map) {
+                    fetchAndDisplayExchangeRate(countryInfo.currencyCode);
+                }).addTo(map);
+
+              // 4- Fetch and display other data about weather
+              createButtons(countryInfo);
+              // 5- Fetch and display other data about flags
             } else {
                 console.error("Invalid data returned from API:", data);
             }
@@ -254,8 +271,10 @@ if (navigator.geolocation) {
     });
 }
 
+
+
 // Moved AJAX call for cities into its own function
-function fetchCitiesWithinBoundingBox() {
+function fetchCitiesWithinBoundingBox(currentBoundingBox) {
     $.ajax({
         url: '../Gazzeter/php/getCitiesInfo.php',
         data: { 
@@ -274,33 +293,85 @@ function fetchCitiesWithinBoundingBox() {
         }
     });
 }
+
+
 function populateMap(cities) {
     // If you have previously added markers or layers to the map, clear them
-    if (typeof markers !== 'undefined') {
-        map.removeLayer(markers);
-    }
-
+    if (typeof markers !== 'undefined') { map.removeLayer(markers);}
     var markers = L.markerClusterGroup();  // Create a marker cluster group
-
     cities.forEach(city => {
         let circleMarker = L.circleMarker([city.lat, city.lng], {
-            radius: 4,  // Adjust the size if necessary
+            radius: 3,  // Adjust the size if necessary
             color: 'blue',  // Circle color
             fillOpacity: 1  // Fill the circle
         });
-
         circleMarker.bindTooltip(`
             <strong>${city.name}</strong>
             <br>
             Population: ${city.population}
         `, {
-            permanent: true,  // This means the tooltip will only show on hover
+            permanent: false,  // This means the tooltip will only show on hover
             direction: 'right'
         });
-
         markers.addLayer(circleMarker);  // Add each marker to the cluster group
     });
-
     map.addLayer(markers);  // Add the marker cluster group to the map
 }
 
+
+
+//Currency Info 
+
+// Function to fetch exchange rate and display in modal
+function fetchAndDisplayExchangeRate(currencyCode) {
+    $.ajax({
+        url: '../Gazzeter/php/exchangeRate.php',
+        method: 'GET',
+        dataType: 'json',
+        data: {
+            currencyCode:  currencyCode // For example: 'USD'
+        },
+        success: function(data) {
+            if (data.rates && data.rates[currencyCode]) {
+                let rate = data.rates[currencyCode];
+                let content = `<strong>Exchange Rate for ${currencyCode}:</strong> ${rate}`;
+                console.log(rate)
+                
+                // Assuming your modal has a content div with id="modalContent"
+                $("#modalContent").html(content);
+
+                // Show the modal
+                $("#exampleModal").modal("show");
+            } else {
+                // Handle any error message from the API or unexpected response structure
+                let errorMsg = data.error || "Unexpected data format";
+                alert("Error fetching exchange rate: " + errorMsg);
+            }
+        },
+        error: function(err) {
+            alert("Error fetching exchange rate. Please try again later.");
+        }
+    });
+}
+
+
+
+
+
+//This function will create all the buttons on the left of the mapp , and will require to be called inside a function 
+// where it can get it nesecary parameters 
+function createButtons(countryInfo) {
+    
+    // Example: creating button for displaying exchange rate
+    L.easyButton('fa-money-bill-alt', function (btn, map) {
+        fetchAndDisplayExchangeRate(countryInfo.currencyCode);  
+    }, 'View Exchange Rate').addTo(map);
+
+   
+    L.easyButton('fa-info-circle', function (btn, map) {
+       
+        fetchAndDisplayCountryInfo(countryInfo, someOtherData, anotherPieceOfData);
+    }, 'View Country Info').addTo(map);
+
+    // And so on for other buttons...
+}

@@ -23,3 +23,22 @@ html, body {
     margin: 0 auto;
   }
 
+
+/* 
+
+  ---------------------------------------------------------- */
+/* Existing Styles */
+/* #my-button .leaflet-bar-part:before {
+  width: auto !important;  
+  padding: 10px 10px !important; 
+  text-align: center!important;
+  white-space: nowrap!important;  
+  background-color: #4CAF50!important;  
+  color: white!important;  
+  transition: all 0.3s ease!important; 
+}
+
+#my-button .leaflet-bar-part:hover:before {
+  background-color: white !important; 
+  color: #4CAF50 !important;  
+} */
