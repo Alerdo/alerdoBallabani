@@ -118,6 +118,7 @@ L.marker([51.7, -0.09], {icon: redMarker}).addTo(map);
 
 // --------------------------------------------
 //Populating the select menu
+
 $.ajax({
     url: '../Gazzeter/php/getCountryInfo.php',  // Adjusted path
     method: 'GET',
@@ -142,10 +143,15 @@ $.ajax({
 
 //mapping the area of the selected country
 
+let isoCode; //  Global variable to store the country code
+
 $('#countrySelect').on('change', function() {
-    let isoCode = $(this).val();
+    isoCode = $(this).val();
+
     fetchCountryBorder(isoCode);
 });
+
+
 
 function fetchCountryBorder(isoCode) {
     $.ajax({
@@ -180,7 +186,7 @@ if (navigator.geolocation) {
         var lon = position.coords.longitude;
         
         // Call the PHP script to get the country ISO based on lat and lon
-        //Using the geonames api becasue I can not get the country just by geting the coordinates
+        //Using the geonames api becasue I can not get the country code just by geting the coordinates
         $.ajax({
             url: '../Gazzeter/php/getIsoCode.php',
             data: {
@@ -192,6 +198,8 @@ if (navigator.geolocation) {
             success: function(data) {
                 if (data && data.countryCode) {
                     $('#countrySelect').val(data.countryCode);
+                     // Fetch country info here after setting isoCode becasue if I call it outsite isoCode its not setup yet
+                     fetchCountryInfo(data.countryCode);
                     fetchCountryBorder(data.countryCode);
                 }
             },
@@ -201,3 +209,74 @@ if (navigator.geolocation) {
         });
     });
 }
+
+
+// -------------Adding information and pins about diffrent developments on the selected country ---------------------
+
+ // Example, this can be dynamic based on user's selection.
+
+ //Make a call to get basic info so I can use it for subsequent calls.
+
+ function fetchCountryInfo(countryCode) {
+    $.ajax({
+        url: '../Gazzeter/php/baseCountryInfo.php',
+        method: 'GET',
+        dataType: 'json',
+        data: {
+            countryCode: countryCode
+        },
+        success: function(data) {
+            if (data && data.country) {
+                let countryDetails = data.country;
+                let countryName = countryDetails.countryName;
+                let population = countryDetails.population;
+                let boundingBox = {
+                    north: countryDetails.north,
+                    south: countryDetails.south,
+                    east: countryDetails.east,
+                    west: countryDetails.west
+                };
+                
+                console.log("Country Name:", countryName);
+                console.log("Population:", population);
+                console.log("Bounding Box:", boundingBox);
+
+                // If you wish to make a subsequent call to getCitiesWithinBoundingBox
+                // You can use the bounding box data
+                // fetchCitiesWithinBoundingBox(boundingBox.north, boundingBox.south, boundingBox.east, boundingBox.west);
+            } else {
+                console.error("Invalid data returned from API:", data);
+            }
+        },
+        error: function(err) {
+            console.error("Error fetching country info:", err);
+        }
+    });
+}
+
+
+
+ //This neds north south west east parameters;
+
+// $.ajax({
+//     url: '../Gazzeter/php/getCitiesInfo.php', // The path to your PHP file.
+//     data: { countryCode: isoCode },
+//     method: 'GET',
+//     dataType: 'json',
+//     success: function(data) {
+//         console.log(data)
+//         populateMap(data.geonames);
+//     },
+//     error: function(err) {
+//         console.error("Error fetching cities:", err);
+//     }
+// });
+
+// //Here I populate the map 
+// function populateMap(cities) {
+//     cities.forEach(city => {
+//         L.marker([city.lat, city.lng])
+//           .addTo(map)
+//           .bindPopup(`<strong>${city.name}</strong><br>Population: ${city.population}`);
+//     });
+// }
