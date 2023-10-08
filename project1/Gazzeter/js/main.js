@@ -120,14 +120,17 @@ L.easyButton('fa-globe', function(btn, map) {
 //Populating the select menu
 
 $.ajax({
-    url: '../Gazzeter/php/getCountryInfo.php',  // Adjusted path
+    url: '../Gazzeter/php/getCountryInfo.php',
     method: 'GET',
     dataType: 'json',
     success: function(data) {
         let dropdown = $('#countrySelect');
         dropdown.empty();
 
-        // Here I will put  a default option
+        // Sort data alphabetically based on countryName
+        data.sort((a, b) => a.countryName.localeCompare(b.countryName));
+
+        // Default option
         dropdown.append('<option selected="true" disabled>Select Country</option>');
         dropdown.prop('selectedIndex', 0);
 
@@ -139,6 +142,7 @@ $.ajax({
         console.error("Error fetching countries:", err);
     }
 });
+
 
 
 //mapping the area of the selected country
@@ -475,7 +479,7 @@ function populateParks(parks) {
 
     parksLayerGroup = L.layerGroup();
 
-    parks.forEach(loc => {
+    parks.forEach(loc => {""
         let marker = L.marker([loc.lat, loc.lng], { icon: park });
         marker.bindTooltip(loc.name);
         marker.addTo(parksLayerGroup);
