@@ -148,15 +148,6 @@ var infoLayer;
 $('#countrySelect').on('change', function() {
    let isoCode = $(this).val();
 
- 
-   if (countryLayer) {
-       map.removeLayer(countryLayer);
-   }
-
-   if (infoLayer) {
-       map.removeLayer(infoLayer);
-   }
-
    fetchCountryInfo(isoCode);
    fetchCountryBorder(isoCode);
 });
@@ -380,6 +371,74 @@ function fetchMapData(countryCode, currentBoundingBox) {
     });
 }
 
+// Global layer group declarations
+var cityLayerGroup;
+var airportLayerGroup;
+var attractionsLayerGroup;
+var parksLayerGroup;
+var countryLayer;
+
+// Country Select change listener
+$('#countrySelect').on('change', function() {
+    let isoCode = $(this).val();
+
+    if (countryLayer) {
+        map.removeLayer(countryLayer);
+    }
+
+    fetchCountryInfo(isoCode);
+    fetchCountryBorder(isoCode);
+});
+
+// Populating Cities
+function populateMap(cities) {
+    var cityIcon = L.divIcon({
+        className: 'city-icon',
+        iconSize: [30, 30],
+        iconAnchor: [15, 15],
+        html: '<i class="fas fa-city" style="color: #5a4a42; font-size: 1rem"></i>'
+    });
+
+    if (cityLayerGroup) {
+        map.removeLayer(cityLayerGroup);
+    }
+
+    cityLayerGroup = L.layerGroup();
+
+    cities.forEach(city => {
+        let circleMarker = L.marker([city.lat, city.lng], { icon: cityIcon });
+        circleMarker.bindTooltip(`${city.name}`, { permanent: true, direction: 'right' }).bindPopup(`Population: ${city.population}`);
+        circleMarker.addTo(cityLayerGroup);
+    });
+
+    cityLayerGroup.addTo(map);
+}
+
+// Populating Airports
+function populateMapWithAirports(airports) {
+    var airplaneIcon = L.divIcon({
+        className: 'custom-icon',
+        iconSize: [40, 40],
+        iconAnchor: [15, 15],
+        html: '<i class="fas fa-plane" style="color: white; font-size: 1rem"></i>'
+    });
+
+    if (airportLayerGroup) {
+        map.removeLayer(airportLayerGroup);
+    }
+
+    airportLayerGroup = L.layerGroup();
+
+    airports.forEach(airport => {
+        let marker = L.marker([airport.lat, airport.lng], { icon: airplaneIcon });
+        marker.bindTooltip(`<strong>${airport.name}</strong>`);
+        marker.addTo(airportLayerGroup);
+    });
+
+    airportLayerGroup.addTo(map);
+}
+
+// Populating Attractions
 function populateAttractions(attractions) {
     const attractionsIcon = L.divIcon({
         className: 'custom-icon',
@@ -387,83 +446,66 @@ function populateAttractions(attractions) {
         iconSize: [20, 20]
     });
 
+    if (attractionsLayerGroup) {
+        map.removeLayer(attractionsLayerGroup);
+    }
+
+    attractionsLayerGroup = L.layerGroup();
+
     attractions.forEach(loc => {
-        L.marker([loc.lat, loc.lng], {icon: attractionsIcon}).bindTooltip(loc.name).addTo(map);
+        let marker = L.marker([loc.lat, loc.lng], { icon: attractionsIcon });
+        marker.bindTooltip(loc.name);
+        marker.addTo(attractionsLayerGroup);
     });
+
+    attractionsLayerGroup.addTo(map);
 }
 
-
+// Populating Parks
 function populateParks(parks) {
     const park = L.divIcon({
         className: 'custom-icon',
-        html: '<i class="fas fa-tree" style="color: #4CAF50;"></i>',  // Changed color to green for protected areas
+        html: '<i class="fas fa-tree" style="color: #4CAF50;"></i>',
         iconSize: [20, 20]
     });
 
-     
+    if (parksLayerGroup) {
+        map.removeLayer(parksLayerGroup);
+    }
+
+    parksLayerGroup = L.layerGroup();
+
     parks.forEach(loc => {
-        L.marker([loc.lat, loc.lng], {icon: park}).bindTooltip(loc.name).addTo(map);
+        let marker = L.marker([loc.lat, loc.lng], { icon: park });
+        marker.bindTooltip(loc.name);
+        marker.addTo(parksLayerGroup);
+    });
+
+    parksLayerGroup.addTo(map);
+}
+
+// Fetch Country Border
+function fetchCountryBorder(isoCode) {
+    $.ajax({
+        url: '../Gazzeter/php/getCountryInfo.php',
+        data: { isoCode: isoCode },
+        method: 'GET',
+        dataType: 'json',
+        success: function(data) {
+            if (countryLayer) {
+                map.removeLayer(countryLayer);
+            }
+
+            countryLayer = L.geoJSON(data).addTo(map);
+            map.fitBounds(countryLayer.getBounds());
+        },
+        error: function(err) {
+            console.error("Error fetching country border:", err);
+        }
     });
 }
 
-
-
-
-
-function populateMap(cities) {
-    var cityIcon = L.divIcon({
-        className: 'city-icon',
-        iconSize: [30, 30], 
-        iconAnchor: [15, 15], 
-        html: '<i class="fas fa-city" style="color: #5a4a42; font-size: 1rem"></i>'
-    });
-    var markers = L.markerClusterGroup();  // Create a marker cluster group
-    cities.forEach(city => {
-        let circleMarker = L.marker([city.lat, city.lng], {icon: cityIcon});
-
-        // Display city name all the time
-        circleMarker.bindTooltip(`${city.name}`, {
-            permanent: true,
-            direction: 'right'
-        });
-
-        // Show population on hover
-        circleMarker.bindPopup(`Population: ${city.population}`);
-
-        markers.addLayer(circleMarker);  // Add each marker to the cluster group
-    });
-    map.addLayer(markers);  // Add the marker cluster group to the map
-}
-
-
-
-
-
-
-function populateMapWithAirports(airports) {
-    var airplaneIcon = L.divIcon({
-        className: 'custom-icon',
-        iconSize: [40, 40], // Adjust the size if needed
-        iconAnchor: [15, 15], // Adjust the anchor point if needed
-        html: '<i class="fas fa-plane" style="color: white; font-size: 1rem"></i>'
-    });
-    
-    let markers = L.markerClusterGroup();  // Create a marker cluster group
-    airports.forEach(airport => {
-        let marker = L.marker([airport.lat, airport.lng], { icon: airplaneIcon });  // Use the custom icon here
-        
-        marker.bindTooltip(`
-            <strong>${airport.name}</strong>
-            
-        `);
-        markers.addLayer(marker);  // Add each marker to the cluster group
-    });
-    map.addLayer(markers);  // Add the marker cluster group to the map
-}
-
-
-
-
+// [Assuming you also have the fetchCountryInfo function somewhere]
 
 
 
