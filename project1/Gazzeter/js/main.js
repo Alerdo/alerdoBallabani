@@ -245,7 +245,8 @@ if (navigator.geolocation) {
                     east: countryDetails.east,
                     west: countryDetails.west
                 };
-                console.log(countryInfo.iso)
+            
+                //This will get data and populate the map with info 
                 fetchMapData(countryInfo.iso, currentBoundingBox)
 
               /*4*/ //Extra Information 
@@ -258,7 +259,7 @@ if (navigator.geolocation) {
                             break;
                         case "exchange":
                             // Call your function for the exchange button here.
-                            fetchAndDisplayExchangeRate(countryInfo.currencyCode);
+                            fetchCurrencyInfo(countryInfo.currencyCode);
                             break;
                         case "weather":
                             fetchWeather(countryInfo.capital, countryInfo.countryName)
@@ -529,10 +530,10 @@ function fetchCountryData(type, param) {
 }
 
 
-// -------------Currency Info Tab--------------------
+// --------------------------------Fetch Currency Info------------------------------
 
 // Function to fetch exchange rate and display in modal
-function fetchAndDisplayExchangeRate(currencyCode) {
+function fetchCurrencyInfo(currencyCode) {
     $.ajax({
         url: '../Gazzeter/php/exchangeRate.php',
         method: 'GET',
@@ -572,7 +573,7 @@ function fetchAndDisplayExchangeRate(currencyCode) {
 
 
 
-/*-----------------Weather-------------------------*/
+/*-------------------------Fetch Weather Data----------------------------------*/
 function fetchWeather(capital, country) {
     $.ajax({
         url: '../Gazzeter/php/getWeather.php',  // Change this to the actual path
@@ -608,7 +609,7 @@ function fetchWeather(capital, country) {
 
 
 
-// ----------------------FETCH NEWS DATA --------------------------------------
+// ---------------------------FETCH NEWS DATA --------------------------------------
 
 function fetchNewsData(countryCode) {
     $.ajax({
@@ -649,7 +650,7 @@ function fetchNewsData(countryCode) {
     });
 }
 
-// -----------------------------CENTRE USER TO ITS LOCATION ------------------------------------------
+// -----------------------------CENTRE USER TO ITS LOCATION ---------------------------------------
 function navigateToUserLocation() {
     if (navigator.geolocation) { 
         navigator.geolocation.getCurrentPosition(function(position) {
@@ -664,7 +665,7 @@ function navigateToUserLocation() {
                 .bindPopup('You are here.').openPopup();
 
         }, function(error) {
-            // Handle error. For example, the user denied permission
+            
             alert("Error: " + error.message);
         });
     } else {
@@ -679,13 +680,9 @@ $(document).ready(function() {
     $(".btn-close").on("click", () => {
         $("#exampleModal").modal("hide");
     });
-
-    // If you have a specific class for the minus button, add it here:
-    // Assuming the class is "btn-minus"
     $(".btn-minus").on("click", () =>{
         $("#exampleModal").modal("hide");
     });
 });
 
 
-// 
