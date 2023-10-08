@@ -227,6 +227,7 @@ if (navigator.geolocation) {
                 const   countryDetails = data.country;
                 console.log(data)
                 console.log(countryDetails)
+
                let countryInfo  = { //use this to display these information.
                     countryDetails: data.country,
                     countryName : countryDetails.countryName,
@@ -244,11 +245,11 @@ if (navigator.geolocation) {
                     east: countryDetails.east,
                     west: countryDetails.west
                 };
-              
+                console.log(countryInfo.iso)
                 fetchMapData(countryInfo.iso, currentBoundingBox)
 
               /*4*/ //Extra Information 
-              $(".custom-btn").click(function() {
+              $(".custom-btn").off('click').click(function() {
                     const dataType = $(this).data("type");  // Get the data-type value from button 
                     switch (dataType) {
                         case "info":
@@ -260,7 +261,7 @@ if (navigator.geolocation) {
                             fetchAndDisplayExchangeRate(countryInfo.currencyCode);
                             break;
                         case "weather":
-                            fetchWeather(countryInfo.capital)
+                            fetchWeather(countryInfo.capital, countryInfo.countryName)
                             break;
                         case "news":
                             fetchNewsData(countryInfo.iso)
@@ -572,7 +573,7 @@ function fetchAndDisplayExchangeRate(currencyCode) {
 
 
 /*-----------------Weather-------------------------*/
-function fetchWeather(capital) {
+function fetchWeather(capital, country) {
     $.ajax({
         url: '../Gazzeter/php/getWeather.php',  // Change this to the actual path
         type: 'GET',
@@ -592,7 +593,7 @@ function fetchWeather(capital) {
                     <p><strong>Humidity:</strong> ${weatherData.humidity}%</p>
                     <p><strong>Pressure:</strong> ${weatherData.pressure_mb} mb (${weatherData.pressure_in} in)</p>
                 `;
-                $("#exampleModal .modal-title").html(`Weather now in ${capital}`);
+                $("#exampleModal .modal-title").html(`Weather now in ${country}`);
                 $("#exampleModal").modal("show");
                 $("#modalContent").html(content);
             }
@@ -635,7 +636,7 @@ function fetchNewsData(countryCode) {
                     </div>`;
                 });
                 
-        
+                $("#exampleModal .modal-title").html(`News`);
                 $("#modalContent").html(content);
                 $("#exampleModal").modal("show");
             } else {
