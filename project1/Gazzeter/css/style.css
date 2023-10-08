@@ -31,6 +31,10 @@ html, body {
     width: 100%;
     height: 600px;
     position: relative;
+    
+      overflow: hidden;
+  
+  
 }
 
 .custom-buttons {
@@ -82,11 +86,28 @@ html, body {
     background-color: rgba(132, 128, 128, 0.8);
 }
 
+.modal-dialog {
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+}
 
 
 /* Media queries for small devices */
 @media (max-width: 676px) {
+  .modal {
+    bottom: 50px !important;
+    top: auto !important;
+    left: auto !important;
+  }
 
+
+  .custom-buttons {
+    position: absolute;
+    top: 30%;
+    left: 1%;
+    z-index: 1000;
+}
 
   .custom-buttons .btn {
       width: 50px; 
@@ -98,3 +119,19 @@ html, body {
       display: none;
   }
 }
+
+
+/*  */
+/* For screens smaller than 576px */
+@media (max-width: 575.98px) {
+  .modal-dialog {
+      max-width: 70%;  /* Adjust as needed */
+      margin: 1rem auto; /* Center the modal */
+  }
+
+  
+}
+
+
+
+

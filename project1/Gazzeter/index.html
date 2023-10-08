@@ -10,7 +10,7 @@
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <link rel="stylesheet" href="./css/style.css">
+    
 
 
    
@@ -21,7 +21,7 @@
      <link rel="stylesheet" href="css/bootstrap.min.css">
      <script src="js/bootstrap.min.js"></script>
  
-
+     <link rel="stylesheet" href="./css/style.css">
   
     <!-- Leaflet CSS & JS -->
     <link rel="stylesheet" href="leaflet/leaflet.css">
@@ -41,6 +41,7 @@
     <!-- Leaflet.ExtraMarkers CSS & JS -->
     <link rel="stylesheet" href="leaflet/leaflet.extra-markers.min.css">
     <script src="leaflet/leaflet.extra-markers.min.js"></script>
+
 
 </head>
 <body>
@@ -66,7 +67,7 @@
             <i class="fa fa-info-circle"></i><span> Info</span>
         </button>
         <button class="btn btn-warning custom-btn" data-type="exchange">
-            <i class="fa fa-money-bill-alt"></i><span> Exchange</span>
+            <i class="fa fa-money-bill-alt"></i><span> Currency</span>
         </button>
         <button class="btn btn-primary custom-btn" data-type="weather">
             <i class="fa fa-cloud-sun"></i><span> Weather</span>
@@ -79,22 +80,29 @@
         </button>
     </div>
     
-
     <div id="exampleModal" class="modal" data-bs-backdrop="false" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content shadow">
-                <div class="modal-header bg-success bg-gradient text-white">
+    
+                <!-- Modal Header with close button -->
+                <div class="modal-header bg-info text-white text-center">
                     <h5 class="modal-title">Overview</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body" id="modalContent">
+                
+                             
+                <!-- Modal Body -->
+                <div class="modal-body text-center" id="modalContent"> <!-- Added text-center class -->
                     <table class="table table-striped" id="modalTable">
                         <!-- Rows will be dynamically inserted here -->
                     </table>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-success btn-sm" data-bs-dismiss="modal">Close</button>
+                <!-- Modal Footer with close button -->
+                <div class="modal-footer bg-info text-center">
+                    <button type="button" class="btn btn-light btn-sm btn-close" data-bs-dismiss="modal">Close</button>
                 </div>
+                
+                
             </div>
         </div>
     </div>

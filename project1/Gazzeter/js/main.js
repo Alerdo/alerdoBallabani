@@ -225,10 +225,12 @@ if (navigator.geolocation) {
         success: function(data) {
             if (data && data.country) {
                 const   countryDetails = data.country;
+                console.log(data)
                 console.log(countryDetails)
                let countryInfo  = { //use this to display these information.
                     countryDetails: data.country,
                     countryName : countryDetails.countryName,
+                    capital: countryDetails.capital,
                     continent: countryDetails.continent,
                     population: countryDetails.population,
                     area: countryDetails.areaInSqKm,
@@ -258,7 +260,11 @@ if (navigator.geolocation) {
                             fetchAndDisplayExchangeRate(countryInfo.currencyCode);
                             break;
                         case "weather":
-                            fetchWeather(countryInfo.countryName)
+                            fetchWeather(countryInfo.capital)
+                            break;
+                        case "news":
+                            fetchNewsData(countryInfo.iso)
+                            break;
                     }
                 });
                 
@@ -484,7 +490,43 @@ function populateParks(parks) {
 
 
 
-//Currency Info 
+
+
+// -----------------------------------------------------
+
+
+
+//  ---------INFO TAB ------------------
+
+
+function fetchCountryData(type, param) {
+    switch (type) {
+        case "info":
+            let content = `
+            <strong>Country Name:</strong> ${param.countryName}<br>
+            <strong>Capital:</strong> ${param.capital}<br>
+            <strong>Continent:</strong> ${param.continent}<br>
+            <strong>Population:</strong> ${param.population}<br>
+            <strong>Area:</strong> ${param.area} sq. km.<br>
+            <strong>Currency Code:</strong> ${param.currencyCode}<br>
+            <strong>ISO Code:</strong> ${param.iso}<br>
+            `;
+
+            // Update modal title
+            $("#exampleModal .modal-title").html("Info");
+            // Update modal content with the generated content string
+            $("#exampleModal").modal("show");
+            $("#modalContent").html(content);
+            break;
+        case "weather":
+            fetchWeather(param);
+            // ... and so on for other types
+            break;
+    }
+}
+
+
+// -------------Currency Info Tab--------------------
 
 // Function to fetch exchange rate and display in modal
 function fetchAndDisplayExchangeRate(currencyCode) {
@@ -493,21 +535,26 @@ function fetchAndDisplayExchangeRate(currencyCode) {
         method: 'GET',
         dataType: 'json',
         data: {
-            currencyCode:  currencyCode 
+            currencyCode: currencyCode
         },
         success: function(data) {
-            if (data.rates && data.rates[currencyCode]) {
-                let rate = data.rates[currencyCode];
-                let roundedRate = rate.toFixed(2);  
-                roundedRate = Number(roundedRate)
-                console.log(data)
-                let content = `<strong>$1 =  £${roundedRate}`;
-                console.log(rate)
+            if (data && data.rates) {
+                let usdRate = data.rates.USD ? data.rates.USD.toFixed(2) : "N/A";
+                let eurRate = data.rates.EUR ? data.rates.EUR.toFixed(2) : "N/A";
+                let gbpRate = data.rates.GBP ? data.rates.GBP.toFixed(2) : "N/A";
+                let jpyRate = data.rates.JPY ? data.rates.JPY.toFixed(2) : "N/A";
                 
+                let content = `
+                    <strong>1 ${currencyCode} is equivalent to:</strong><br>
+                    USD: $${usdRate}<br>
+                    EUR: €${eurRate}<br>
+                    GBP: £${gbpRate}<br>
+                    JPY: ¥${jpyRate}
+                `;
+                $("#exampleModal .modal-title").html("Local Currency Exchange");
                 $("#modalContent").html(content);
                 $("#exampleModal").modal("show");
             } else {
-               
                 let errorMsg = data.error || "Unexpected data format";
                 alert("Error fetching exchange rate: " + errorMsg);
             }
@@ -519,12 +566,15 @@ function fetchAndDisplayExchangeRate(currencyCode) {
 }
 
 
+
+
+
 /*-----------------Weather-------------------------*/
-function fetchWeather(countryName) {
+function fetchWeather(capital) {
     $.ajax({
         url: '../Gazzeter/php/getWeather.php',  // Change this to the actual path
         type: 'GET',
-        data: { country: countryName },
+        data: { capital: capital },
         dataType: 'json',
         success: function(data) {
             if (data.location && data.current) {
@@ -540,6 +590,7 @@ function fetchWeather(countryName) {
                     <p><strong>Humidity:</strong> ${weatherData.humidity}%</p>
                     <p><strong>Pressure:</strong> ${weatherData.pressure_mb} mb (${weatherData.pressure_in} in)</p>
                 `;
+                $("#exampleModal .modal-title").html(`Weather now in ${capital}`);
                 $("#exampleModal").modal("show");
                 $("#modalContent").html(content);
             }
@@ -554,36 +605,60 @@ function fetchWeather(countryName) {
 
 
 
+// ----------------------FETCH NEWS DATA --------------------------------------
 
+function fetchNewsData(countryCode) {
+    $.ajax({
+        url: '../Gazzeter/php/fetchNewsData.php',
+        method: 'GET',
+        dataType: 'json',
+        data: {
+            countryCode: countryCode
+        },
+        success: function(data) {
+            if (data && data.articles) {
+                const articles = data.articles;
+                let content = '<h5>Top News</h5> <br>';
 
-
-
-// -----------------------------------------------------
-
-
-
-
-
-
-function fetchCountryData(type, param) {
-    switch (type) {
-        case "info":
-            let content = `
-            <strong>Country Name:</strong> ${param.countryName}<br>
-            <strong>Continent:</strong> ${param.continent}<br>
-            <strong>Population:</strong> ${param.population}<br>
-            <strong>Area:</strong> ${param.area} sq. km.<br>
-            <strong>Currency Code:</strong> ${param.currencyCode}<br>
-            <strong>ISO Code:</strong> ${param.iso}<br>
-            `;
-            // Update modal content with the generated content string
-            $("#exampleModal").modal("show");
-            $("#modalContent").html(content);
-            break;
-        case "weather":
-            fetchWeather(param);
-            // ... and so on for other types
-            break;
-    }
+                articles.forEach(article => {
+                    content += `
+                    <div>
+                        <strong>${article.title}</strong><br>
+                        Author: ${article.author}<br>
+                        Source: ${article.source.name}<br>
+                        Published At: ${article.publishedAt}<br>
+                        <a href="${article.url}" target="_blank">Read more...</a><br>
+                        <hr>
+                    </div>`;
+                });
+                
+        
+                $("#modalContent").html(content);
+                $("#exampleModal").modal("show");
+            } else {
+                console.error("Invalid data returned from API:", data);
+            }
+        },
+        error: function(err) {
+            console.error("Error fetching news data:", err);
+        }
+    });
 }
 
+
+//styling 
+$(document).ready(function() {
+    // Listener for close button
+    $(".btn-close").on("click", () => {
+        $("#exampleModal").modal("hide");
+    });
+
+    // If you have a specific class for the minus button, add it here:
+    // Assuming the class is "btn-minus"
+    $(".btn-minus").on("click", () =>{
+        $("#exampleModal").modal("hide");
+    });
+});
+
+
+// 

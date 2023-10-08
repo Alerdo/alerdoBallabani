@@ -36,3 +36,41 @@
 //         alert("Geolocation is not supported by this browser.");
 //     }
 // }
+
+// You might use this later
+const countryDetails = data;
+console.log(data);
+let currencyCode = Object.keys(countryDetails.currencies)[0]
+
+let countryInfo  = { 
+    countryName: countryDetails.name.common,
+    flag: countryDetails.flags.png,
+    capital: countryDetails.capital[0],
+    continent: countryDetails.region,
+    population: countryDetails.population,
+    area: countryDetails.area,
+    currency: Object.keys(countryDetails.currencies)[0],
+    currencyName:countryDetails.currencies[currencyCode].name,
+    currencySymbol:countryDetails.currencies[currencyCode].symbol ,
+    iso: countryDetails.cca2
+}
+
+
+
+
+// <?php
+// // getCountriesInfo.php
+// function getCountryInfo($countryCode, $username) {
+//     $url = "https://restcountries.com/v3.1/name/{$countryCode}";
+
+//     $response = file_get_contents($url);
+//     $xml = simplexml_load_string($response);
+//     return json_encode($xml);
+// }
+
+// // Use the function
+// $countryCode = $_GET['countryCode'] ?? 'GB'; // default to GB if no countryCode is provided
+// $username = "AlerdoBallabani"; 
+
+// echo getCountryInfo($countryCode, $username);
+// ?>
