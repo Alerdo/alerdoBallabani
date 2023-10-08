@@ -45,18 +45,20 @@
 
 </head>
 <body>
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="#">Gazetteer 2023</a>
-        
-        <!-- Using ml-auto to push select to the right but not to the edge, and px-2 for padding -->
-        <div class="ml-auto px-2">
-            <select id="countrySelect" class="form-control">
-                <!-- Options will be populated using JavaScript -->
-            </select>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Gazetteer 2023</a>
+            
+            <div class="ml-auto px-2">
+                <div class="col-lg-3 p-0"> <!-- Wrap select in a column div -->
+                    <select id="countrySelect" class="form-control custom-select-size">
+                        <!-- Options will be populated using JavaScript -->
+                    </select>
+                </div>
+            </div>
         </div>
-    </div>
- </nav>
+    </nav>
+    
 
  <!-- NAVIGATION  -->
       
@@ -80,17 +82,15 @@
         </button>
     </div>
     
+    
     <div id="exampleModal" class="modal" data-bs-backdrop="false" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content shadow">
-    
-                <!-- Modal Header with close button -->
+ <!-- Modal Header with close button -->
                 <div class="modal-header bg-info text-white text-center">
                     <h5 class="modal-title">Overview</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                
-                             
+                </div>            
                 <!-- Modal Body -->
                 <div class="modal-body text-center" id="modalContent"> <!-- Added text-center class -->
                     <table class="table table-striped" id="modalTable">
@@ -101,8 +101,6 @@
                 <div class="modal-footer bg-info text-center">
                     <button type="button" class="btn btn-light btn-sm btn-close" data-bs-dismiss="modal">Close</button>
                 </div>
-                
-                
             </div>
         </div>
     </div>

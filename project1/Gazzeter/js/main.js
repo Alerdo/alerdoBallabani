@@ -265,6 +265,8 @@ if (navigator.geolocation) {
                         case "news":
                             fetchNewsData(countryInfo.iso)
                             break;
+                        case "center":
+                            navigateToUserLocation()
                     }
                 });
                 
@@ -580,12 +582,12 @@ function fetchWeather(capital) {
             if (data.location && data.current) {
                 const weatherData = data.current;
                 const locationData = data.location;
-                
+                // <h4>Weather Information for ${locationData.name}, ${locationData.country}</h4>
                 const content = `
-                    <h4>Weather Information for ${locationData.name}, ${locationData.country}</h4>
+                  
                     <p><strong>Temperature:</strong> ${weatherData.temp_c}°C (${weatherData.temp_f}°F)</p>
                     <p><strong>Condition:</strong> ${weatherData.condition.text}</p>
-                    <p><img src="${weatherData.condition.icon}" alt="${weatherData.condition.text} icon"></p>
+                    <p><img src="${weatherData.condition.icon}" alt="${weatherData.condition.text} icon" ></p>
                     <p><strong>Wind Speed:</strong> ${weatherData.wind_kph} km/h (${weatherData.wind_mph} mph) from ${weatherData.wind_dir}</p>
                     <p><strong>Humidity:</strong> ${weatherData.humidity}%</p>
                     <p><strong>Pressure:</strong> ${weatherData.pressure_mb} mb (${weatherData.pressure_in} in)</p>
@@ -609,7 +611,7 @@ function fetchWeather(capital) {
 
 function fetchNewsData(countryCode) {
     $.ajax({
-        url: '../Gazzeter/php/fetchNewsData.php',
+        url: '../Gazzeter/php/getNewsData.php',
         method: 'GET',
         dataType: 'json',
         data: {
@@ -618,7 +620,8 @@ function fetchNewsData(countryCode) {
         success: function(data) {
             if (data && data.articles) {
                 const articles = data.articles;
-                let content = '<h5>Top News</h5> <br>';
+                let content = '<h5 class="news"></h5>'
+
 
                 articles.forEach(article => {
                     content += `
@@ -643,6 +646,29 @@ function fetchNewsData(countryCode) {
             console.error("Error fetching news data:", err);
         }
     });
+}
+
+// -----------------------------CENTRE USER TO ITS LOCATION ------------------------------------------
+function navigateToUserLocation() {
+    if (navigator.geolocation) { 
+        navigator.geolocation.getCurrentPosition(function(position) {
+            var lat = position.coords.latitude;
+            var lon = position.coords.longitude;
+
+            // Center the map on the user's location
+            map.setView([lat, lon], 10); // 13 is the zoom level
+
+            // Add a marker to the user's location
+            L.marker([lat, lon]).addTo(map)
+                .bindPopup('You are here.').openPopup();
+
+        }, function(error) {
+            // Handle error. For example, the user denied permission
+            alert("Error: " + error.message);
+        });
+    } else {
+        alert("Geolocation is not supported by this browser.");
+    }
 }
 
 

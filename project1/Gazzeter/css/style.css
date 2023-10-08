@@ -19,23 +19,61 @@ html, body {
   }
   
   #countrySelect {
-    width: 200px;
+    width: auto;
     margin: 0 auto;
   }
 
-
-/* 
-
-  ---------------------------------------------------------- */
-  #map {
-    width: 100%;
-    height: 600px;
-    position: relative;
-    
-      overflow: hidden;
+  .navbar {
+    background-color: #112233 !important ;
+    box-sizing: border-box;
+   
+  }
   
-  
+  .navbar-brand {
+    font-family: 'Tahoma', 'Verdana', sans-serif; /* Using system fonts for broad compatibility */
+    font-weight: 600;
+    font-size: 20px; 
+    color: #e0e0e0; /* Slightly off-white for a more subtle appearance */
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2); /* Providing a little shadow for depth */
+    padding: 8px 12px; /* A bit of padding for better appearance */
+    border-radius: 4px; /* Slight rounded corners */
+    background: rgba(255, 255, 255, 0.1); /* A subtle hint of background to make it pop */
+    transition: all 0.3s ease; /* Smooth transitions for hover effects */
 }
+
+.navbar-brand:hover {
+    background: rgba(255, 255, 255, 0.2);
+    text-shadow: 2px 2px 3px rgba(0, 0, 0, 0.2);
+    color: #ffffff;
+}
+
+
+
+
+
+.news {
+    font-weight: bold; /* Make the text thick */
+    font-style: italic;
+    background-color: white;
+    padding: 10px 20px; /* Add some padding around the text for a better appearance */
+    border-radius: 5px; /* Rounded corners for a fancy look */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* A subtle shadow for depth */
+    display: inline-block; /* To ensure padding and other box properties are applied */
+    font-size: 20px; /* Increase font size a bit for prominence */
+}
+
+.news:before {
+    content: "Gazetter"; /* Using the :before pseudo-element for "Gazetter" */
+    color: blue; /* Set "Gazetter" to blue */
+}
+
+.news:after {
+    content: " News"; /* Using the :after pseudo-element for "News" */
+    color: red; /* Set "News" to red */
+}
+
+
+
 
 .custom-buttons {
     position: absolute;
@@ -86,11 +124,26 @@ html, body {
     background-color: rgba(132, 128, 128, 0.8);
 }
 
+
+
 .modal-dialog {
   margin: 0 auto;
   display: flex;
   justify-content: center;
 }
+.modal-content {
+  max-height: 90vh; /* Adjust as necessary; 90vh will make the modal take up to 90% of the viewport height */
+  overflow: hidden; /* Hide any content that would overflow this container */
+}
+
+/* Make the modal body scrollable */
+.modal-body {
+  overflow-y: auto; /* Add a vertical scrollbar when necessary */
+}
+
+
+
+
 
 
 /* Media queries for small devices */
@@ -101,6 +154,14 @@ html, body {
     left: auto !important;
   }
 
+a.navbar-brand {
+font-size: 1.2rem;
+margin: 0;
+}
+
+.custom-select-size {
+  font-size: 1rem !important;
+}
 
   .custom-buttons {
     position: absolute;
@@ -129,9 +190,30 @@ html, body {
       margin: 1rem auto; /* Center the modal */
   }
 
-  
 }
 
 
 
 
+
+
+
+
+.custom-select-size {
+  padding: 0.5rem 0.75rem;
+}
+
+/* Adjust for small devices */
+@media (max-width: 992px) { /* 992px is the breakpoint for Bootstrap's lg */
+  .custom-select-size {
+      padding: 0.25rem 0.5rem;
+      font-size: 1rem;
+      border-width: 1px;
+      border-radius: 3px;
+  }
+
+  .col-lg-3 { /* Ensure the column doesn't take up full width on small devices */
+      max-width: 50%; /* Or whatever percentage you deem suitable */
+      flex: 0 0 50%; 
+  }
+}
