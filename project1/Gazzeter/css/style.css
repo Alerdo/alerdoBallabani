@@ -50,6 +50,7 @@ html, body {
     width: 130px;
     display: flex;
     justify-content: space-evenly;
+    
 }
 
 .custom-buttons .btn i { 

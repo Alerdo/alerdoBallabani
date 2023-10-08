@@ -62,24 +62,32 @@
       <div id="map"> </div>
 
       <div class="custom-buttons">
-        <button class="btn btn-info"><i class="fa fa-info-circle"></i><span> Info</span></button>
-        <button class="btn btn-warning"><i class="fa fa-money-bill-alt"></i><span> Exchange</span></button>
-        <button class="btn btn-primary"><i class="fa fa-cloud-sun"></i><span> Weather</span></button>
-        <button class="btn btn-dark"><i class="fa fa-newspaper"></i><span> News</span></button>
-        <button class="btn btn-success"><i class="fa fa-crosshairs"></i><span> Center</span></button>
+        <button class="btn btn-info custom-btn" data-type="info">
+            <i class="fa fa-info-circle"></i><span> Info</span>
+        </button>
+        <button class="btn btn-warning custom-btn" data-type="exchange">
+            <i class="fa fa-money-bill-alt"></i><span> Exchange</span>
+        </button>
+        <button class="btn btn-primary custom-btn" data-type="weather">
+            <i class="fa fa-cloud-sun"></i><span> Weather</span>
+        </button>
+        <button class="btn btn-dark custom-btn" data-type="news">
+            <i class="fa fa-newspaper"></i><span> News</span>
+        </button>
+        <button class="btn btn-success custom-btn" data-type="center">
+            <i class="fa fa-crosshairs"></i><span> Center</span>
+        </button>
     </div>
     
 
-    
-      <div class="modal-body" id="modalContent" ></div>
-      <div id="exampleModal"  class="modal" data-bs-backdrop="false" tabindex="-1">
+    <div id="exampleModal" class="modal" data-bs-backdrop="false" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content shadow">
                 <div class="modal-header bg-success bg-gradient text-white">
                     <h5 class="modal-title">Overview</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body" id="modalContent">
                     <table class="table table-striped" id="modalTable">
                         <!-- Rows will be dynamically inserted here -->
                     </table>
@@ -90,6 +98,7 @@
             </div>
         </div>
     </div>
+    
     
       
     <script src="./js/main.js" async defer></script>

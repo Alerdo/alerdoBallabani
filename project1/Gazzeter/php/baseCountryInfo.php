@@ -10,8 +10,8 @@ function getCountryInfo($countryCode, $username) {
 }
 
 // Use the function
-$countryCode = $_GET['countryCode'] ?? 'GB'; // default to US if no countryCode is provided
-$username = "AlerdoBallabani";  // replace this with your username
+$countryCode = $_GET['countryCode'] ?? 'GB'; // default to GB if no countryCode is provided
+$username = "AlerdoBallabani"; 
 
 echo getCountryInfo($countryCode, $username);
 ?>

@@ -4,7 +4,7 @@
 header('Content-Type: application/json');
 
 // Your API key from Open Exchange Rates
-$appId = '6e30a49737924e6d81715bb92e89eebb';
+$appId = 'I will set it after commit';
 $baseUrl = 'https://openexchangerates.org/api/latest.json';
 
 // Check if the currency code is provided

@@ -54,26 +54,26 @@ satellite.addTo(map);
 //FINISH INFO BUTTON 
 
 
-// !IMPORTANT Create a FeatureGroup to hold multiple markers and polylines
-var featureGroup = L.featureGroup().addTo(map);
+// // !IMPORTANT Create a FeatureGroup to hold multiple markers and polylines
+// var featureGroup = L.featureGroup().addTo(map);
 
-// Example markers
-var marker1 = L.marker([51.5, -0.09]);
-var marker2 = L.marker([51.6, -0.1]);
+// // Example markers
+// var marker1 = L.marker([51.5, -0.09]);
+// var marker2 = L.marker([51.6, -0.1]);
 
-// Example polyline
-var polyline = L.polyline([
-    [51.5, -0.09],
-    [51.6, -0.1]
-]);
+// // Example polyline
+// var polyline = L.polyline([
+//     [51.5, -0.09],
+//     [51.6, -0.1]
+// ]);
 
-// Add markers and polyline to the feature group
-featureGroup.addLayer(marker1);
-featureGroup.addLayer(marker2);
-featureGroup.addLayer(polyline);
+// // Add markers and polyline to the feature group
+// featureGroup.addLayer(marker1);
+// featureGroup.addLayer(marker2);
+// featureGroup.addLayer(polyline);
 
-// Automatically fit bounds to feature group
-map.fitBounds(featureGroup.getBounds());  //IMPORTANT: You will use this to display info based on the cordinates of the country
+// // Automatically fit bounds to feature group
+// map.fitBounds(featureGroup.getBounds());  //IMPORTANT: You will use this to display info based on the cordinates of the country
 
 
 
@@ -84,16 +84,16 @@ map.fitBounds(featureGroup.getBounds());  //IMPORTANT: You will use this to disp
 // Create a cluster group //SO THAT THE ICONS CHANGE SIZE BASED ON ZOOM-IN AND ZOOM-OUT
 var markers = L.markerClusterGroup();
 
-// Example markers with adjusted coordinates
-var marker1 = L.marker([51.52, -0.09]);
-var marker2 = L.marker([51.63, -0.11]);
+// // Example markers with adjusted coordinates
+// var marker1 = L.marker([51.52, -0.09]);
+// var marker2 = L.marker([51.63, -0.11]);
 
-// Add markers to the cluster group
-markers.addLayer(marker1);
-markers.addLayer(marker2);
+// // Add markers to the cluster group
+// markers.addLayer(marker1);
+// markers.addLayer(marker2);
 
-// Add the cluster group to the map
-map.addLayer(markers); 
+// // Add the cluster group to the map
+// map.addLayer(markers); 
 
 // Add an easy button to your map
 L.easyButton('fa-globe', function(btn, map) {
@@ -103,15 +103,15 @@ L.easyButton('fa-globe', function(btn, map) {
 }).addTo(map);
 
 // Extra marker
-var redMarker = L.ExtraMarkers.icon({
-    icon: 'fa-number',
-    markerColor: 'red',
-    shape: 'circle',
-    prefix: 'fa'
-});
+// var redMarker = L.ExtraMarkers.icon({
+//     icon: 'fa-number',
+//     markerColor: 'red',
+//     shape: 'circle',
+//     prefix: 'fa'
+// });
 
-// Using the custom marker
-L.marker([51.7, -0.09], {icon: redMarker}).addTo(map);
+// // Using the custom marker
+// L.marker([51.7, -0.09], {icon: redMarker}).addTo(map);
 
 
 
@@ -142,13 +142,23 @@ $.ajax({
 
 
 //mapping the area of the selected country
-
-
+var countryLayer;
+var infoLayer;   
 
 $('#countrySelect').on('change', function() {
    let isoCode = $(this).val();
 
-    fetchCountryBorder(isoCode); //calling the function here so we make sure isoCode has an value
+ 
+   if (countryLayer) {
+       map.removeLayer(countryLayer);
+   }
+
+   if (infoLayer) {
+       map.removeLayer(infoLayer);
+   }
+
+   fetchCountryInfo(isoCode);
+   fetchCountryBorder(isoCode);
 });
 
 
@@ -228,10 +238,11 @@ if (navigator.geolocation) {
         success: function(data) {
             if (data && data.country) {
                 const   countryDetails = data.country;
-
+                console.log(countryDetails)
                let countryInfo  = { //use this to display these information.
                     countryDetails: data.country,
                     countryName : countryDetails.countryName,
+                    continent: countryDetails.continent,
                     population: countryDetails.population,
                     area: countryDetails.areaInSqKm,
                     currencyCode: countryDetails.currencyCode,
@@ -245,8 +256,27 @@ if (navigator.geolocation) {
                     west: countryDetails.west
                 };
               
-         
+                fetchMapData(countryInfo.iso, currentBoundingBox)
+
+              /*4*/ //Extra Information 
+              $(".custom-btn").click(function() {
+                    const dataType = $(this).data("type");  // Get the data-type value from button 
+                    switch (dataType) {
+                        case "info":
+                            // Call your function for the info button here.
+                            fetchCountryData("info", countryInfo);  
+                            break;
+                        case "exchange":
+                            // Call your function for the exchange button here.
+                            fetchAndDisplayExchangeRate(countryInfo.currencyCode);
+                            break;
+                        case "weather":
+                            fetchWeather(countryInfo.countryName)
+                    }
+                });
+                
             //   createButtons(countryInfo);
+            
              
             } else {
                 console.error("Invalid data returned from API:", data);
@@ -261,7 +291,8 @@ if (navigator.geolocation) {
 
 
 // Moved AJAX call for cities into its own function
-function fetchCitiesWithinBoundingBox(currentBoundingBox) {
+function fetchMapData(countryCode, currentBoundingBox) {
+    // Fetch cities data
     $.ajax({
         url: '../Gazzeter/php/getCitiesInfo.php',
         data: { 
@@ -279,31 +310,162 @@ function fetchCitiesWithinBoundingBox(currentBoundingBox) {
             console.error("Error fetching cities:", err);
         }
     });
+
+    // Fetch airports data
+    $.ajax({
+        url: '../Gazzeter/php/getAirports.php',
+        data: { countryCode: countryCode },
+        method: 'GET',
+        dataType: 'xml',
+        success: function(data) {
+            let airports = [];
+            $(data).find('geoname').each(function() {
+                let airport = {
+                    toponymName: $(this).find('toponymName').text(),
+                    name: $(this).find('name').text(),
+                    lat: parseFloat($(this).find('lat').text()),
+                    lng: parseFloat($(this).find('lng').text()),
+                };
+                airports.push(airport);
+            });
+            populateMapWithAirports(airports);
+        },
+        error: function(err) {
+            console.error("Error fetching airports:", err);
+        }
+    });
+
+    // Fetch attractions data
+    $.ajax({
+        url: '../Gazzeter/php/getAttractions.php',
+        data: { countryCode: countryCode },
+        method: 'GET',
+        dataType: 'xml',
+        success: function(data) {
+            let attractions = [];
+            $(data).find('geoname').each(function() {
+                attractions.push({
+                    name: $(this).find('name').text(),
+                    lat: parseFloat($(this).find('lat').text()),
+                    lng: parseFloat($(this).find('lng').text())
+                });
+            });
+            populateAttractions(attractions);
+        },
+        error: function(err) {
+            console.error("Error fetching attractions:", err);
+        }
+    });
+
+    //Fetch protected area
+    $.ajax({
+        url: '../Gazzeter/php/getParks.php',
+        data: { countryCode: countryCode },
+        method: 'GET',
+        dataType: 'xml',
+        success: function(data) {
+            let parks = [];
+            $(data).find('geoname').each(function() {
+                parks.push({
+                    name: $(this).find('name').text(),
+                    lat: parseFloat($(this).find('lat').text()),
+                    lng: parseFloat($(this).find('lng').text())
+                });
+            });
+            populateParks(parks);
+        },
+        error: function(err) {
+            console.error("Error fetching protected areas:", err);
+        }
+    });
+}
+
+function populateAttractions(attractions) {
+    const attractionsIcon = L.divIcon({
+        className: 'custom-icon',
+        html: '<i class="fas fa-landmark" style="color: #ff5722;"></i>',
+        iconSize: [20, 20]
+    });
+
+    attractions.forEach(loc => {
+        L.marker([loc.lat, loc.lng], {icon: attractionsIcon}).bindTooltip(loc.name).addTo(map);
+    });
 }
 
 
+function populateParks(parks) {
+    const park = L.divIcon({
+        className: 'custom-icon',
+        html: '<i class="fas fa-tree" style="color: #4CAF50;"></i>',  // Changed color to green for protected areas
+        iconSize: [20, 20]
+    });
+
+     
+    parks.forEach(loc => {
+        L.marker([loc.lat, loc.lng], {icon: park}).bindTooltip(loc.name).addTo(map);
+    });
+}
+
+
+
+
+
 function populateMap(cities) {
-    // If you have previously added markers or layers to the map, clear them
-    if (typeof markers !== 'undefined') { map.removeLayer(markers);}
+    var cityIcon = L.divIcon({
+        className: 'city-icon',
+        iconSize: [30, 30], 
+        iconAnchor: [15, 15], 
+        html: '<i class="fas fa-city" style="color: #5a4a42; font-size: 1rem"></i>'
+    });
     var markers = L.markerClusterGroup();  // Create a marker cluster group
     cities.forEach(city => {
-        let circleMarker = L.circleMarker([city.lat, city.lng], {
-            radius: 3,  // Adjust the size if necessary
-            color: 'blue',  // Circle color
-            fillOpacity: 1  // Fill the circle
-        });
-        circleMarker.bindTooltip(`
-            <strong>${city.name}</strong>
-            <br>
-            Population: ${city.population}
-        `, {
-            permanent: false,  // This means the tooltip will only show on hover
+        let circleMarker = L.marker([city.lat, city.lng], {icon: cityIcon});
+
+        // Display city name all the time
+        circleMarker.bindTooltip(`${city.name}`, {
+            permanent: true,
             direction: 'right'
         });
+
+        // Show population on hover
+        circleMarker.bindPopup(`Population: ${city.population}`);
+
         markers.addLayer(circleMarker);  // Add each marker to the cluster group
     });
     map.addLayer(markers);  // Add the marker cluster group to the map
 }
+
+
+
+
+
+
+function populateMapWithAirports(airports) {
+    var airplaneIcon = L.divIcon({
+        className: 'custom-icon',
+        iconSize: [40, 40], // Adjust the size if needed
+        iconAnchor: [15, 15], // Adjust the anchor point if needed
+        html: '<i class="fas fa-plane" style="color: white; font-size: 1rem"></i>'
+    });
+    
+    let markers = L.markerClusterGroup();  // Create a marker cluster group
+    airports.forEach(airport => {
+        let marker = L.marker([airport.lat, airport.lng], { icon: airplaneIcon });  // Use the custom icon here
+        
+        marker.bindTooltip(`
+            <strong>${airport.name}</strong>
+            
+        `);
+        markers.addLayer(marker);  // Add each marker to the cluster group
+    });
+    map.addLayer(markers);  // Add the marker cluster group to the map
+}
+
+
+
+
+
+
 
 
 
@@ -316,21 +478,21 @@ function fetchAndDisplayExchangeRate(currencyCode) {
         method: 'GET',
         dataType: 'json',
         data: {
-            currencyCode:  currencyCode // For example: 'USD'
+            currencyCode:  currencyCode 
         },
         success: function(data) {
             if (data.rates && data.rates[currencyCode]) {
                 let rate = data.rates[currencyCode];
-                let content = `<strong>Exchange Rate for ${currencyCode}:</strong> ${rate}`;
+                let roundedRate = rate.toFixed(2);  
+                roundedRate = Number(roundedRate)
+                console.log(data)
+                let content = `<strong>$1 =  £${roundedRate}`;
                 console.log(rate)
                 
-                // Assuming your modal has a content div with id="modalContent"
                 $("#modalContent").html(content);
-
-                // Show the modal
                 $("#exampleModal").modal("show");
             } else {
-                // Handle any error message from the API or unexpected response structure
+               
                 let errorMsg = data.error || "Unexpected data format";
                 alert("Error fetching exchange rate: " + errorMsg);
             }
@@ -342,33 +504,71 @@ function fetchAndDisplayExchangeRate(currencyCode) {
 }
 
 
-
-
-
-
-$(".btn-info").click(function() {
-    // This is where you fetch the data and populate the modal
-    fetchCountryData('info');
-});
-
-// Similarly for other buttons:
-$(".btn-warning").click(function() {
-    fetchCountryData('exchange');
-});
-// ... Do this for all buttons
-
-
-function fetchCountryData(type) {
-    // Based on 'type', you can determine what kind of data you need.
-    let data;
-    // switch (type) {
-    //     case 'info':
-    //       data ="hello"
-    // }
-
-    // After fetching the data, populate the modal:
-    populateModal(data);
-
-    // Then, show the modal
-    $("#exampleModal").modal("show");
+/*-----------------Weather-------------------------*/
+function fetchWeather(countryName) {
+    $.ajax({
+        url: '../Gazzeter/php/getWeather.php',  // Change this to the actual path
+        type: 'GET',
+        data: { country: countryName },
+        dataType: 'json',
+        success: function(data) {
+            if (data.location && data.current) {
+                const weatherData = data.current;
+                const locationData = data.location;
+                
+                const content = `
+                    <h4>Weather Information for ${locationData.name}, ${locationData.country}</h4>
+                    <p><strong>Temperature:</strong> ${weatherData.temp_c}°C (${weatherData.temp_f}°F)</p>
+                    <p><strong>Condition:</strong> ${weatherData.condition.text}</p>
+                    <p><img src="${weatherData.condition.icon}" alt="${weatherData.condition.text} icon"></p>
+                    <p><strong>Wind Speed:</strong> ${weatherData.wind_kph} km/h (${weatherData.wind_mph} mph) from ${weatherData.wind_dir}</p>
+                    <p><strong>Humidity:</strong> ${weatherData.humidity}%</p>
+                    <p><strong>Pressure:</strong> ${weatherData.pressure_mb} mb (${weatherData.pressure_in} in)</p>
+                `;
+                $("#exampleModal").modal("show");
+                $("#modalContent").html(content);
+            }
+        },
+        error: function(error) {
+            console.error("Error fetching weather data:", error);
+            $("#modalContent").html('<p>Error fetching weather data. Please try again later.</p>');
+        }
+    });
 }
+
+
+
+
+
+
+
+
+// -----------------------------------------------------
+
+
+
+
+
+
+function fetchCountryData(type, param) {
+    switch (type) {
+        case "info":
+            let content = `
+            <strong>Country Name:</strong> ${param.countryName}<br>
+            <strong>Continent:</strong> ${param.continent}<br>
+            <strong>Population:</strong> ${param.population}<br>
+            <strong>Area:</strong> ${param.area} sq. km.<br>
+            <strong>Currency Code:</strong> ${param.currencyCode}<br>
+            <strong>ISO Code:</strong> ${param.iso}<br>
+            `;
+            // Update modal content with the generated content string
+            $("#exampleModal").modal("show");
+            $("#modalContent").html(content);
+            break;
+        case "weather":
+            fetchWeather(param);
+            // ... and so on for other types
+            break;
+    }
+}
+
