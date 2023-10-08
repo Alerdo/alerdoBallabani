@@ -1,6 +1,6 @@
 // Set initial map view
 var map = L.map('map', {
-    center: [51.505, -0.09],
+    // center: [51.505, -0.09],
     zoom: 12,
     layers: [] // We'll initialize without any default layer, then add it based on user preference or default to one.
 });
@@ -148,14 +148,6 @@ $.ajax({
 //mapping the area of the selected country
 var countryLayer;
 var infoLayer;   
-
-$('#countrySelect').on('change', function() {
-   let isoCode = $(this).val();
-
-   fetchCountryInfo(isoCode);
-   fetchCountryBorder(isoCode);
-});
-
 
 
 function fetchCountryBorder(isoCode) {
@@ -375,13 +367,14 @@ function fetchMapData(countryCode, currentBoundingBox) {
     });
 }
 
-// Global layer group declarations
-var cityLayerGroup;
-var airportLayerGroup;
-var attractionsLayerGroup;
-var parksLayerGroup;
+// Global marker cluster group declarations
+var cityClusterGroup;
+var airportClusterGroup;
+var attractionsClusterGroup;
+var parksClusterGroup;
 var countryLayer;
 
+// ...
 // Country Select change listener
 $('#countrySelect').on('change', function() {
     let isoCode = $(this).val();
@@ -394,7 +387,7 @@ $('#countrySelect').on('change', function() {
     fetchCountryBorder(isoCode);
 });
 
-// Populating Cities
+// Populating Cities with clustering
 function populateMap(cities) {
     var cityIcon = L.divIcon({
         className: 'city-icon',
@@ -403,22 +396,22 @@ function populateMap(cities) {
         html: '<i class="fas fa-city" style="color: #5a4a42; font-size: 1rem"></i>'
     });
 
-    if (cityLayerGroup) {
-        map.removeLayer(cityLayerGroup);
+    if (cityClusterGroup) {
+        map.removeLayer(cityClusterGroup);
     }
 
-    cityLayerGroup = L.layerGroup();
+    cityClusterGroup = L.markerClusterGroup();
 
     cities.forEach(city => {
         let circleMarker = L.marker([city.lat, city.lng], { icon: cityIcon });
         circleMarker.bindTooltip(`${city.name}`, { permanent: true, direction: 'right' }).bindPopup(`Population: ${city.population}`);
-        circleMarker.addTo(cityLayerGroup);
+        cityClusterGroup.addLayer(circleMarker);
     });
 
-    cityLayerGroup.addTo(map);
+    map.addLayer(cityClusterGroup);
 }
 
-// Populating Airports
+// Populating Airports with clustering
 function populateMapWithAirports(airports) {
     var airplaneIcon = L.divIcon({
         className: 'custom-icon',
@@ -427,22 +420,22 @@ function populateMapWithAirports(airports) {
         html: '<i class="fas fa-plane" style="color: white; font-size: 1rem"></i>'
     });
 
-    if (airportLayerGroup) {
-        map.removeLayer(airportLayerGroup);
+    if (airportClusterGroup) {
+        map.removeLayer(airportClusterGroup);
     }
 
-    airportLayerGroup = L.layerGroup();
+    airportClusterGroup = L.markerClusterGroup();
 
     airports.forEach(airport => {
         let marker = L.marker([airport.lat, airport.lng], { icon: airplaneIcon });
         marker.bindTooltip(`<strong>${airport.name}</strong>`);
-        marker.addTo(airportLayerGroup);
+        airportClusterGroup.addLayer(marker);
     });
 
-    airportLayerGroup.addTo(map);
+    map.addLayer(airportClusterGroup);
 }
 
-// Populating Attractions
+// Populating Attractions with clustering
 function populateAttractions(attractions) {
     const attractionsIcon = L.divIcon({
         className: 'custom-icon',
@@ -450,22 +443,22 @@ function populateAttractions(attractions) {
         iconSize: [20, 20]
     });
 
-    if (attractionsLayerGroup) {
-        map.removeLayer(attractionsLayerGroup);
+    if (attractionsClusterGroup) {
+        map.removeLayer(attractionsClusterGroup);
     }
 
-    attractionsLayerGroup = L.layerGroup();
+    attractionsClusterGroup = L.markerClusterGroup();
 
     attractions.forEach(loc => {
         let marker = L.marker([loc.lat, loc.lng], { icon: attractionsIcon });
         marker.bindTooltip(loc.name);
-        marker.addTo(attractionsLayerGroup);
+        attractionsClusterGroup.addLayer(marker);
     });
 
-    attractionsLayerGroup.addTo(map);
+    map.addLayer(attractionsClusterGroup);
 }
 
-// Populating Parks
+// Populating Parks with clustering
 function populateParks(parks) {
     const park = L.divIcon({
         className: 'custom-icon',
@@ -473,44 +466,20 @@ function populateParks(parks) {
         iconSize: [20, 20]
     });
 
-    if (parksLayerGroup) {
-        map.removeLayer(parksLayerGroup);
+    if (parksClusterGroup) {
+        map.removeLayer(parksClusterGroup);
     }
 
-    parksLayerGroup = L.layerGroup();
+    parksClusterGroup = L.markerClusterGroup();
 
-    parks.forEach(loc => {""
+    parks.forEach(loc => {
         let marker = L.marker([loc.lat, loc.lng], { icon: park });
         marker.bindTooltip(loc.name);
-        marker.addTo(parksLayerGroup);
+        parksClusterGroup.addLayer(marker);
     });
 
-    parksLayerGroup.addTo(map);
+    map.addLayer(parksClusterGroup);
 }
-
-// Fetch Country Border
-function fetchCountryBorder(isoCode) {
-    $.ajax({
-        url: '../Gazzeter/php/getCountryInfo.php',
-        data: { isoCode: isoCode },
-        method: 'GET',
-        dataType: 'json',
-        success: function(data) {
-            if (countryLayer) {
-                map.removeLayer(countryLayer);
-            }
-
-            countryLayer = L.geoJSON(data).addTo(map);
-            map.fitBounds(countryLayer.getBounds());
-        },
-        error: function(err) {
-            console.error("Error fetching country border:", err);
-        }
-    });
-}
-
-// [Assuming you also have the fetchCountryInfo function somewhere]
-
 
 
 
