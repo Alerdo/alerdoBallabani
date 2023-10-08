@@ -20,7 +20,7 @@ if (isset($_GET['countryCode'])) {
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
     curl_setopt($ch, CURLOPT_HTTPHEADER, array(
         "X-Api-Key: " . $apiKey,
-        "User-Agent: MyApplicationName"  // You can replace 'MyApplicationName' with the name of your application.
+        "User-Agent: Gazetter"  // You can replace 'MyApplicationName' with the name of your application.
     ));
 
     // Execute cURL session and get the response

@@ -3,10 +3,7 @@ html, body {
     padding: 0;
   }
   
-  body {
-    overflow: hidden;
-  }
-  
+
   #map {
     width: 100%;
     height: 100vh;
@@ -53,6 +50,9 @@ html, body {
 
 
 
+.loading {
+  display: none; /* Initially hidden */
+}
 
 
 .news {
@@ -95,7 +95,7 @@ html, body {
     transition: background-color 0.3s; /* Smooth transition for hover effect */
     width: 130px;
     display: flex;
-    justify-content: space-evenly;
+    justify-content: space-between;
     
 }
 

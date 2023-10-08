@@ -1,22 +1,29 @@
 <?php
 
-// Set the content type
+// Set ontent type
 header('Content-Type: application/json');
 
-// Your API key from Open Exchange Rates
+
 $apiKey = '3c4764e02d54d4559244b7929208eb5b';
 $baseUrl = 'https://open.er-api.com/v6/latest/';
 
-// Check if the currency code is provided
+// Check if e currency code is provided
 if(isset($_GET['currencyCode'])) {
     $currencyCode = $_GET['currencyCode'];
     
-    // Construct the URL for the API request
+   
     // Get conversion rates against USD, EUR, GBP, and JPY
     $url = $baseUrl . $currencyCode . "?apikey=" . $apiKey . "&symbols=USD,EUR,GBP,JPY";
-    
-    // Use file_get_contents to make the API call
-    $response = file_get_contents($url);
+
+    // Initialize curl
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+    // Get the response
+    $response = curl_exec($ch);
+
+    // close curl
+    curl_close($ch);
 
     // Check if we got a valid response
     if($response) {

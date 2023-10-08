@@ -10,18 +10,32 @@ $baseUrl = 'https://api.weatherapi.com/v1/current.json';
 if(isset($_GET['capital'])) {
     $capital = $_GET['capital'];
 
-    // Construct the URL for the API request
     $url = $baseUrl . "?key=" . $apiKey . "&q=" . $capital;
 
-    // Use file_get_contents to make the API call
-    $response = file_get_contents($url);
+    $ch = curl_init();
 
-    // Check if we got a valid response
-    if($response) {
-        echo $response;
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);          // Return the result as a string
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);      // Do not verify SSL
+
+    // Execute the curl session and get the response
+    $response = curl_exec($ch);
+
+    // Chec errors
+    if(curl_errno($ch)){
+        echo json_encode(['error' => 'Curl error: ' . curl_error($ch)]);
     } else {
-        echo json_encode(['error' => 'Failed to fetch weather data']);
+        // Check if we got a valid response
+        if($response) {
+            echo $response;
+        } else {
+            echo json_encode(['error' => 'Failed to fetch weather data']);
+        }
     }
+
+    // Close the curl session
+    curl_close($ch);
+
 } else {
     echo json_encode(['error' => 'No country name provided']);
 }
