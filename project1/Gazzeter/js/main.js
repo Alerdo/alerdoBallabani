@@ -1,6 +1,6 @@
 // Set initial map view
 var map = L.map('map', {
-    // center: [51.505, -0.09],
+    center: [51.505, -0.09],
     zoom: 12,
     layers: [] // We'll initialize without any default layer, then add it based on user preference or default to one.
 });
