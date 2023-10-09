@@ -435,8 +435,9 @@ function populateParks(parks) {
 
 
 function fetchCountryData(type, param) {
-    switch (type) {
-        case "info":
+    $("#loading-spinner").show();
+
+    if(type === 'info') {
             let content = `
             <strong>Country Name:</strong> ${param.countryName}<br>
             <strong>Capital:</strong> ${param.capital}<br>
@@ -448,15 +449,14 @@ function fetchCountryData(type, param) {
             `;
 
             // Update modal title
+            
+            $("#loading-spinner").hide();
             $("#exampleModal .modal-title").html("Info");
             // Update modal content with the generated content string
             $("#exampleModal").modal("show");
             $("#modalContent").html(content);
-            break;
-        case "weather":
-            fetchWeather(param);
-            // ... and so on for other types
-            break;
+          
+       
     }
 }
 
@@ -465,6 +465,8 @@ function fetchCountryData(type, param) {
 
 
 function fetchCurrencyInfo(currencyCode) {
+    $("#loading-spinner").show();
+    
     $.ajax({
         url: '../Gazzeter/php/exchangeRate.php',
         method: 'GET',
@@ -486,6 +488,7 @@ function fetchCurrencyInfo(currencyCode) {
                     GBP: £${gbpRate}<br>
                     JPY: ¥${jpyRate}
                 `;
+                $("#loading-spinner").hide();
                 $("#exampleModal .modal-title").html("Local Currency Exchange");
                 $("#modalContent").html(content);
                 $("#exampleModal").modal("show");
@@ -506,6 +509,8 @@ function fetchCurrencyInfo(currencyCode) {
 
 /*-------------------------Fetch Weather Data----------------------------------*/
 function fetchWeather(capital, country) {
+    $("#loading-spinner").show();
+
     $.ajax({
         url: '../Gazzeter/php/getWeather.php',  // Change this to the actual path
         type: 'GET',
@@ -525,6 +530,7 @@ function fetchWeather(capital, country) {
                     <p><strong>Humidity:</strong> ${weatherData.humidity}%</p>
                     <p><strong>Pressure:</strong> ${weatherData.pressure_mb} mb (${weatherData.pressure_in} in)</p>
                 `;
+                $("#loading-spinner").hide();
                 $("#exampleModal .modal-title").html(`Weather now in ${country}`);
                 $("#exampleModal").modal("show");
                 $("#modalContent").html(content);
@@ -543,6 +549,7 @@ function fetchWeather(capital, country) {
 // ---------------------------FETCH NEWS DATA --------------------------------------
 
 function fetchNewsData(countryCode) {
+    $("#loading-spinner").show();
     
     $.ajax({
         url: '../Gazzeter/php/getNewsData.php',
@@ -568,7 +575,8 @@ function fetchNewsData(countryCode) {
                         <hr>
                     </div>`;
                 });
-                
+
+                $("#loading-spinner").hide();
                 $("#exampleModal .modal-title").html(`News`);
                 $("#modalContent").html(content);
                 $("#exampleModal").modal("show");
@@ -605,8 +613,10 @@ function navigateToUserLocation() {
     }
 }
 
+// --------------------------SIDE BUTTONS LOGIC FINISH ----------------------------------
 
-//styling 
+
+//Styling 
 $(document).ready(function() {
     // Listener for close button
     $(".btn-close").on("click", () => {
