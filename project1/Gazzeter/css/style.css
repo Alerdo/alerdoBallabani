@@ -171,6 +171,22 @@ div#modalContent {
 
 /* Media queries for small devices */
 @media (max-width: 676px) {
+
+  .container-fluid {
+    display: flex !important;
+    flex-direction: column!important;
+    justify-content: center!important;
+    align-items: center!important;
+
+  }
+
+  .ml-auto {
+    align-self: center !important;
+  }
+  .ml-auto, .mx-auto {
+    margin-left: 0!important;
+    margin-top: 5% !important;
+}
   .modal {
     bottom: 50px !important;
     top: auto !important;
