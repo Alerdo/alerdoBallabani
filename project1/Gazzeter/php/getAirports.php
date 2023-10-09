@@ -14,7 +14,7 @@ $ch = curl_init();
 curl_setopt($ch, CURLOPT_URL, $url);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);  // Return the result as a string
 
-e
+
 $response = curl_exec($ch);
 
 // Check for curl errors

@@ -41,15 +41,17 @@ L.control.layers(baseMaps).addTo(map);
 // Setting 'streets' as default layer
 satellite.addTo(map);
 
-// Add an easy button to your map
-L.easyButton('fa-globe', function(btn, map) {
-    alert("EasyButton clicked!");
-}, 'Button Title', {
-    position: 'topright'  // other options include 'topleft', 'bottomleft', 'bottomright'
-}).addTo(map);
+// // Add an easy button to your map
+// L.easyButton('fa-globe', function(btn, map) {
+//     alert("EasyButton clicked!");
+// }, 'Button Title', {
+//     position: 'topright'  // other options include 'topleft', 'bottomleft', 'bottomright'
+// }).addTo(map);
 
 // --------------------------------------------
 //Populating the select menu
+// 
+// EF
 
 $.ajax({
     url: '../Gazzeter/php/getCountryInfo.php',
@@ -95,6 +97,7 @@ function fetchCountryBorder(isoCode) {
             if (typeof countryLayer !== 'undefined') {
                 map.removeLayer(countryLayer);
             }
+            console.log(data)
 
             // Draw the country border using L.geoJSON
             countryLayer = L.geoJSON(data).addTo(map);
@@ -201,6 +204,9 @@ if (navigator.geolocation) {
                             break;
                         case "center":
                             navigateToUserLocation()
+                            break;
+                        case "wikipedia":
+                            getWikipediaInfo(countryInfo.countryName)
                     }
                 });
                 
@@ -331,11 +337,11 @@ $('#countrySelect').on('change', function() {
 
 // Populating Cities with clustering
 function populateMap(cities) {
-    var cityIcon = L.divIcon({
-        className: 'city-icon',
-        iconSize: [30, 30],
-        iconAnchor: [15, 15],
-        html: '<i class="fas fa-city" style="color: #5a4a42; font-size: 1rem"></i>'
+    var cityIcon = L.ExtraMarkers.icon({
+        icon: 'fa-city',
+        markerColor: 'blue',
+        shape: 'circle',
+        prefix: 'fas'
     });
 
     if (cityClusterGroup) {
@@ -355,11 +361,11 @@ function populateMap(cities) {
 
 // Populating Airports with clustering
 function populateMapWithAirports(airports) {
-    var airplaneIcon = L.divIcon({
-        className: 'custom-icon',
-        iconSize: [40, 40],
-        iconAnchor: [15, 15],
-        html: '<i class="fas fa-plane" style="color: white; font-size: 1rem"></i>'
+    var airplaneIcon = L.ExtraMarkers.icon({
+        icon: 'fa-plane',
+        markerColor: 'red',
+        shape: 'circle',
+        prefix: 'fas'
     });
 
     if (airportClusterGroup) {
@@ -379,10 +385,11 @@ function populateMapWithAirports(airports) {
 
 // Populating Attractions with clustering
 function populateAttractions(attractions) {
-    const attractionsIcon = L.divIcon({
-        className: 'custom-icon',
-        html: '<i class="fas fa-landmark" style="color: #ff5722;"></i>',
-        iconSize: [20, 20]
+    const attractionsIcon = L.ExtraMarkers.icon({
+        icon: 'fa-landmark',
+        markerColor: 'orange',
+        shape: 'circle',
+        prefix: 'fas'
     });
 
     if (attractionsClusterGroup) {
@@ -402,10 +409,11 @@ function populateAttractions(attractions) {
 
 // Populating Parks with clustering
 function populateParks(parks) {
-    const park = L.divIcon({
-        className: 'custom-icon',
-        html: '<i class="fas fa-tree" style="color: #4CAF50;"></i>',
-        iconSize: [20, 20]
+    const parkIcon = L.ExtraMarkers.icon({
+        icon: 'fa-tree',
+        markerColor: 'green',
+        shape: 'circle',
+        prefix: 'fas'
     });
 
     if (parksClusterGroup) {
@@ -415,14 +423,13 @@ function populateParks(parks) {
     parksClusterGroup = L.markerClusterGroup();
 
     parks.forEach(loc => {
-        let marker = L.marker([loc.lat, loc.lng], { icon: park });
+        let marker = L.marker([loc.lat, loc.lng], { icon: parkIcon });
         marker.bindTooltip(loc.name);
         parksClusterGroup.addLayer(marker);
     });
 
     map.addLayer(parksClusterGroup);
 }
-
 
 
 
@@ -454,9 +461,7 @@ function fetchCountryData(type, param) {
             $("#exampleModal .modal-title").html("Info");
             // Update modal content with the generated content string
             $("#exampleModal").modal("show");
-            $("#modalContent").html(content);
-          
-       
+            $("#modalContent").html(content);      
     }
 }
 
@@ -476,21 +481,27 @@ function fetchCurrencyInfo(currencyCode) {
         },
         success: function(data) {
             if (data && data.rates) {
-                let usdRate = data.rates.USD ? data.rates.USD.toFixed(2) : "N/A";
-                let eurRate = data.rates.EUR ? data.rates.EUR.toFixed(2) : "N/A";
-                let gbpRate = data.rates.GBP ? data.rates.GBP.toFixed(2) : "N/A";
-                let jpyRate = data.rates.JPY ? data.rates.JPY.toFixed(2) : "N/A";
-                
-                let content = `
-                    <strong>1 ${currencyCode} is equivalent to:</strong><br>
-                    USD: $${usdRate}<br>
-                    EUR: €${eurRate}<br>
-                    GBP: £${gbpRate}<br>
-                    JPY: ¥${jpyRate}
-                `;
                 $("#loading-spinner").hide();
                 $("#exampleModal .modal-title").html("Local Currency Exchange");
-                $("#modalContent").html(content);
+
+                // Create an input field for user to enter a value in the local currency
+                const inputField = `
+                    <label for="currencyInput">Local Currency (${currencyCode}):</label>
+                    <input type="number" id="currencyInput" value="1" style="width:100%; padding: 10px; margin-bottom: 10px;">
+                `;
+                
+                $("#modalContent").html(inputField);
+                $("#modalContent").append('<div id="conversionResults"></div>');
+
+                // Event listener to update conversion values when input is changed
+                $("#currencyInput").on("keyup change", function() {
+                    const amount = parseFloat($(this).val()) || 1;
+                    updateConversionValues(data.rates, amount, currencyCode);
+                });
+
+                // Initial conversion display
+                updateConversionValues(data.rates, 1, currencyCode);
+                
                 $("#exampleModal").modal("show");
             } else {
                 let errorMsg = data.error || "Unexpected data format";
@@ -502,6 +513,26 @@ function fetchCurrencyInfo(currencyCode) {
         }
     });
 }
+
+
+
+function updateConversionValues(rates, amount, currencyCode) {
+    let usdRate = rates.USD ? (rates.USD * amount).toFixed(2) : "N/A";
+    let eurRate = rates.EUR ? (rates.EUR * amount).toFixed(2) : "N/A";
+    let gbpRate = rates.GBP ? (rates.GBP * amount).toFixed(2) : "N/A";
+    let jpyRate = rates.JPY ? (rates.JPY * amount).toFixed(2) : "N/A";
+
+    let content = `
+        <strong>${amount} ${currencyCode} is equivalent to:</strong><br>
+        USD: $${usdRate}<br>
+        EUR: €${eurRate}<br>
+        GBP: £${gbpRate}<br>
+        JPY: ¥${jpyRate}
+    `;
+
+    $("#conversionResults").html(content);
+}
+
 
 
 
@@ -550,7 +581,7 @@ function fetchWeather(capital, country) {
 
 function fetchNewsData(countryCode) {
     $("#loading-spinner").show();
-    
+
     $.ajax({
         url: '../Gazzeter/php/getNewsData.php',
         method: 'GET',
@@ -596,16 +627,12 @@ function navigateToUserLocation() {
         navigator.geolocation.getCurrentPosition(function(position) {
             var lat = position.coords.latitude;
             var lon = position.coords.longitude;
-
             // Center the map on the user's location
             map.setView([lat, lon], 10); // 13 is the zoom level
-
             // Add a marker to the user's location
             L.marker([lat, lon]).addTo(map)
                 .bindPopup('You are here.').openPopup();
-
         }, function(error) {
-            
             alert("Error: " + error.message);
         });
     } else {
@@ -613,7 +640,58 @@ function navigateToUserLocation() {
     }
 }
 
+
+
+// ----------------------------- GET WIKIPEDIA INFORMATION ---------------------------------------
+
+function getWikipediaInfo(countryName) {
+    console.log("Function called with country:", countryName);
+
+    $.ajax({
+        url: "../Gazzeter/php/getWikipediaInfo.php",
+        method: "GET",
+        dataType: "json",
+        data: { countryName: countryName },
+        success: function(data) {
+            if (data && data.query && data.query.pages) {
+                // Extract the Wikipedia content from the response
+                const pages = data.query.pages;
+                const pageId = Object.keys(pages)[0];
+                let fullText = pages[pageId].extract;
+
+                // Extract the first non-empty paragraph using regex
+                const firstParagraphMatches = fullText.match(/<p>(?!<)(.*?)<\/p>/);
+
+                if (firstParagraphMatches && firstParagraphMatches[1]) {
+                    // Generate the link to the full Wikipedia article
+                    const articleLink = "https://en.wikipedia.org/wiki/" + encodeURIComponent(pages[pageId].title);
+                    
+                    // Populate the modal with the first paragraph and the link
+                    $("#exampleModal .modal-title").html(`About ${countryName}`);
+                    $("#modalContent").html(firstParagraphMatches[1] + `<br><br><a href="${articleLink}" target="_blank">Read full article on Wikipedia</a>`);
+                    $("#exampleModal").modal("show");
+                } else {
+                    console.error("Error parsing the Wikipedia data.");
+                    $("#modalContent").html('<p>Error fetching Wikipedia info. Please try again later.</p>');
+                }
+            } else if (data.error) {
+                console.log("Error from server:", data.error);
+                $("#modalContent").html('<p>Error fetching Wikipedia info. Please try again later.</p>');
+            }
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            console.error("AJAX request error:", textStatus, "|", errorThrown);
+            $("#modalContent").html('<p>Error fetching Wikipedia info. Please try again later.</p>');
+        }
+    });
+}
+
+
 // --------------------------SIDE BUTTONS LOGIC FINISH ----------------------------------
+
+
+
+
 
 
 //Styling 
@@ -628,3 +706,13 @@ $(document).ready(function() {
 });
 
 
+
+//Testing extra markers
+L.ExtraMarkers.icon({
+    icon: 'fa-coffee',
+    markerColor: 'blue',
+    shape: 'square',
+    prefix: 'fa'
+});
+
+L.marker([lat, lon], { icon: myIcon }).addTo(map);
