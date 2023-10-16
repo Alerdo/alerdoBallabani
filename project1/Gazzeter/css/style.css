@@ -140,11 +140,11 @@ html, body {
 }
 
 
-.modal-dialog {
+/* .modal-dialog {
   margin: 0 auto;
   display: flex;
   justify-content: center;
-}
+} */
 .modal-content {
   max-height: 90vh; /* Adjust as necessary; 90vh will make the modal take up to 90% of the viewport height */
   overflow: hidden; /* Hide any content that would overflow this container */

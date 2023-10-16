@@ -500,33 +500,28 @@ function fetchMapData(countryCode, currentBoundingBox) {
 function fetchCountryData(type, param) {
     $("#loading-spinner").show();
 
-    if(type === 'info') {
-            let content = `
-            <strong>Country Name:</strong> ${param.countryName}<br>
-            <strong>Capital:</strong> ${param.capital}<br>
-            <strong>Continent:</strong> ${param.continent}<br>
-            <strong>Population:</strong> ${param.population}<br>
-            <strong>Area:</strong> ${param.area} sq. km.<br>
-            <strong>Currency Code:</strong> ${param.currencyCode}<br>
-            <strong>ISO Code:</strong> ${param.iso}<br>
-            `;
+    if (type === 'info') {
+        // Populate the modal fields directly
+        $("#countryName").text(param.countryName);
+        $("#capitalCity").text(param.capital);
+        $("#continent").text(param.continent);
+        $("#population").text(param.population);
+        $("#areaInSqKm").text(param.area);
+        $("#currencyCode").text(param.currencyCode);
+        $("#isoCode").text(param.iso);
 
-            // Update modal title
-            
-            $("#loading-spinner").hide();
-            $("#exampleModal .modal-title").html("Info");
-            // Update modal content with the generated content string
-            $("#exampleModal").modal("show");
-            $("#modalContent").html(content);      
+        // Hide the spinner and display the modal
+        $("#loading-spinner").hide();
+        $("#exampleeModal").modal("show");
     }
 }
 
 
+
 // ----------------------------------Fetch Currency Info------------------------------
 
-
 function fetchCurrencyInfo(currencyCode) {
-    $("#loading-spinner").show();
+    $("#loading-spinner").show(); // Show pre-loading animation or any indication of loading
     
     $.ajax({
         url: '../Gazzeter/php/exchangeRate.php',
@@ -537,17 +532,19 @@ function fetchCurrencyInfo(currencyCode) {
         },
         success: function(data) {
             if (data && data.rates) {
-               
-                $("#exampleModal .modal-title").html("Local Currency Exchange");
+                // Set modal title
+                $("#loading-spinner").hide()
+                $("#currencyInfoModal .modal-title").html('<i class="fa-solid fa-coins fa-xl me-2"></i>Local Currency Exchange');
 
                 // Create an input field for user to enter a value in the local currency
                 const inputField = `
                     <label for="currencyInput">Local Currency (${currencyCode}):</label>
-                    <input type="number" id="currencyInput" value="1" style="width:100%; padding: 10px; margin-bottom: 10px;">
+                    <input type="number" id="currencyInput" value="1" class="form-control mb-3">
                 `;
-                $("#loading-spinner").hide();
-                $("#modalContent").html(inputField);
-                $("#modalContent").append('<div id="conversionResults"></div>');
+                
+                // Set the content of the modal-body
+                $("#currencyInfoModal .modal-body").html(inputField);
+                $("#currencyInfoModal .modal-body").append('<div id="conversionResults"></div>');
 
                 // Event listener to update conversion values when input is changed
                 $("#currencyInput").on("keyup change", function() {
@@ -557,7 +554,9 @@ function fetchCurrencyInfo(currencyCode) {
 
                 // Initial conversion display
                 updateConversionValues(data.rates, 1, currencyCode);
-                $("#exampleModal").modal("show");
+
+                // Show the modal
+                $("#currencyInfoModal").modal("show");
             } else {
                 let errorMsg = data.error || "Unexpected data format";
                 alert("Error fetching exchange rate: " + errorMsg);
@@ -565,11 +564,12 @@ function fetchCurrencyInfo(currencyCode) {
         },
         error: function(err) {
             alert("Error fetching exchange rate. Please try again later.");
+        },
+        complete: function() {
+            $("#pre-load").hide(); // Hide pre-loading animation or indication once request is complete (either success or error)
         }
     });
 }
-
-
 
 function updateConversionValues(rates, amount, currencyCode) {
     let usdRate = rates.USD ? (rates.USD * amount).toFixed(2) : "N/A";
@@ -587,7 +587,6 @@ function updateConversionValues(rates, amount, currencyCode) {
 
     $("#conversionResults").html(content);
 }
-
 
 
 
@@ -698,9 +697,8 @@ function navigateToUserLocation() {
 
 
 // ----------------------------- GET WIKIPEDIA INFORMATION ---------------------------------------
-
 function getWikipediaInfo(countryName) {
-    $("#loading-spinner").show();
+    $("#loading-spinner").show(); // Show pre-loading animation
 
     $.ajax({
         url: "../Gazzeter/php/getWikipediaInfo.php",
@@ -723,24 +721,28 @@ function getWikipediaInfo(countryName) {
                     
                     // Populate the modal with the first paragraph and the link
                     $("#loading-spinner").hide();
-                    $("#exampleModal .modal-title").html(`About ${countryName}`);
-                    $("#modalContent").html(firstParagraphMatches[1] + `<br><br><a href="${articleLink}" target="_blank">Read full article on Wikipedia</a>`);
-                    $("#exampleModal").modal("show");
+                    $("#wikipediaInfoModal .modal-title").html(`<i class="fa-solid fa-book fa-xl me-2"></i>About ${countryName}`);
+                    $("#wikipediaContent").html(firstParagraphMatches[1] + `<br><br><a href="${articleLink}" target="_blank">Read full article on Wikipedia</a>`);
+                    $("#wikipediaInfoModal").modal("show");
                 } else {
                     console.error("Error parsing the Wikipedia data.");
-                    $("#modalContent").html('<p>Error fetching Wikipedia info. Please try again later.</p>');
+                    $("#wikipediaContent").html('<p>Error fetching Wikipedia info. Please try again later.</p>');
                 }
             } else if (data.error) {
                 console.log("Error from server:", data.error);
-                $("#modalContent").html('<p>Error fetching Wikipedia info. Please try again later.</p>');
+                $("#wikipediaContent").html('<p>Error fetching Wikipedia info. Please try again later.</p>');
             }
         },
         error: function(jqXHR, textStatus, errorThrown) {
             console.error("AJAX request error:", textStatus, "|", errorThrown);
-            $("#modalContent").html('<p>Error fetching Wikipedia info. Please try again later.</p>');
+            $("#wikipediaContent").html('<p>Error fetching Wikipedia info. Please try again later.</p>');
+        },
+        complete: function() {
+            $("#pre-load-wikipedia").hide(); // Hide pre-loading animation once the request is complete
         }
     });
 }
+
 
 
 // --------------------------SIDE BUTTONS LOGIC FINISH ----------------------------------

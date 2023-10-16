@@ -419,6 +419,170 @@
             <span> Center</span><i class="fa fa-crosshairs"></i>
         </button>    
     </div> -->
+    <div id="exampleeModal" class="modal" data-bs-backdrop="false" tabindex="-1">
+  
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+          
+          <div class="modal-content shadow">
+            
+            <div class="modal-header bg-success bg-gradient text-white">
+              <h5 class="modal-title"><i class="fa-solid fa-circle-info fa-xl me-2"></i>Info</h5>
+              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>           
+            
+            <div class="modal-body">
+              
+              <div id="pre-load"></div>
+              
+              <table class="table table-striped">
+                
+                <tr>
+                  <td class="text-center col-2">
+                    <i class="fa-solid fa-landmark-flag fa-xl text-success"></i>
+                  </td>
+                  <td class="text-nowrap">
+                    Country Name
+                  </td>
+                  <td id="countryName" class="text-end"> 
+                  </td>
+                </tr>
+      
+                <tr>
+                  <td class="text-center">
+                    <i class="fa-solid fa-globe fa-xl text-success"></i>
+                  </td>
+                  <td>
+                    Capital
+                  </td>
+                  <td id="capitalCity" class="text-end">
+                  </td>
+                </tr>
+      
+                <tr>
+                  <td class="text-center">
+                    <i class="fa-solid fa-globe fa-xl text-success"></i>
+                  </td>
+                  <td>
+                    Continent
+                  </td>
+                  <td id="continent" class="text-end">              
+                  </td>
+                </tr>
+      
+                <tr>
+                  <td class="text-center">
+                    <i class="fa-solid fa-coins fa-xl text-success"></i>
+                  </td>
+                  <td>
+                    Currency Code
+                  </td>
+                  <td id="currencyCode" class="text-end">
+                  </td>
+                </tr>
+      
+                <tr>
+                  <td class="text-center">
+                    <i class="fa-solid fa-equals fa-xl text-success"></i>
+                  </td>
+                  <td>
+                    ISO Code
+                  </td>
+                  <td id="isoCode" class="text-end">
+                  </td>
+                </tr>
+      
+                <tr>
+                  <td class="text-center">
+                    <i class="fa-solid fa-person fa-xl text-success"></i>
+                  </td>
+                  <td>
+                    Population
+                  </td>
+                  <td id="population" class="text-end">
+                  </td>
+                </tr>
+      
+                <tr>
+                  <td class="text-center">
+                    <i class="fa-solid fa-ruler-combined fa-xl text-success"></i>
+                  </td>
+                  <td>
+                    Area (km<sup>2</sup>)
+                  </td>
+                  <td id="areaInSqKm" class="text-end">
+                  </td>
+                </tr>
+      
+              </table>
+              
+            </div>
+            
+            <div class="modal-footer">
+              <button type="button" class="btn btn-outline-success btn-sm" data-bs-dismiss="modal">Close</button>
+            </div>
+            
+          </div>
+          
+        </div>
+        
+      </div>
+      <div id="wikipediaInfoModal" class="modal" data-bs-backdrop="false" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content shadow">
+                <div class="modal-header bg-success bg-gradient text-white">
+                    <h5 class="modal-title"><i class="fa-solid fa-book fa-xl me-2"></i>About the Country</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>           
+                <div class="modal-body">
+                    <div id="pre-load-wikipedia"></div>
+                    <div id="wikipediaContent"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-success btn-sm" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+
+      <div id="currencyInfoModal" class="modal" data-bs-backdrop="false" tabindex="-1">
+  
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+          
+          <div class="modal-content shadow">
+            
+            <div class="modal-header bg-success bg-gradient text-white">
+              <h5 class="modal-title"><i class="fa-solid fa-coins fa-xl me-2"></i>Local Currency Exchange</h5>
+              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>           
+            
+            <div class="modal-body">
+              
+              <div id="pre-load"></div>
+      
+              <div class="mb-3">
+                  <label for="currencyInput" class="form-label">Local Currency (<span id="currencyCodeDisplay"></span>):</label>
+                  <input type="number" id="currencyInput" value="1" class="form-control" placeholder="Enter amount">
+              </div>
+      
+              <div id="conversionResults" class="table-responsive">
+                  <table class="table table-striped">
+                      <!-- Dynamic rows for conversion values will be added here by JavaScript -->
+                  </table>
+              </div>
+              
+            </div>
+            
+            <div class="modal-footer">
+              <button type="button" class="btn btn-outline-success btn-sm" data-bs-dismiss="modal">Close</button>
+            </div>
+            
+          </div>
+          
+        </div>
+        
+      </div>
+      
     
     <div id="loading-spinner" style="display:none;">
         <!-- <img src="./css/fontawesome-free-6.0.0-web/Spinner-1s-200px.gif" alt="Loading..."/> -->
