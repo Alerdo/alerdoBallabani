@@ -159,8 +159,14 @@ div#modalContent {
   max-height: 400px !important;
 }
 
+.leaflet-bar a:last-child {
+  margin-bottom: 4rem !important;
+  border: none;
+}
 
-
+.leaflet-bar a:last-child {
+  border: none !important;
+}
 
 /* Media queries for small devices */
 @media (max-width: 676px) {
