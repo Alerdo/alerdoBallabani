@@ -5,7 +5,7 @@ header('Content-Type: application/json');
 $data = file_get_contents("../countryBorders.geo.json");
 $json_data = json_decode($data, true);
 
-// Check if an ISO code is provided 
+
 if (isset($_GET['isoCode'])) {
     $isoCode = $_GET['isoCode'];
     foreach ($json_data['features'] as $feature) {

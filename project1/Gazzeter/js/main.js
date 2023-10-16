@@ -1,34 +1,34 @@
 // Set initial map view
-var map = L.map('map', {
+const map = L.map('map', {
     center: [51.505, -0.09],
     zoom: 12,
     layers: [] // We'll initialize without any default layer, then add it based on user preference or default to one.
 });
 
 // Street view tile layer
-var streets = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}", {
+const streets = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}", {
     attribution: "Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012"
 });
 
 // Satellite view tile layer
-var satellite = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
+const satellite = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
     attribution: "Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community"
 });
 
 
 // national geoagrphic 
-var natGeoWorldMap = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}', {
+const natGeoWorldMap = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}', {
     attribution: 'Tiles &copy; Esri &mdash; Source: National Geographic, Esri, DeLorme, NAVTEQ, UNEP-WCMC, USGS, NASA, ESA, METI, NRCAN, GEBCO, NOAA, iPC'
 });
 
 //Topographic
 
-var esriTopographic = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+const esriTopographic = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
     attribution: 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri Korea, Esri (Thailand), NGCC, (c) OpenStreetMap contributors, and the GIS User Community'
 });
 
 // Define base maps for layer control
-var baseMaps = {
+const baseMaps = {
     "Streets": streets,
     "Satellite": satellite,
     "National Geographic": natGeoWorldMap ,
@@ -41,17 +41,29 @@ L.control.layers(baseMaps).addTo(map);
 // Setting 'streets' as default layer
 satellite.addTo(map);
 
-// // Add an easy button to your map
-// L.easyButton('fa-globe', function(btn, map) {
-//     alert("EasyButton clicked!");
-// }, 'Button Title', {
-//     position: 'topright'  // other options include 'topleft', 'bottomleft', 'bottomright'
-// }).addTo(map);
 
-// --------------------------------------------
-//Populating the select menu
-// 
-// EF
+
+
+
+
+
+
+//For every country selected we need borders, and info. This function provides that
+function runCountryData(isoCode) {
+    fetchCountryBorder(isoCode);
+    fetchCountryInfo(isoCode);
+}
+
+// Country Select change listener, this is valid when we choose one country using the dropdown menu
+
+$('#countrySelect').on('change', function() {
+    let isoCode = $(this).val();
+
+    runCountryData(isoCode) 
+    
+});
+
+//Populating the select menu 1
 
 $.ajax({
     url: '../Gazzeter/php/getCountryInfo.php',
@@ -59,7 +71,7 @@ $.ajax({
     dataType: 'json',
     success: function(data) {
         let dropdown = $('#countrySelect');
-        dropdown.empty();
+        dropdown.empty(); //empty the dropdown if country is already selected
 
         // Sort data alphabetically based on countryName
         data.sort((a, b) => a.countryName.localeCompare(b.countryName));
@@ -67,7 +79,8 @@ $.ajax({
         // Default option
         dropdown.append('<option selected="true" disabled>Select Country</option>');
         dropdown.prop('selectedIndex', 0);
-
+        
+        //for each country append <option> and value="isoCode"
         $.each(data, function (key, entry) {
             dropdown.append($('<option></option>').attr('value', entry.isoCode).text(entry.countryName));
         });
@@ -79,39 +92,7 @@ $.ajax({
 
 
 
-//mapping the area of the selected country
-var countryLayer;
-var infoLayer;   
-
-
-function fetchCountryBorder(isoCode) {
-    $.ajax({
-        url: '../Gazzeter/php/getCountryInfo.php',  // relative path 
-        data: {
-            isoCode: isoCode
-        },
-        method: 'GET',
-        dataType: 'json',
-        success: function(data) {
-            // Clear previous layers
-            if (typeof countryLayer !== 'undefined') {
-                map.removeLayer(countryLayer);
-            }
-            console.log(data)
-
-            // Draw the country border using L.geoJSON
-            countryLayer = L.geoJSON(data).addTo(map);
-            map.fitBounds(countryLayer.getBounds());
-        },
-        error: function(err) {
-            console.error("Error fetching country border:", err);
-        }
-    });
-}
-
-
-
-/// GETING THE USER'S LOCATION 
+/// GETING THE USER'S LOCATION AND CHANGING THE SELECT MENU 2
 if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(function(position) {
         var lat = position.coords.latitude;
@@ -129,11 +110,9 @@ if (navigator.geolocation) {
             dataType: 'json',
             success: function(data) {
                 if (data && data.countryCode) {
-                    //selecting the country for hte menu based on countryCode
+                    //selecting the country for the menu based on countryCode
                     $('#countrySelect').val(data.countryCode);
-                     // Fetch country info here after setting isoCode becasue if I call it outsite isoCode its not setup yet
-                     fetchCountryInfo(data.countryCode);
-                    fetchCountryBorder(data.countryCode);
+                    runCountryData(data.countryCode) 
                 }
             },
             error: function(err) {
@@ -144,11 +123,44 @@ if (navigator.geolocation) {
 }
 
 
-// --------------Adding information and pins about diffrent developments on the selected country ---------------------
+// 2 mapping the area of the selected country
+
+let countryLayer;
+
+function fetchCountryBorder(isoCode) {
+    $.ajax({
+        url: '../Gazzeter/php/getCountryInfo.php',  // relative path 
+        data: {
+            isoCode: isoCode
+        },
+        method: 'GET',
+        dataType: 'json',
+        success: function(data) {
+            // Clear previous layers
+            if (typeof countryLayer !== 'undefined') {
+                map.removeLayer(countryLayer);
+            }
+            console.log(data)
+            
+            // Draw the country border using L.geoJSON
+            countryLayer = L.geoJSON(data).addTo(map);
+            map.fitBounds(countryLayer.getBounds());
+        },
+        error: function(err) {
+            console.error("Error fetching country border:", err);
+        }
+    });
+}
+
+
+
+
+
+// --------------------fetchCountruInfoo---------------------
 
 
  //Make a call to get basic info so I can use it for subsequent calls.
-
+//Fetch country info is responsible for 
  function fetchCountryInfo(countryCode) {
     $.ajax({
         url: '../Gazzeter/php/baseCountryInfo.php',
@@ -316,24 +328,12 @@ function fetchMapData(countryCode, currentBoundingBox) {
 }
 
 // Global marker cluster group declarations
-var cityClusterGroup;
-var airportClusterGroup;
-var attractionsClusterGroup;
-var parksClusterGroup;
-var countryLayer;
+let cityClusterGroup;
+let airportClusterGroup;
+let attractionsClusterGroup;
+let parksClusterGroup;
 
-// ...
-// Country Select change listener
-$('#countrySelect').on('change', function() {
-    let isoCode = $(this).val();
 
-    if (countryLayer) {
-        map.removeLayer(countryLayer);
-    }
-
-    fetchCountryInfo(isoCode);
-    fetchCountryBorder(isoCode);
-});
 
 // Populating Cities with clustering
 function populateMap(cities) {
@@ -481,7 +481,7 @@ function fetchCurrencyInfo(currencyCode) {
         },
         success: function(data) {
             if (data && data.rates) {
-                $("#loading-spinner").hide();
+               
                 $("#exampleModal .modal-title").html("Local Currency Exchange");
 
                 // Create an input field for user to enter a value in the local currency
@@ -489,7 +489,7 @@ function fetchCurrencyInfo(currencyCode) {
                     <label for="currencyInput">Local Currency (${currencyCode}):</label>
                     <input type="number" id="currencyInput" value="1" style="width:100%; padding: 10px; margin-bottom: 10px;">
                 `;
-                
+                $("#loading-spinner").hide();
                 $("#modalContent").html(inputField);
                 $("#modalContent").append('<div id="conversionResults"></div>');
 
@@ -501,7 +501,6 @@ function fetchCurrencyInfo(currencyCode) {
 
                 // Initial conversion display
                 updateConversionValues(data.rates, 1, currencyCode);
-                
                 $("#exampleModal").modal("show");
             } else {
                 let errorMsg = data.error || "Unexpected data format";
@@ -607,7 +606,7 @@ function fetchNewsData(countryCode) {
                     </div>`;
                 });
 
-                $("#loading-spinner").hide();
+                
                 $("#exampleModal .modal-title").html(`News`);
                 $("#modalContent").html(content);
                 $("#exampleModal").modal("show");
@@ -645,7 +644,7 @@ function navigateToUserLocation() {
 // ----------------------------- GET WIKIPEDIA INFORMATION ---------------------------------------
 
 function getWikipediaInfo(countryName) {
-    console.log("Function called with country:", countryName);
+    $("#loading-spinner").show();
 
     $.ajax({
         url: "../Gazzeter/php/getWikipediaInfo.php",
@@ -667,6 +666,7 @@ function getWikipediaInfo(countryName) {
                     const articleLink = "https://en.wikipedia.org/wiki/" + encodeURIComponent(pages[pageId].title);
                     
                     // Populate the modal with the first paragraph and the link
+                    $("#loading-spinner").hide();
                     $("#exampleModal .modal-title").html(`About ${countryName}`);
                     $("#modalContent").html(firstParagraphMatches[1] + `<br><br><a href="${articleLink}" target="_blank">Read full article on Wikipedia</a>`);
                     $("#exampleModal").modal("show");
@@ -707,12 +707,3 @@ $(document).ready(function() {
 
 
 
-//Testing extra markers
-L.ExtraMarkers.icon({
-    icon: 'fa-coffee',
-    markerColor: 'blue',
-    shape: 'square',
-    prefix: 'fa'
-});
-
-L.marker([lat, lon], { icon: myIcon }).addTo(map);

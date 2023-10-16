@@ -1,4 +1,7 @@
 <?php
+$countryCode = $_GET['countryCode'] ?? 'GB'; // default to GB if no countryCode is provided
+$username = "AlerdoBallabani"; 
+
 
 function getCountryInfo($countryCode, $username) {
     $url = "http://api.geonames.org/countryInfo?country={$countryCode}&username={$username}";
@@ -18,8 +21,7 @@ function getCountryInfo($countryCode, $username) {
 }
 
 
-$countryCode = $_GET['countryCode'] ?? 'GB'; // default to GB if no countryCode is provided
-$username = "AlerdoBallabani"; 
+
 
 echo getCountryInfo($countryCode, $username);
 
