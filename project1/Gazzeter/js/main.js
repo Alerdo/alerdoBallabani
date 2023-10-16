@@ -123,7 +123,7 @@ if (navigator.geolocation) {
 }
 
 
-// 2 mapping the area of the selected country
+//2 mapping the area of the selected country
 
 let countryLayer;
 
