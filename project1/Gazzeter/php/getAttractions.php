@@ -3,7 +3,7 @@
 $countryCode = $_GET['countryCode'];
 $username = "AlerdoBallabani";  //
 
-$url = "http://api.geonames.org/search?country={$countryCode}&featureCode=MUS&maxRows=20&username={$username}";
+$url = "http://api.geonames.org/search?country={$countryCode}&featureCode=MUS&maxRows=15&username={$username}";
 
 
 $ch = curl_init();

@@ -2,7 +2,7 @@
 
 $countryCode = $_GET['countryCode'] ?? 'GB'; // Default to 'GB' if no country code is provided
 
-$url = "http://api.geonames.org/search?country={$countryCode}&featureCode=PRK&maxRows=30&username=AlerdoBallabani";
+$url = "http://api.geonames.org/search?country={$countryCode}&featureCode=PRK&maxRows=15&username=AlerdoBallabani";
 
 // Initialize the curl session
 $ch = curl_init();

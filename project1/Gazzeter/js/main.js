@@ -36,7 +36,7 @@ const baseMaps = {
 };
 
 // Add control to switch between layers
-L.control.layers(baseMaps).addTo(map);
+// var layerControl = L.control.layers(baseMaps, overlays).addTo(map);
 
 // Setting 'streets' as default layer
 satellite.addTo(map);
@@ -60,6 +60,7 @@ $('#countrySelect').on('change', function() {
     let isoCode = $(this).val();
 
     runCountryData(isoCode) 
+
     
 });
 
@@ -126,7 +127,6 @@ if (navigator.geolocation) {
 //2 mapping the area of the selected country
 
 let countryLayer;
-
 function fetchCountryBorder(isoCode) {
     $.ajax({
         url: '../Gazzeter/php/getCountryInfo.php',  // relative path 
@@ -140,10 +140,18 @@ function fetchCountryBorder(isoCode) {
             if (typeof countryLayer !== 'undefined') {
                 map.removeLayer(countryLayer);
             }
-            console.log(data)
-            
+            console.log(data);
+
             // Draw the country border using L.geoJSON
-            countryLayer = L.geoJSON(data).addTo(map);
+            countryLayer = L.geoJSON(data, {
+                style: {
+                    fillColor: '#3388ff', // Change this color if you have another preference
+                    fillOpacity: 0.4,
+                    weight: 1, // Stroke weight (border thickness)
+                    color: 'white', // Stroke color (border color)
+                    opacity: 1  // Stroke opacity
+                }
+            }).addTo(map);
             map.fitBounds(countryLayer.getBounds());
         },
         error: function(err) {
@@ -151,6 +159,7 @@ function fetchCountryBorder(isoCode) {
         }
     });
 }
+
 
 
 
@@ -194,6 +203,7 @@ function fetchCountryBorder(isoCode) {
                 };
             
                 //This will get data and populate the map with info 
+                
                 fetchMapData(countryInfo.iso, currentBoundingBox)
 
               /*4*/ //Extra Information 
@@ -236,13 +246,58 @@ function fetchCountryBorder(isoCode) {
 }
 
 
+var airports = L.markerClusterGroup().addTo(map);
+var cities = L.markerClusterGroup().addTo(map);
+var attractions = L.markerClusterGroup().addTo(map);
+var parks = L.markerClusterGroup().addTo(map);
 
-// Moved AJAX call for cities into its own function
+var overlays = {
+    "Airports": airports,
+    "Cities": cities,
+    "Attractions": attractions,
+    "Parks": parks
+};
+
+var layerControl = L.control.layers(baseMaps, overlays).addTo(map);
+
+// 3. Define Icon Styles
+
+var airportIcon = L.ExtraMarkers.icon({
+    prefix: 'fa',
+    icon: 'fa-plane',
+    iconColor: 'black',
+    markerColor: 'white',
+    shape: 'square'
+  });
+
+
+var cityIcon = L.ExtraMarkers.icon({
+    prefix: 'fa',
+    icon: 'fa-city',
+    markerColor: 'blue',
+    shape: 'circle'
+});
+
+var attractionsIcon = L.ExtraMarkers.icon({
+    prefix: 'fa',
+    icon: 'fa-landmark',
+    markerColor: 'orange',
+    shape: 'circle'
+});
+
+var parkIcon = L.ExtraMarkers.icon({
+    prefix: 'fa',
+    icon: 'fa-tree',
+    markerColor: 'green',
+    shape: 'circle'
+});
+
 function fetchMapData(countryCode, currentBoundingBox) {
-    // Fetch cities data
+    
+    // Fetch Cities
     $.ajax({
         url: '../Gazzeter/php/getCitiesInfo.php',
-        data: { 
+        data: {
             north: currentBoundingBox.north,
             south: currentBoundingBox.south,
             east: currentBoundingBox.east,
@@ -251,189 +306,105 @@ function fetchMapData(countryCode, currentBoundingBox) {
         method: 'GET',
         dataType: 'json',
         success: function(data) {
-            populateMap(data.geonames);
+            cities.clearLayers();
+            data.geonames.forEach(city => {
+                L.marker([city.lat, city.lng], { icon: cityIcon })
+                    .bindTooltip(city.name, { direction: 'right' }) // No 'permanent: true'
+                    .bindPopup(`Population: ${city.population}`)
+                    .addTo(cities);
+            });
         },
         error: function(err) {
             console.error("Error fetching cities:", err);
         }
     });
 
-    // Fetch airports data
+    // Fetch Airports
     $.ajax({
         url: '../Gazzeter/php/getAirports.php',
         data: { countryCode: countryCode },
         method: 'GET',
         dataType: 'xml',
         success: function(data) {
-            let airports = [];
+            airports.clearLayers();
+            let airportData = [];
+    
+            // Parse the XML data
             $(data).find('geoname').each(function() {
-                let airport = {
-                    toponymName: $(this).find('toponymName').text(),
+                airportData.push({
                     name: $(this).find('name').text(),
                     lat: parseFloat($(this).find('lat').text()),
-                    lng: parseFloat($(this).find('lng').text()),
-                };
-                airports.push(airport);
+                    lng: parseFloat($(this).find('lng').text())
+                });
             });
-            populateMapWithAirports(airports);
+    
+            airportData.forEach(function(airport) {
+                L.marker([airport.lat, airport.lng], { icon: airportIcon })
+                    .bindTooltip(airport.name, { direction: 'right' }) // No 'permanent: true'
+                    .addTo(airports);
+            });
         },
         error: function(err) {
             console.error("Error fetching airports:", err);
         }
     });
 
-    // Fetch attractions data
+    // Fetch Attractions
     $.ajax({
         url: '../Gazzeter/php/getAttractions.php',
         data: { countryCode: countryCode },
         method: 'GET',
         dataType: 'xml',
         success: function(data) {
-            let attractions = [];
+            attractions.clearLayers();
+            let attractionsList = [];
             $(data).find('geoname').each(function() {
-                attractions.push({
+                attractionsList.push({
                     name: $(this).find('name').text(),
                     lat: parseFloat($(this).find('lat').text()),
                     lng: parseFloat($(this).find('lng').text())
                 });
             });
-            populateAttractions(attractions);
+
+            attractionsList.forEach(attraction => {
+                L.marker([attraction.lat, attraction.lng], { icon: attractionsIcon })
+                    .bindTooltip(attraction.name, { direction: 'right' }) // No 'permanent: true'
+                    .addTo(attractions);
+            });
         },
         error: function(err) {
             console.error("Error fetching attractions:", err);
         }
     });
 
-    //Fetch protected area
+    // Fetch Parks
     $.ajax({
         url: '../Gazzeter/php/getParks.php',
         data: { countryCode: countryCode },
         method: 'GET',
         dataType: 'xml',
         success: function(data) {
-            let parks = [];
+            parks.clearLayers();
+            let parksList = [];
             $(data).find('geoname').each(function() {
-                parks.push({
+                parksList.push({
                     name: $(this).find('name').text(),
                     lat: parseFloat($(this).find('lat').text()),
                     lng: parseFloat($(this).find('lng').text())
                 });
             });
-            populateParks(parks);
+
+            parksList.forEach(park => {
+                L.marker([park.lat, park.lng], { icon: parkIcon })
+                    .bindTooltip(park.name, { direction: 'right' }) // No 'permanent: true'
+                    .addTo(parks);
+            });
         },
         error: function(err) {
-            console.error("Error fetching protected areas:", err);
+            console.error("Error fetching parks:", err);
         }
     });
 }
-
-// Global marker cluster group declarations
-let cityClusterGroup;
-let airportClusterGroup;
-let attractionsClusterGroup;
-let parksClusterGroup;
-
-
-
-// Populating Cities with clustering
-function populateMap(cities) {
-    var cityIcon = L.ExtraMarkers.icon({
-        icon: 'fa-city',
-        markerColor: 'blue',
-        shape: 'circle',
-        prefix: 'fas'
-    });
-
-    if (cityClusterGroup) {
-        map.removeLayer(cityClusterGroup);
-    }
-
-    cityClusterGroup = L.markerClusterGroup();
-
-    cities.forEach(city => {
-        let circleMarker = L.marker([city.lat, city.lng], { icon: cityIcon });
-        circleMarker.bindTooltip(`${city.name}`, { permanent: true, direction: 'right' }).bindPopup(`Population: ${city.population}`);
-        cityClusterGroup.addLayer(circleMarker);
-    });
-
-    map.addLayer(cityClusterGroup);
-}
-
-// Populating Airports with clustering
-function populateMapWithAirports(airports) {
-    var airplaneIcon = L.ExtraMarkers.icon({
-        icon: 'fa-plane',
-        markerColor: 'red',
-        shape: 'circle',
-        prefix: 'fas'
-    });
-
-    if (airportClusterGroup) {
-        map.removeLayer(airportClusterGroup);
-    }
-
-    airportClusterGroup = L.markerClusterGroup();
-
-    airports.forEach(airport => {
-        let marker = L.marker([airport.lat, airport.lng], { icon: airplaneIcon });
-        marker.bindTooltip(`<strong>${airport.name}</strong>`);
-        airportClusterGroup.addLayer(marker);
-    });
-
-    map.addLayer(airportClusterGroup);
-}
-
-// Populating Attractions with clustering
-function populateAttractions(attractions) {
-    const attractionsIcon = L.ExtraMarkers.icon({
-        icon: 'fa-landmark',
-        markerColor: 'orange',
-        shape: 'circle',
-        prefix: 'fas'
-    });
-
-    if (attractionsClusterGroup) {
-        map.removeLayer(attractionsClusterGroup);
-    }
-
-    attractionsClusterGroup = L.markerClusterGroup();
-
-    attractions.forEach(loc => {
-        let marker = L.marker([loc.lat, loc.lng], { icon: attractionsIcon });
-        marker.bindTooltip(loc.name);
-        attractionsClusterGroup.addLayer(marker);
-    });
-
-    map.addLayer(attractionsClusterGroup);
-}
-
-// Populating Parks with clustering
-function populateParks(parks) {
-    const parkIcon = L.ExtraMarkers.icon({
-        icon: 'fa-tree',
-        markerColor: 'green',
-        shape: 'circle',
-        prefix: 'fas'
-    });
-
-    if (parksClusterGroup) {
-        map.removeLayer(parksClusterGroup);
-    }
-
-    parksClusterGroup = L.markerClusterGroup();
-
-    parks.forEach(loc => {
-        let marker = L.marker([loc.lat, loc.lng], { icon: parkIcon });
-        marker.bindTooltip(loc.name);
-        parksClusterGroup.addLayer(marker);
-    });
-
-    map.addLayer(parksClusterGroup);
-}
-
-
-
-
 
 
 
