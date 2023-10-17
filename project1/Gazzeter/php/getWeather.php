@@ -7,7 +7,7 @@ header('Content-Type: application/json');
 if(isset($_GET['capital'])) {
     $capital = $_GET['capital'];
     $apiKey = 'ecdcd59f19fe416383a220316232607';  
-    $url = "https://api.weatherapi.com/v1/forecast.json?key=${apiKey}&q=${capital}&days=7";
+    $url = "https://api.weatherapi.com/v1/forecast.json?key=${apiKey}&q=${capital}&days=3";
 
     $ch = curl_init();
 

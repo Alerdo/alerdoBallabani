@@ -583,6 +583,53 @@
         
       </div>
       
+     
+      <div id="weatherModal" class="modal" data-bs-backdrop="false" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content shadow">
+                <div class="modal-header bg-success bg-gradient text-white">
+                    <h5 class="modal-title"><i class="fa-solid fa-cloud-sun-rain fa-xl me-2"></i>3-Day Weather Forecast</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="weather-day" id="weatherToday">
+                        <div>
+                        <h4>TODAY</h4>
+                        <p id="todayDescription"></p>
+                    </div>
+                        <div>
+                        <img src="" id="todayIcon" alt="Weather Icon">
+                         </div>
+                        <div>
+                        <h2 id="todayMaxTemp"></h2>
+                        <h6 id="todayMinTemp"></h6>
+                        </div>
+                    </div>
+                    <div class="weather-day-row">
+                        <div class="weather-day" id="weatherDay2">
+                            <h4 id="day2Date"></h4>
+                            <img src="" id="day2Icon" alt="Weather Icon">
+                            <p id="day2Description"></p>
+                            <h2 id="day2MaxTemp"></h2>
+                            <h6 id="day2MinTemp"></h6>
+                        </div>
+                        <div class="weather-day" id="weatherDay3">
+                            <h4 id="day3Date"></h4>
+                            <img src="" id="day3Icon" alt="Weather Icon">
+                            <p id="day3Description"></p>
+                            <h2 id="day3MaxTemp"></h2>
+                            <h6 id="day3MinTemp"></h6>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-success btn-sm" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    
     
     <div id="loading-spinner" style="display:none;">
         <!-- <img src="./css/fontawesome-free-6.0.0-web/Spinner-1s-200px.gif" alt="Loading..."/> -->

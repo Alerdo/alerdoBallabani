@@ -597,28 +597,46 @@ function fetchWeather(capital, country) {
     $("#loading-spinner").show();
 
     $.ajax({
-        url: '../Gazzeter/php/getWeather.php',  // Change this to the actual path
+        url: '../Gazzeter/php/getWeather.php',
         type: 'GET',
         data: { capital: capital },
         dataType: 'json',
         success: function(data) {
-            if (data.location && data.current) {
-                const weatherData = data.current;
-                const locationData = data.location;
-                // <h4>Weather Information for ${locationData.name}, ${locationData.country}</h4>
-                const content = `
-                  
-                    <p><strong>Temperature:</strong> ${weatherData.temp_c}°C (${weatherData.temp_f}°F)</p>
-                    <p><strong>Condition:</strong> ${weatherData.condition.text}</p>
-                    <p><img src="${weatherData.condition.icon}" alt="${weatherData.condition.text} icon" ></p>
-                    <p><strong>Wind Speed:</strong> ${weatherData.wind_kph} km/h (${weatherData.wind_mph} mph) from ${weatherData.wind_dir}</p>
-                    <p><strong>Humidity:</strong> ${weatherData.humidity}%</p>
-                    <p><strong>Pressure:</strong> ${weatherData.pressure_mb} mb (${weatherData.pressure_in} in)</p>
-                `;
+            if (data.location && data.current && data.forecast) {
+                const forecastDays = data.forecast.forecastday;
+
+                function getDayOfWeek(dateString) {
+                    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+                    const date = new Date(dateString);
+                    return days[date.getDay()];
+                }
+                
+                // Populate the "Today" section
+                $("#todayDescription").text(forecastDays[0].day.condition.text);
+                $("#todayIcon").attr("src", forecastDays[0].day.condition.icon);
+                $("#todayMaxTemp").text(`${forecastDays[0].day.maxtemp_c}°C`);
+                $("#todayMinTemp").text(`${forecastDays[0].day.mintemp_c}°C`);
+
+                // Populate Day 2
+                $("#day2Date").text(getDayOfWeek(forecastDays[1].date));
+                $("#day2Description").text(forecastDays[1].day.condition.text);
+                $("#day2Icon").attr("src", forecastDays[1].day.condition.icon);
+                $("#day2MaxTemp").text(`${forecastDays[1].day.maxtemp_c}°C`);
+                $("#day2MinTemp").text(`${forecastDays[1].day.mintemp_c}°C`);
+
+              
+
+                // Populate Day 3
+                $("#day3Date").text(getDayOfWeek(forecastDays[2].date));
+                $("#day3Description").text(forecastDays[2].day.condition.text);
+                $("#day3Icon").attr("src", forecastDays[2].day.condition.icon);
+                $("#day3MaxTemp").text(`${forecastDays[2].day.maxtemp_c}°C`);
+                $("#day3MinTemp").text(`${forecastDays[2].day.mintemp_c}°C`);
+
                 $("#loading-spinner").hide();
-                $("#exampleModal .modal-title").html(`Weather now in ${country}`);
-                $("#exampleModal").modal("show");
-                $("#modalContent").html(content);
+                $("#weatherModal").modal("show");
+            } else {
+                $("#modalContent").html('<p>Error fetching weather data. Please try again later.</p>');
             }
         },
         error: function(error) {
@@ -627,8 +645,6 @@ function fetchWeather(capital, country) {
         }
     });
 }
-
-
 
 
 // ---------------------------FETCH NEWS DATA --------------------------------------
