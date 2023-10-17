@@ -231,9 +231,9 @@ function fetchCountryInfo(countryCode) {
                         fetchNewsData(countryInfo.iso);
                     }, 'News').addTo(map);
 
-                    buttons.center = L.easyButton('fa-crosshairs', function(btn, map) {
-                        navigateToUserLocation();
-                    }, 'Center').addTo(map);
+                    // buttons.center = L.easyButton('fa-crosshairs', function(btn, map) {
+                    //     navigateToUserLocation();
+                    // }, 'Center').addTo(map);
 
                     // Check if buttons are created
                     for (let key in buttons) {
@@ -574,22 +574,22 @@ function fetchWeather(capital, country) {
                 // Populate the "Today" section
                 $("#todayDescription").text(forecastDays[0].day.condition.text);
                 $("#todayIcon").attr("src", forecastDays[0].day.condition.icon);
-                $("#todayMaxTemp").text(`${forecastDays[0].day.maxtemp_c}°C`);
-                $("#todayMinTemp").text(`${forecastDays[0].day.mintemp_c}°C`);
+                $("#todayMaxTemp").text(`${Math.round(forecastDays[0].day.maxtemp_c)}°C`);
+                $("#todayMinTemp").text(`${Math.round(forecastDays[0].day.mintemp_c)}°C`);
 
                 // Populate Day 2
                 $("#day2Date").text(getDayOfWeek(forecastDays[1].date));
                 $("#day2Description").text(forecastDays[1].day.condition.text);
                 $("#day2Icon").attr("src", forecastDays[1].day.condition.icon);
-                $("#day2MaxTemp").text(`${forecastDays[1].day.maxtemp_c}°C`);
-                $("#day2MinTemp").text(`${forecastDays[1].day.mintemp_c}°C`);
+                $("#day2MaxTemp").text(`${Math.round(forecastDays[1].day.maxtemp_c)}°C`);
+                $("#day2MinTemp").text(`${Math.round(forecastDays[1].day.mintemp_c)}°C`);
 
                 // Populate Day 3
                 $("#day3Date").text(getDayOfWeek(forecastDays[2].date));
                 $("#day3Description").text(forecastDays[2].day.condition.text);
                 $("#day3Icon").attr("src", forecastDays[2].day.condition.icon);
-                $("#day3MaxTemp").text(`${forecastDays[2].day.maxtemp_c}°C`);
-                $("#day3MinTemp").text(`${forecastDays[2].day.mintemp_c}°C`);
+                $("#day3MaxTemp").text(`${Math.round(forecastDays[2].day.maxtemp_c)}°C`);
+                $("#day3MinTemp").text(`${Math.round(forecastDays[2].day.mintemp_c)}°C`);
 
                 $("#loading-spinner").hide();
                 $("#weatherModal").modal("show");
@@ -662,23 +662,23 @@ function fetchNewsData() {
     </div>
     <hr>`; */}
 // -----------------------------CENTRE USER TO ITS LOCATION ---------------------------------------
-function navigateToUserLocation() {
-    if (navigator.geolocation) { 
-        navigator.geolocation.getCurrentPosition(function(position) {
-            var lat = position.coords.latitude;
-            var lon = position.coords.longitude;
-            // Center the map on the user's location
-            map.setView([lat, lon], 10); // 13 is the zoom level
-            // Add a marker to the user's location
-            L.marker([lat, lon]).addTo(map)
-                .bindPopup('You are here.').openPopup();
-        }, function(error) {
-            alert("Error: " + error.message);
-        });
-    } else {
-        alert("Geolocation is not supported by this browser.");
-    }
-}
+// function navigateToUserLocation() {
+//     if (navigator.geolocation) { 
+//         navigator.geolocation.getCurrentPosition(function(position) {
+//             var lat = position.coords.latitude;
+//             var lon = position.coords.longitude;
+//             // Center the map on the user's location
+//             map.setView([lat, lon], 10); // 13 is the zoom level
+//             // Add a marker to the user's location
+//             L.marker([lat, lon]).addTo(map)
+//                 .bindPopup('You are here.').openPopup();
+//         }, function(error) {
+//             alert("Error: " + error.message);
+//         });
+//     } else {
+//         alert("Geolocation is not supported by this browser.");
+//     }
+// }
 
 
 
