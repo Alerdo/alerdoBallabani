@@ -560,6 +560,9 @@ function fetchWeather(capital, country) {
         dataType: 'json',
         success: function(data) {
             if (data.location && data.current && data.forecast) {
+                // Add the capital's name to the span
+                $(".Capital").text(capital);
+
                 const forecastDays = data.forecast.forecastday;
 
                 function getDayOfWeek(dateString) {
@@ -581,8 +584,6 @@ function fetchWeather(capital, country) {
                 $("#day2MaxTemp").text(`${forecastDays[1].day.maxtemp_c}°C`);
                 $("#day2MinTemp").text(`${forecastDays[1].day.mintemp_c}°C`);
 
-              
-
                 // Populate Day 3
                 $("#day3Date").text(getDayOfWeek(forecastDays[2].date));
                 $("#day3Description").text(forecastDays[2].day.condition.text);
@@ -602,6 +603,7 @@ function fetchWeather(capital, country) {
         }
     });
 }
+
 
 
 // ---------------------------FETCH NEWS DATA --------------------------------------
