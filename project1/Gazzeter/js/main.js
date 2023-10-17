@@ -161,174 +161,124 @@ function fetchCountryBorder(isoCode) {
 }
 
 
+let buttons = {
+    info: null,
+    wikipedia: null,
+    currency: null,
+    weather: null,
+    news: null,
+    center: null
+};
 
-
-
-
-// --------------------fetchCountruInfoo---------------------
-
-let buttonsInitialized = false;
-function fetchCountryInfo(countryCode) {
-   $.ajax({
-       url: '../Gazzeter/php/baseCountryInfo.php',
-       method: 'GET',
-       dataType: 'json',
-       data: {
-           countryCode: countryCode
-       },
-       success: function(data) {
-           if (data && data.country) {
-               const   countryDetails = data.country;
-               console.log(data)
-               console.log(countryDetails)
-
-              let countryInfo  = { //use this to display these information.
-                   countryDetails: data.country,
-                   countryName : countryDetails.countryName,
-                   capital: countryDetails.capital,
-                   continent: countryDetails.continent,
-                   population: countryDetails.population,
-                   area: countryDetails.areaInSqKm,
-                   currencyCode: countryDetails.currencyCode,
-                   iso: countryCode,
-            }
-               // Updating the currentBoundingBox object
-              let currentBoundingBox = {
-                   north: countryDetails.north,
-                   south: countryDetails.south,
-                   east: countryDetails.east,
-                   west: countryDetails.west
-               };
-           
-               //This will get data and populate the map with info 
-               fetchMapData(countryInfo.iso, currentBoundingBox)
-             
-
-               if (!buttonsInitialized) {
-                   /*4*/ //Extra Information 
-                   // Info button
-                   L.easyButton('fa-info-circle', function(btn, map) {
-                       fetchCountryData("info", countryInfo);
-                   }, 'Info').addTo(map);
-           
-                   // Wikipedia button
-                   L.easyButton('fa-book', function(btn, map) {
-                       getWikipediaInfo(countryInfo.countryName);
-                   }, 'Wikipedia').addTo(map);
-           
-                   // Currency button
-                   L.easyButton('fa-money-bill-alt', function(btn, map) {
-                       fetchCurrencyInfo(countryInfo.currencyCode);
-                   }, 'Currency').addTo(map);
-           
-                   // Weather button
-                   L.easyButton('fa-cloud-sun', function(btn, map) {
-                       fetchWeather(countryInfo.capital, countryInfo.countryName);
-                   }, 'Weather').addTo(map);
-           
-                   // News button
-                   L.easyButton('fa-newspaper', function(btn, map) {
-                       fetchNewsData(countryInfo.iso);
-                   }, 'News').addTo(map);
-           
-                   // Center button
-                   L.easyButton('fa-crosshairs', function(btn, map) {
-                       navigateToUserLocation();
-                   }, 'Center').addTo(map);
-           
-                   buttonsInitialized = true;  // Set the flag to true after creating the buttons
-               }
-
-               
-           //   createButtons(countryInfo);
-           
-            
-           } else {
-               console.error("Invalid data returned from API:", data);
-           }
-       },
-       error: function(err) {
-           console.error("Error fetching country info:", err);
-       }
-   });
+function clearButtons() {
+    for (let key in buttons) {
+        if (buttons[key]) {
+            buttons[key].remove();
+            buttons[key] = null;
+        }
+    }
 }
 
-//  //Make a call to get basic info so I can use it for subsequent calls.
-// //Fetch country info is responsible for 
-//  function fetchCountryInfo(countryCode) {
-//     $.ajax({
-//         url: '../Gazzeter/php/baseCountryInfo.php',
-//         method: 'GET',
-//         dataType: 'json',
-//         data: {
-//             countryCode: countryCode
-//         },
-//         success: function(data) {
-//             if (data && data.country) {
-//                 const   countryDetails = data.country;
-//                 console.log(data)
-//                 console.log(countryDetails)
+function fetchCountryInfo(countryCode) {
+    $.ajax({
+        url: '../Gazzeter/php/baseCountryInfo.php',
+        method: 'GET',
+        dataType: 'json',
+        data: { countryCode: countryCode },
 
-//                let countryInfo  = { //use this to display these information.
-//                     countryDetails: data.country,
-//                     countryName : countryDetails.countryName,
-//                     capital: countryDetails.capital,
-//                     continent: countryDetails.continent,
-//                     population: countryDetails.population,
-//                     area: countryDetails.areaInSqKm,
-//                     currencyCode: countryDetails.currencyCode,
-//                     iso: countryCode,
-//              }
-//                 // Updating the currentBoundingBox object
-//                let currentBoundingBox = {
-//                     north: countryDetails.north,
-//                     south: countryDetails.south,
-//                     east: countryDetails.east,
-//                     west: countryDetails.west
-//                 };
-            
-//                 //This will get data and populate the map with info 
-                
-//                 fetchMapData(countryInfo.iso, currentBoundingBox)
+        success: function(data) {
+            if (data && data.country) {
+                const countryDetails = data.country;
+                let countryInfo = {
+                    countryDetails: data.country,
+                    countryName: countryDetails.countryName,
+                    capital: countryDetails.capital,
+                    continent: countryDetails.continent,
+                    population: countryDetails.population,
+                    area: countryDetails.areaInSqKm,
+                    currencyCode: countryDetails.currencyCode,
+                    iso: countryCode
+                };
 
-//               /*4*/ //Extra Information 
-//               $(".custom-btn").off('click').click(function() {
-//                     const dataType = $(this).data("type");  // Get the data-type value from button 
-//                     switch (dataType) {
-//                         case "info":
-//                             // Call your function for the info button here.
-//                             fetchCountryData("info", countryInfo);  
-//                             break;
-//                         case "exchange":
-//                             // Call your function for the exchange button here.
-//                             fetchCurrencyInfo(countryInfo.currencyCode);
-//                             break;
-//                         case "weather":
-//                             fetchWeather(countryInfo.capital, countryInfo.countryName)
-//                             break;
-//                         case "news":
-//                             fetchNewsData(countryInfo.iso)
-//                             break;
-//                         case "center":
-//                             navigateToUserLocation()
-//                             break;
-//                         case "wikipedia":
-//                             getWikipediaInfo(countryInfo.countryName)
-//                     }
-//                 });
-                
-//             //   createButtons(countryInfo);
-            
-             
-//             } else {
-//                 console.error("Invalid data returned from API:", data);
-//             }
-//         },
-//         error: function(err) {
-//             console.error("Error fetching country info:", err);
-//         }
-//     });
-// }
+                let currentBoundingBox = {
+                    north: countryDetails.north,
+                    south: countryDetails.south,
+                    east: countryDetails.east,
+                    west: countryDetails.west
+                };
+
+                clearButtons();
+                fetchMapData(countryInfo.iso, currentBoundingBox);
+
+                if (!buttons.info) {
+                    buttons.info = L.easyButton('fa-info-circle', function(btn, map) {
+                        fetchCountryData("info", countryInfo);
+                    }, 'Info').addTo(map);
+
+                    buttons.wikipedia = L.easyButton('fa-book', function(btn, map) {
+                        getWikipediaInfo(countryInfo.countryName);
+                    }, 'Wikipedia').addTo(map);
+
+                    buttons.currency = L.easyButton('fa-money-bill-alt', function(btn, map) {
+                        fetchCurrencyInfo(countryInfo.currencyCode);
+                    }, 'Currency').addTo(map);
+
+                    buttons.weather = L.easyButton('fa-cloud-sun', function(btn, map) {
+                        fetchWeather(countryInfo.capital, countryInfo.countryName);
+                    }, 'Weather').addTo(map);
+
+                    buttons.news = L.easyButton('fa-newspaper', function(btn, map) {
+                        fetchNewsData(countryInfo.iso);
+                    }, 'News').addTo(map);
+
+                    buttons.center = L.easyButton('fa-crosshairs', function(btn, map) {
+                        navigateToUserLocation();
+                    }, 'Center').addTo(map);
+
+                    // Check if buttons are created
+                    for (let key in buttons) {
+                        if (!buttons[key]) {
+                            console.error("Button", key, "was not created!");
+                        }
+                    }
+                } else {
+                    // Update event listeners of existing buttons
+                    buttons.info.off('click').on('click', function(btn, map) {
+                        fetchCountryData("info", countryInfo);
+                    });
+
+                    buttons.wikipedia.off('click').on('click', function(btn, map) {
+                        getWikipediaInfo(countryInfo.countryName);
+                    });
+
+                    buttons.currency.off('click').on('click', function(btn, map) {
+                        fetchCurrencyInfo(countryInfo.currencyCode);
+                    });
+
+                    buttons.weather.off('click').on('click', function(btn, map) {
+                        fetchWeather(countryInfo.capital, countryInfo.countryName);
+                    });
+
+                    buttons.news.off('click').on('click', function(btn, map) {
+                        fetchNewsData(countryInfo.iso);
+                    });
+
+                    buttons.center.off('click').on('click', function(btn, map) {
+                        navigateToUserLocation();
+                    });
+                }
+            } else {
+                console.error("Invalid data returned from API:", data);
+            }
+        },
+        error: function(err) {
+            console.error("Error fetching country info:", err);
+        }
+    });
+}
+
+
+
 
 
 var airports = L.markerClusterGroup().addTo(map);
@@ -496,6 +446,9 @@ function fetchMapData(countryCode, currentBoundingBox) {
 
 //  ------------------------------------------INFO TAB ------------------------------
 
+function formatNumber(number) {
+    return new Intl.NumberFormat().format(number);
+}
 
 function fetchCountryData(type, param) {
     $("#loading-spinner").show();
@@ -505,8 +458,12 @@ function fetchCountryData(type, param) {
         $("#countryName").text(param.countryName);
         $("#capitalCity").text(param.capital);
         $("#continent").text(param.continent);
-        $("#population").text(param.population);
-        $("#areaInSqKm").text(param.area);
+        const formattedPopulation = formatNumber(param.population);
+const formattedArea = formatNumber(param.area);
+
+$("#population").text(formattedPopulation);
+$("#areaInSqKm").text(formattedArea);
+
         $("#currencyCode").text(param.currencyCode);
         $("#isoCode").text(param.iso);
 
@@ -572,13 +529,13 @@ function fetchCurrencyInfo(currencyCode) {
 }
 
 function updateConversionValues(rates, amount, currencyCode) {
-    let usdRate = rates.USD ? (rates.USD * amount).toFixed(2) : "N/A";
-    let eurRate = rates.EUR ? (rates.EUR * amount).toFixed(2) : "N/A";
-    let gbpRate = rates.GBP ? (rates.GBP * amount).toFixed(2) : "N/A";
-    let jpyRate = rates.JPY ? (rates.JPY * amount).toFixed(2) : "N/A";
+    let usdRate = rates.USD ? formatNumber((rates.USD * amount).toFixed(2)) : "N/A";
+    let eurRate = rates.EUR ? formatNumber((rates.EUR * amount).toFixed(2)) : "N/A";
+    let gbpRate = rates.GBP ? formatNumber((rates.GBP * amount).toFixed(2)) : "N/A";
+    let jpyRate = rates.JPY ? formatNumber((rates.JPY * amount).toFixed(2)) : "N/A";
 
     let content = `
-        <strong>${amount} ${currencyCode} is equivalent to:</strong><br>
+        <strong>${formatNumber(amount)} ${currencyCode} is equivalent to:</strong><br>
         USD: $${usdRate}<br>
         EUR: €${eurRate}<br>
         GBP: £${gbpRate}<br>
@@ -648,8 +605,7 @@ function fetchWeather(capital, country) {
 
 
 // ---------------------------FETCH NEWS DATA --------------------------------------
-
-function fetchNewsData(countryCode) {
+function fetchNewsData() {
     $("#loading-spinner").show();
 
     $.ajax({
@@ -657,30 +613,29 @@ function fetchNewsData(countryCode) {
         method: 'GET',
         dataType: 'json',
         data: {
-            countryCode: countryCode
+            language: 'en'
         },
         success: function(data) {
-            if (data && data.articles) {
-                const articles = data.articles;
-                let content = '<h5 class="news"></h5>'
-
-
+            console.log(data);
+            if (data && data.news) {
+                const articles = data.news;
+                let content = '';
                 articles.forEach(article => {
-                    content += `
-                    <div>
-                        <strong>${article.title}</strong><br>
-                        Author: ${article.author}<br>
-                        Source: ${article.source.name}<br>
-                        Published At: ${article.publishedAt}<br>
-                        <a href="${article.url}" target="_blank">Read more...</a><br>
-                        <hr>
-                    </div>`;
+                    if (article.image) {
+                        content += `
+                        <div class="news-item">
+                            <img src="${article.image}" alt="News Image" class="news-image">
+                            <div>
+                                <a href="${article.url}" target="_blank" class="news-title">${article.title}</a><br>
+                                <span class="news-author">Source: ${article.author}</span>
+                            </div>
+                        </div>
+                        <hr>`;
+                    }
                 });
-
                 $("#loading-spinner").hide();
-                $("#exampleModal .modal-title").html(`News`);
-                $("#modalContent").html(content);
-                $("#exampleModal").modal("show");
+                $("#newsContent").html(content);
+                $("#newsModal").modal("show");
             } else {
                 console.error("Invalid data returned from API:", data);
             }
@@ -691,6 +646,19 @@ function fetchNewsData(countryCode) {
     });
 }
 
+
+{/* <div class="news-item d-flex">
+        <div class="news-image-container">
+            <img src="${article.image}" alt="News Image" class="news-image">
+        </div>
+        <div class="news-info">
+            <a href="${article.url}" target="_blank" class="news-link">
+                <strong>${article.title}</strong>
+            </a>
+            <small class="news-author">${article.author}</small>
+        </div>
+    </div>
+    <hr>`; */}
 // -----------------------------CENTRE USER TO ITS LOCATION ---------------------------------------
 function navigateToUserLocation() {
     if (navigator.geolocation) { 

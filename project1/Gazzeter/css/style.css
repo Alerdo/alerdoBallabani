@@ -200,6 +200,29 @@ div#modalContent {
 .leaflet-bar a:last-child {
   border: none !important;
 }
+.news-item {
+  display: flex;
+  justify-content: start;
+  align-items: center;
+}
+
+.news-image {
+  width: 50%;
+  max-width: 200px; /* Adjust if needed */
+  margin-right: 10px;
+}
+
+.news-title {
+  flex-grow: 1;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.news-author {
+  font-style: italic;
+  opacity: 0.6; /* to make it a bit blurred or faded */
+}
+
 
 /* Media queries for small devices */
 @media (max-width: 676px) {
