@@ -29,23 +29,20 @@
           
               <div class="row">
           
-
             <!-- SEARCH BAR -->
             <div class="col">
                 <div class="input-group mb-3">
-                    <input id="searchInp" class="form-control" placeholder="search">
+                    <input id="searchInp" class="form-control" placeholder="Search employee...">
                     <button class="btn btn-outline-secondary" type="button" id="searchBtn">
                         <i class="fa-solid fa-search"></i>
                     </button>
                 </div>
             </div>
 
-              
-          
+                <!-- Refresh / Filter / Add -->
+
                 <div class="col-6 text-end me-2">
-          
                   <div class="btn-group" role="group" aria-label="buttons">
-          
                     <button id="refreshBtn" type="button" class="btn btn-primary">
                       <i class="fa-solid fa-refresh fa-fw"></i>
                     </button>
@@ -55,13 +52,12 @@
                     <button id="addBtn" type="button" class="btn btn-primary">
                       <i class="fa-solid fa-plus fa-fw"></i>
                     </button>
-          
                   </div>
-          
                 </div>
                 
               </div>
           
+                <!-- NAVBAR SECTIONS -->
               <ul class="nav nav-tabs" id="myTab" role="tablist">
                   <li class="nav-item" role="presentation">
                     <button class="nav-link active" id="personnelBtn" data-bs-toggle="tab" data-bs-target="#personnel-tab-pane" type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true">
@@ -83,8 +79,10 @@
           
             </div>
           
+
             <div class="tab-content bg-white">
           
+                  <!-- EMPLOYEE SECTION  -->
               <div class="tab-pane show active" id="personnel-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
                 <table class="table table-hover">
                     <thead>
@@ -102,7 +100,7 @@
                             <td class="align-middle text-nowrap employeeLocation"></td>
                             <td class="align-middle text-nowrap d-none d-md-table-cell employeeEmail"></td>
                             <td class="text-end text-nowrap">
-                                <button type="button" class="btn btn-primary btn-sm editEmployeeBtn" data-bs-toggle="modal" data-bs-target="#editPersonnelModal" data-id="">
+                                <button type="button" class="btn btn-primary btn-sm editEmployeeBtn" data-bs-toggle="modal" data-bs-target="#editPersonnelModal" data-id="" data-context="employee">
                                     <i class="fa-solid fa-pencil fa-fw"></i>
                                 </button>
                                 <button type="button" class="btn btn-primary btn-sm deletePersonnelBtn" data-id="">
@@ -114,12 +112,10 @@
                 </table>
             </div>
             
-
-
+                    <!-- DEPARTMENT SECTION  -->
               <div class="tab-pane" id="departments-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
                 <table class="table table-hover">
                   <thead>
-                      <!-- You can have table headers here if required -->
                       <tr>
                           <th>Department Name</th>
                           <th>Location</th>
@@ -132,9 +128,10 @@
                           <td class="align-middle text-nowrap departmentName"></td>
                           <td class="align-middle text-nowrap departmentLocation"></td>
                           <td class="align-middle text-end text-nowrap">
-                              <button type="button" class="btn btn-primary btn-sm editDepartmentBtn" data-bs-toggle="modal" data-bs-target="#editDepartmentModal" data-id="">
-                                  <i class="fa-solid fa-pencil fa-fw"></i>
-                              </button>
+                             <!-- for departments -->
+                          <button type="button" class="btn btn-primary btn-sm editDepartmentBtn" data-bs-toggle="modal" data-bs-target="#editPersonnelModal" data-id="" data-context="department">
+                            <i class="fa-solid fa-pencil fa-fw"></i>
+                          </button>
                               <button type="button" class="btn btn-primary btn-sm deleteDepartmentBtn" data-id="">
                                   <i class="fa-solid fa-trash fa-fw"></i>
                               </button>
@@ -144,7 +141,9 @@
               </table>
               
               </div>
-          
+
+
+                      <!-- LOCATIONS SECTION -->
               <div class="tab-pane" id="locations-tab-pane" role="tabpanel" aria-labelledby="contact-tab" tabindex="0">
                 <table class="table table-hover">
                   <thead>
@@ -157,9 +156,10 @@
                       <tr class="locationTemplate" style="display: none;">
                           <td class="align-middle text-nowrap locationName"></td>
                           <td class="align-middle text-end text-nowrap">
-                              <button type="button" class="btn btn-primary btn-sm editLocationBtn">
-                                  <i class="fa-solid fa-pencil fa-fw"></i>
-                              </button>
+                             <!-- for locations -->
+                            <button type="button" class="btn btn-primary btn-sm editLocationBtn" data-bs-toggle="modal" data-bs-target="#editPersonnelModal" data-id="" data-context="location">
+                              <i class="fa-solid fa-pencil fa-fw"></i>
+                            </button>
                               <button type="button" class="btn btn-primary btn-sm deleteLocationBtn">
                                   <i class="fa-solid fa-trash fa-fw"></i>
                               </button>
@@ -172,6 +172,7 @@
           
             </div>
             
+
             <footer class="border-top text-center fw-bold">
               
               <p class="fw-light my-3">Company Directory version 1.0</p>
@@ -182,68 +183,29 @@
               
 
            <!-- Edit personel Modale -->
-          <div id="editPersonnelModal" class="modal fade" tabindex="-1" data-bs-backdrop="false" data-bs-keyboard="false" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            
-            <!--   the last two classes centre the modal and, if the content is too long, ensures  -->
-            <!--   that the header and footer are always on display by making the body scroll -->
-            
-            <div class="modal-dialog modal-sm modal-dialog-centered modal-dialog-scrollable">
-                 
-              <div class="modal-content shadow"> 
-                
-                <div class="modal-header bg-primary bg-gradient text-white">
-                  <h5 class="modal-title">Edit employee</h5>
-                  <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-          
-                <div class="modal-body">
-                    
-                  <form id="editPersonnelForm">
-          
-                    <input type="hidden" id="editPersonnelEmployeeID">
-          
-                    <div class="form-floating mb-3">
-                      <input type="text" class="form-control" id="editPersonnelFirstName" placeholder="First name" required>
-                      <label for="editPersonnelFirstName">First name</label>
+           <div id="editPersonnelModal" class="modal fade" tabindex="-1" data-bs-backdrop="false" data-bs-keyboard="false" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-sm modal-dialog-centered modal-dialog-scrollable">    
+                <div class="modal-content shadow">   
+                    <div class="modal-header bg-primary bg-gradient text-white">
+                        <h5 class="modal-title" id="modalTitle">Edit Details</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-          
-                    <div class="form-floating mb-3">
-                      <input type="text" class="form-control" id="editPersonnelLastName" placeholder="Last name" required>
-                      <label for="editPersonnelLastName">Last name</label>
+                    <div class="modal-body">   
+                        <form id="editPersonnelForm">
+                            <input type="hidden" id="editPersonnelEntityID">
+                            <div id="dynamicModalFields">
+                                <!-- Dynamic fields will be inserted here -->
+                            </div>
+                        </form>
                     </div>
-          
-                    <div class="form-floating mb-3">
-                      <input type="text" class="form-control" id="editPersonnelJobTitle" placeholder="Job title" required>
-                      <label for="editPersonnelJobTitle">Job Title</label>
-                    </div>          
-          
-                    <div class="form-floating mb-3">
-                      <input type="email" class="form-control" id="editPersonnelEmailAddress" placeholder="Email address" required>
-                      <label for="editPersonnelEmailAddress">Email Address</label>
-                    </div>    
-          
-                    <div class="form-floating">
-                      <select class="form-select" id="editPersonnelDepartment" placeholder="Department">
-                      </select>
-                      <label for="editPersonnelDepartment">Department</label>
-                    </div>  
-          
-                  </form>
-          
+                    <div class="modal-footer">
+                        <button type="submit" form="editPersonnelForm" class="btn btn-outline-primary btn-sm myBtn">SAVE</button>
+                        <button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">CANCEL</button>
+                    </div>
                 </div>
-          
-                <div class="modal-footer">
-                  <button type="submit" form="editPersonnelForm" class="btn btn-outline-primary btn-sm myBtn">SAVE</button>
-                  <button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">CANCEL</button>
-                </div>
-           
-              </div>
-              
             </div>
-            
-          </div>
-              
-
+        </div>
+        
 
           <!-- Delete Modale -->
           <!-- Delete Confirmation Modal -->
@@ -266,7 +228,10 @@
 </div>
 
 
-          
+
+           
+              
+
         <script src="./js/main.js" async defer></script>
     </body>
 </html>

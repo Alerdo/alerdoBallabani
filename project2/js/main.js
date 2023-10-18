@@ -143,80 +143,10 @@ $("#locationsBtn").click(function () {
 });
 
 
-  // $("#refreshBtn").click(function () {
-    
-  //   if ($("#personnelBtn").hasClass("active")) {
-      
-  //     // Refresh personnel table
-      
-  //   } else {
-      
-  //     if ($("#departmentsBtn").hasClass("active")) {
-        
-  //       // Refresh department table
-        
-  //     } else {
-        
-  //       // Refresh location table
-        
-  //     }
-      
-  //   }
-    
-  // });
-  
-  // $("#filterBtn").click(function () {
-    
-  //   // Open a modal of your own design that allows the user to apply a filter to the personnel table on either department or location
-    
-  // });
-  
-  // $("#addBtn").click(function () {
-    
-  //   // Replicate the logic of the refresh button click to open the add modal for the table that is currently on display
-    
-  // });
-  
-  // $("#personnelBtn").click(function () {
-    
-  //   // Call function to refresh presonnel table
-    
-  // });
-  
-  // $("#departmentsBtn").click(function () {
-    
-  //   // Call function to refresh department table
-    
-  // });
-  
-  // $("#locationsBtn").click(function () {
-    
-  //   // Call function to refresh location table
-    
-  // });
-  
+ 
 
 
-  $("#editPersonnelModal").on("show.bs.modal", function (e) {
-    const employeeId = $(e.relatedTarget).attr("data-id");
-    const employee = apiResponse.find(emp => emp.id == employeeId);
   
-    if (employee) {
-      $("#editPersonnelEmployeeID").val(employee.id);
-
-      const nameParts = employee.name.split(' '); // Splitting by space
-      $("#editPersonnelFirstName").val(nameParts[0]); // First part is the first name
-      $("#editPersonnelLastName").val(nameParts.slice(1).join(' ')); // Rest of the parts are last name
-
-      $("#editPersonnelJobTitle").val(employee.role);
-      $("#editPersonnelEmailAddress").val(employee.email);
-  
-      // When you're ready to populate the department dropdown, you can do it here
-  
-    } else {
-      $("#editPersonnelModal .modal-title").replaceWith("Employee not found");
-    }
-  });
 
   
 
@@ -342,10 +272,13 @@ function populateLocationsTable(response) {
 // Call the function to populate the locations table when you receive the API response
 populateLocationsTable(locationsApiResponse);
 
+
+
+
 // ------------------------DELETE MODALE-----------------------------------
 
 
-// Event listener for the Personnel Delete button
+
 $(document).on("click", ".deletePersonnelBtn", function() {
   const itemId = $(this).attr("data-id");
   const item = apiResponse.find(emp => emp.id == itemId);
@@ -356,7 +289,7 @@ $(document).on("click", ".deletePersonnelBtn", function() {
   }
 });
 
-// Event listener for the Department Delete button
+
 $(document).on("click", ".deleteDepartmentBtn", function() {
   const itemId = $(this).attr("data-id");
   const item = departmentsApiResponse.find(dept => dept.id == itemId);
@@ -385,3 +318,124 @@ $(document).on("click", ".confirmDelete", function() {
   // Or you can set a global state/data attribute indicating the current type - Personnel, Department, or Location
   $("#deleteConfirmationModal").modal("hide");
 });
+
+
+
+
+
+
+
+// $("#editPersonnelModal").on("show.bs.modal", function (e) {
+//   const employeeId = $(e.relatedTarget).attr("data-id");
+//   const employee = apiResponse.find(emp => emp.id == employeeId);
+
+//   if (employee) {
+//     $("#editPersonnelEmployeeID").val(employee.id);
+
+//     const nameParts = employee.name.split(' '); // Splitting by space
+//     $("#editPersonnelFirstName").val(nameParts[0]); // First part is the first name
+//     $("#editPersonnelLastName").val(nameParts.slice(1).join(' ')); // Rest of the parts are last name
+
+//     $("#editPersonnelJobTitle").val(employee.role);
+//     $("#editPersonnelEmailAddress").val(employee.email);
+
+//     // When you're ready to populate the department dropdown, you can do it here
+
+//   } else {
+//     $("#editPersonnelModal .modal-title").replaceWith("Employee not found");
+//   }
+// });
+
+// $("#editPersonnelModal").on("show.bs.modal", function (e) {
+//   const context = $(e.relatedTarget).attr("data-context");
+//   const id = $(e.relatedTarget).attr("data-id");
+
+//   switch (context) {
+//     case "department":
+//       // Load department data based on 'id'
+//       const department = departmentsApiResponse.find(dep => dep.id == id);
+//       // Handle department data and populate modal fields
+//       break;
+      
+//     case "location":
+//       // Load location data based on 'id'
+//       const location = locationsApiResponse.find(loc => loc.id == id);
+//       // Handle location data and populate modal fields
+//       break;
+      
+//     default:
+//       // Assume it's an employee context
+//       const employee = apiResponse.find(emp => emp.id == id);
+//       if (employee) {
+//         $("#editPersonnelEmployeeID").val(employee.id);
+
+//             const nameParts = employee.name.split(' '); // Splitting by space
+//             $("#editPersonnelFirstName").val(nameParts[0]); // First part is the first name
+//             $("#editPersonnelLastName").val(nameParts.slice(1).join(' ')); // Rest of the parts are last name
+        
+//             $("#editPersonnelJobTitle").val(employee.role);
+//             $("#editPersonnelEmailAddress").val(employee.email);
+//       } else {
+//         $("#editPersonnelModal .modal-title").replaceWith("Data not found");
+//       }
+//       break;
+//   }
+// });
+
+
+
+$("#editPersonnelModal").on("show.bs.modal", function (e) {
+  const entityId = $(e.relatedTarget).attr("data-id");
+  const context = $(e.relatedTarget).attr("data-context");
+
+  switch(context) {
+      case "employee":
+          const employee = apiResponse.find(emp => emp.id == entityId);
+          console.log(employee)
+          if (employee) {
+            
+              $("#modalTitle").text("Edit Employee");
+              $("#editPersonnelEntityID").val(employee.id);
+
+              const nameParts = employee.name.split(' '); 
+              const firstName = nameParts[0];
+              const lastName = nameParts.slice(1).join(' ');
+
+              const content = `
+                  <div class="form-floating mb-3">
+                      <input type="text" class="form-control" id="editPersonnelFirstName" placeholder="First name" required value="${firstName}">
+                      <label for="editPersonnelFirstName">First name</label>
+                  </div>
+                  <div class="form-floating mb-3">
+                      <input type="text" class="form-control" id="editPersonnelLastName" placeholder="Last name" required value="${lastName}">
+                      <label for="editPersonnelLastName">Last name</label>
+                  </div>
+                  <div class="form-floating mb-3">
+                      <input type="text" class="form-control" id="editPersonnelJobTitle" placeholder="Job title" required value="${employee.role}">
+                      <label for="editPersonnelJobTitle">Job Title</label>
+                  </div>
+                  <div class="form-floating mb-3">
+                      <input type="email" class="form-control" id="editPersonnelEmailAddress" placeholder="Email address" required value="${employee.email}">
+                      <label for="editPersonnelEmailAddress">Email Address</label>
+                  </div>
+              `;
+
+              $("#dynamicModalFields").html(content);
+
+          } else {
+              $("#modalTitle").text("Employee not found");
+          }
+          break;
+
+      case "department":
+        $("#dynamicModalFields").html("conent for department ");
+          // similar logic for department, adjust the content to match department data
+          break;
+
+      case "location":
+        $("#dynamicModalFields").html("conent for locations ");
+          // similar logic for location, adjust the content to match location data
+          break;
+  }
+});
+
