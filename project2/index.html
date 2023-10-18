@@ -29,9 +29,18 @@
           
               <div class="row">
           
-                <div class="col">
-                  <input id="searchInp" class="form-control mb-3" placeholder="search">
+
+            <!-- SEARCH BAR -->
+            <div class="col">
+                <div class="input-group mb-3">
+                    <input id="searchInp" class="form-control" placeholder="search">
+                    <button class="btn btn-outline-secondary" type="button" id="searchBtn">
+                        <i class="fa-solid fa-search"></i>
+                    </button>
                 </div>
+            </div>
+
+              
           
                 <div class="col-6 text-end me-2">
           
@@ -78,36 +87,33 @@
           
               <div class="tab-pane show active" id="personnel-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
                 <table class="table table-hover">
-                  <thead>
-                      <!-- You can have table headers here if required -->
-                      <tr>
-                          <th>Name</th>
-                          <th>Role</th>
-                          <th>Location</th>
-                          <th>Email</th>
-                          <!-- <th>Actions</th> -->
-                      </tr>
-                  </thead>
-                  <tbody id="employeesTableBody">
-                      <tr class="employeeTemplate" style="display: none;">
-                          <td class="align-middle text-nowrap employeeName"></td>
-                          <td class="align-middle text-nowrap d-none d-md-table-cell employeeRole"></td>
-                          <td class="align-middle text-nowrap d-none d-md-table-cell employeeLocation"></td>
-                          <td class="align-middle text-nowrap d-none d-md-table-cell employeeEmail"></td>
-                          <td class="text-end text-nowrap">
-                              <button type="button" class="btn btn-primary btn-sm editEmployeeBtn" data-bs-toggle="modal" data-bs-target="#editPersonnelModal" data-id="">
-                                  <i class="fa-solid fa-pencil fa-fw"></i>
-                              </button>
-                              <button type="button" class="btn btn-primary btn-sm deletePersonnelBtn" data-id="">
-                                  <i class="fa-solid fa-trash fa-fw"></i>
-                              </button>
-                          </td>
-                      </tr>
-                  </tbody>
-              </table>
-              
-              </div>
-          
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Role</th>
+                            <th>Location</th>
+                            <th class="d-none d-md-table-cell">Email</th>
+                        </tr>
+                    </thead>
+                    <tbody id="employeesTableBody">
+                        <tr class="employeeTemplate" style="display: none;">
+                            <td class="align-middle text-nowrap employeeName"></td>
+                            <td class="align-middle text-nowrap employeeRole"></td>
+                            <td class="align-middle text-nowrap employeeLocation"></td>
+                            <td class="align-middle text-nowrap d-none d-md-table-cell employeeEmail"></td>
+                            <td class="text-end text-nowrap">
+                                <button type="button" class="btn btn-primary btn-sm editEmployeeBtn" data-bs-toggle="modal" data-bs-target="#editPersonnelModal" data-id="">
+                                    <i class="fa-solid fa-pencil fa-fw"></i>
+                                </button>
+                                <button type="button" class="btn btn-primary btn-sm deletePersonnelBtn" data-id="">
+                                    <i class="fa-solid fa-trash fa-fw"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
 
 
               <div class="tab-pane" id="departments-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
@@ -124,7 +130,7 @@
                       <!-- This is the template row for departments that will remain hidden and be used as a blueprint -->
                       <tr class="departmentTemplate" style="display: none;">
                           <td class="align-middle text-nowrap departmentName"></td>
-                          <td class="align-middle text-nowrap d-none d-md-table-cell departmentLocation"></td>
+                          <td class="align-middle text-nowrap departmentLocation"></td>
                           <td class="align-middle text-end text-nowrap">
                               <button type="button" class="btn btn-primary btn-sm editDepartmentBtn" data-bs-toggle="modal" data-bs-target="#editDepartmentModal" data-id="">
                                   <i class="fa-solid fa-pencil fa-fw"></i>
@@ -241,24 +247,24 @@
 
           <!-- Delete Modale -->
           <!-- Delete Confirmation Modal -->
-          <div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="deleteModalLabel">Delete Confirmation</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        Are you sure you want to delete <span id="itemNameToDelete"></span>?
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-danger confirmDelete">Yes, Delete</button>
-                    </div>
-                </div>
+        <div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Delete Confirmation</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete <span id="itemNameToDelete"></span>?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger confirmDelete">Yes, Delete</button>
             </div>
         </div>
-        
+    </div>
+</div>
+
 
           
         <script src="./js/main.js" async defer></script>

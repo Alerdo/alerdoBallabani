@@ -1,9 +1,69 @@
-$("#searchInp").on("keyup", function () {
-  
-    // your code
-    
+// The performSearch function that will be executed when the search button is clicked
+function performSearch() {
+  // Get the value of the search input
+  let query = $('#searchInp').val().toLowerCase();
+
+  // Check which tab is active
+  if ($('#personnelBtn').hasClass('active')) {
+      // Perform the search for the personnel table
+      console.log("Searching personnel");
+      searchTable(query, "#employeesTableBody");
+  }
+  else if ($('#departmentsBtn').hasClass('active')) {
+      // Perform the search for the department table
+      console.log("Searching departments");
+      searchTable(query, "#departmentsTableBody");
+  }
+  else if ($('#locationsBtn').hasClass('active')) {
+      // Perform the search for the location table
+      console.log("Searching locations");
+      searchTable(query, "#locationsTableBody");
+  }
+}
+
+// The searchTable function to perform the actual search in the table
+function searchTable(query, tableBodySelector) {
+  // Loop through all rows of the table body
+  $(tableBodySelector + " tr").each(function() {
+      $(this).show(); // Initially show every row
+      
+      // If the query is not empty and it's not found in the row, hide the row
+      if (query && $(this).text().toLowerCase().indexOf(query) == -1) {
+          $(this).hide();
+      }
   });
-  
+}
+
+// Event listener for the search button
+$('#searchBtn').click(function() {
+  console.log("Search button clicked"); // Debugging
+  performSearch();
+});
+
+// Event to detect tab changes and update the search input's placeholder accordingly
+$('button[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
+  var target = $(e.target).attr("data-bs-target"); // activated tab
+
+  if (target === '#personnel-tab-pane') {
+      $('#searchInp').attr('placeholder', 'Search personnel...');
+  } else if (target === '#departments-tab-pane') {
+      $('#searchInp').attr('placeholder', 'Search departments...');
+  } else if (target === '#locations-tab-pane') {
+      $('#searchInp').attr('placeholder', 'Search locations...');
+  }
+});
+
+// Trigger search when pressing 'Enter' on the keyboard
+$("#searchInp").on("keyup", function (e) {
+  if (e.key === 'Enter' || e.keyCode === 13) {
+      performSearch();
+  }
+});
+
+
+
+
+
 
   // Returns the active tab id
 function getActiveTab() {
