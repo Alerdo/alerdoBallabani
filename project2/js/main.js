@@ -427,15 +427,52 @@ $("#editPersonnelModal").on("show.bs.modal", function (e) {
           }
           break;
 
-      case "department":
-        $("#dynamicModalFields").html("conent for department ");
-          // similar logic for department, adjust the content to match department data
-          break;
+          case "department":
+            const department = departmentsApiResponse.find(dep => dep.id == entityId);
+            console.log(department);
+            if (department) {
+                $("#modalTitle").text("Edit Department");
+        
+                $("#editPersonnelEntityID").val(department.id);
+        
+                const content = `
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="editDepartmentName" placeholder="Department Name" required value="${department.departmentName}">
+                        <label for="editDepartmentName">Department Name</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="editDepartmentLocation" placeholder="Location" required value="${department.departmentLocation}">
+                        <label for="editDepartmentLocation">Location</label>
+                    </div>
+                `;
+        
+                $("#dynamicModalFields").html(content);
+            } else {
+                $("#modalTitle").text("Department not found");
+            }
+            break;
 
-      case "location":
-        $("#dynamicModalFields").html("conent for locations ");
-          // similar logic for location, adjust the content to match location data
-          break;
+            case "location":
+              const location = locationsApiResponse.find(loc => loc.id == entityId);
+              console.log(location);
+              if (location) {
+                  $("#modalTitle").text("Edit Location");
+          
+                  $("#editPersonnelEntityID").val(location.id);
+          
+                  const content = `
+                      <div class="form-floating mb-3">
+                          <input type="text" class="form-control" id="editLocationName" placeholder="Location Name" required value="${location.locationName}">
+                          <label for="editLocationName">Location Name</label>
+                      </div>
+                  `;
+          
+                  $("#dynamicModalFields").html(content);
+              } else {
+                  $("#modalTitle").text("Location not found");
+              }
+              break;
+          
   }
 });
 
