@@ -112,43 +112,56 @@
 
               <div class="tab-pane" id="departments-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
                 <table class="table table-hover">
-                  <tr>
-                    <td class="align-middle text-nowrap">
-                      Human resources
-                    </td>
-                    <td class="align-middle text-nowrap d-none d-md-table-cell">
-                      London
-                    </td>
-                    <td class="align-middle text-end text-nowrap">
-                      <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#deleteDepartmentModal" data-id="1">
-                        <i class="fa-solid fa-pencil fa-fw"></i>
-                      </button>
-                      <button type="button" class="btn btn-primary btn-sm deleteDepartmentBtn" data-id="1">
-                        <i class="fa-solid fa-trash fa-fw"></i>
-                      </button>
-                    </td>
-                  </tr> 
-          
-                </table>
+                  <thead>
+                      <!-- You can have table headers here if required -->
+                      <tr>
+                          <th>Department Name</th>
+                          <th>Location</th>
+                          <!-- <th>Actions</th> -->
+                      </tr>
+                  </thead>
+                  <tbody id="departmentsTableBody">
+                      <!-- This is the template row for departments that will remain hidden and be used as a blueprint -->
+                      <tr class="departmentTemplate" style="display: none;">
+                          <td class="align-middle text-nowrap departmentName"></td>
+                          <td class="align-middle text-nowrap d-none d-md-table-cell departmentLocation"></td>
+                          <td class="align-middle text-end text-nowrap">
+                              <button type="button" class="btn btn-primary btn-sm editDepartmentBtn" data-bs-toggle="modal" data-bs-target="#editDepartmentModal" data-id="">
+                                  <i class="fa-solid fa-pencil fa-fw"></i>
+                              </button>
+                              <button type="button" class="btn btn-primary btn-sm deleteDepartmentBtn" data-id="">
+                                  <i class="fa-solid fa-trash fa-fw"></i>
+                              </button>
+                          </td>
+                      </tr>
+                  </tbody>
+              </table>
+              
               </div>
           
               <div class="tab-pane" id="locations-tab-pane" role="tabpanel" aria-labelledby="contact-tab" tabindex="0">
                 <table class="table table-hover">
-                  <tr>
-                    <td class="align-middle text-nowrap">
-                      London
-                    </td>
-                    <td class="align-middle text-end text-nowrap">
-                      <button type="button" class="btn btn-primary btn-sm">
-                        <i class="fa-solid fa-pencil fa-fw"></i>
-                      </button>
-                      <button type="button" class="btn btn-primary btn-sm">
-                        <i class="fa-solid fa-trash fa-fw"></i>
-                      </button>
-                    </td>
-                  </tr>
-          
-                </table>
+                  <thead>
+                      <tr>
+                          <th>Location</th>
+                          <!-- <th>Actions</th> -->
+                      </tr>
+                  </thead>
+                  <tbody id="locationsTableBody">
+                      <tr class="locationTemplate" style="display: none;">
+                          <td class="align-middle text-nowrap locationName"></td>
+                          <td class="align-middle text-end text-nowrap">
+                              <button type="button" class="btn btn-primary btn-sm editLocationBtn">
+                                  <i class="fa-solid fa-pencil fa-fw"></i>
+                              </button>
+                              <button type="button" class="btn btn-primary btn-sm deleteLocationBtn">
+                                  <i class="fa-solid fa-trash fa-fw"></i>
+                              </button>
+                          </td>
+                      </tr>
+                  </tbody>
+              </table>
+              
               </div>
           
             </div>
@@ -161,6 +174,8 @@
           
           </section>
               
+
+           <!-- Edit personel Modale -->
           <div id="editPersonnelModal" class="modal fade" tabindex="-1" data-bs-backdrop="false" data-bs-keyboard="false" aria-labelledby="exampleModalLabel" aria-hidden="true">
             
             <!--   the last two classes centre the modal and, if the content is too long, ensures  -->
@@ -230,11 +245,11 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="deleteModalLabel">Delete Employee</h5>
+                        <h5 class="modal-title" id="deleteModalLabel">Delete Confirmation</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        Are you sure you want to delete <span id="employeeNameToDelete"></span>?
+                        Are you sure you want to delete <span id="itemNameToDelete"></span>?
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -242,7 +257,8 @@
                     </div>
                 </div>
             </div>
-          </div>
+        </div>
+        
 
           
         <script src="./js/main.js" async defer></script>
