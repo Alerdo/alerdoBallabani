@@ -43,18 +43,33 @@
 
                 <div class="col-6 text-end me-2">
                   <div class="btn-group" role="group" aria-label="buttons">
+                    <div>
                     <button id="refreshBtn" type="button" class="btn btn-primary">
                       <i class="fa-solid fa-refresh fa-fw"></i>
                     </button>
-                    <button id="filterBtn" type="button" class="btn btn-primary">
-                      <i class="fa-solid fa-filter fa-fw"></i>
-                    </button>          
+                    </div>
+
+                    <div>
+                      <button id="filterBtn" type="button" class="btn btn-primary">
+                        <i class="fa-solid fa-filter fa-fw"></i> ↓
+                      </button>
+                      <div class="dropdown-content" id="filterOptions" style="display: none;">
+                        <!-- Dropdown items will be dynamically inserted here -->
+                      </div>
+                      
+                  </div>
+
+                    <div>    
                     <button id="addBtn" type="button" class="btn btn-primary">
                       <i class="fa-solid fa-plus fa-fw"></i>
                     </button>
                   </div>
-                </div>
-                
+
+
+                  </div>
+              
+              
+                </div>   
               </div>
           
                 <!-- NAVBAR SECTIONS -->
@@ -100,7 +115,7 @@
                             <td class="align-middle text-nowrap employeeLocation"></td>
                             <td class="align-middle text-nowrap d-none d-md-table-cell employeeEmail"></td>
                             <td class="text-end text-nowrap">
-                                <button type="button" class="btn btn-primary btn-sm editEmployeeBtn" data-bs-toggle="modal" data-bs-target="#editPersonnelModal" data-id="" data-context="employee">
+                                <button type="button" class="btn btn-primary btn-sm editEmployeeBtn" data-bs-toggle="modal" data-bs-target="#editData" data-id="" data-context="employee">
                                     <i class="fa-solid fa-pencil fa-fw"></i>
                                 </button>
                                 <button type="button" class="btn btn-primary btn-sm deletePersonnelBtn" data-id="">
@@ -129,7 +144,7 @@
                           <td class="align-middle text-nowrap departmentLocation"></td>
                           <td class="align-middle text-end text-nowrap">
                              <!-- for departments -->
-                          <button type="button" class="btn btn-primary btn-sm editDepartmentBtn" data-bs-toggle="modal" data-bs-target="#editPersonnelModal" data-id="" data-context="department">
+                          <button type="button" class="btn btn-primary btn-sm editDepartmentBtn" data-bs-toggle="modal" data-bs-target="#editData" data-id="" data-context="department">
                             <i class="fa-solid fa-pencil fa-fw"></i>
                           </button>
                               <button type="button" class="btn btn-primary btn-sm deleteDepartmentBtn" data-id="">
@@ -157,7 +172,7 @@
                           <td class="align-middle text-nowrap locationName"></td>
                           <td class="align-middle text-end text-nowrap">
                              <!-- for locations -->
-                            <button type="button" class="btn btn-primary btn-sm editLocationBtn" data-bs-toggle="modal" data-bs-target="#editPersonnelModal" data-id="" data-context="location">
+                            <button type="button" class="btn btn-primary btn-sm editLocationBtn" data-bs-toggle="modal" data-bs-target="#editData" data-id="" data-context="location">
                               <i class="fa-solid fa-pencil fa-fw"></i>
                             </button>
                               <button type="button" class="btn btn-primary btn-sm deleteLocationBtn">
@@ -182,8 +197,8 @@
           </section>
               
 
-           <!-- Edit personel Modale -->
-           <div id="editPersonnelModal" class="modal fade" tabindex="-1" data-bs-backdrop="false" data-bs-keyboard="false" aria-labelledby="exampleModalLabel" aria-hidden="true">
+           <!-- EDIT DATA COMMON  Modale -->
+           <div id="editData" class="modal fade" tabindex="-1" data-bs-backdrop="false" data-bs-keyboard="false" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-sm modal-dialog-centered modal-dialog-scrollable">    
                 <div class="modal-content shadow">   
                     <div class="modal-header bg-primary bg-gradient text-white">
@@ -199,7 +214,7 @@
                         </form>
                     </div>
                     <div class="modal-footer">
-                        <button type="submit" form="editPersonnelForm" class="btn btn-outline-primary btn-sm myBtn">SAVE</button>
+                        <button type="submit" form="editPersonnelForm" id ="updateData" class="btn btn-outline-primary btn-sm myBtn">SAVE</button>
                         <button type="button" class="btn btn-outline-primary btn-sm myBtn" data-bs-dismiss="modal">CANCEL</button>
                     </div>
                 </div>
@@ -207,8 +222,31 @@
         </div>
         
 
-          <!-- Delete Modale -->
-          <!-- Delete Confirmation Modal -->
+        <!-- CREATE DATA COMMON MODALE -->
+        <!-- Modal Structure -->
+        <div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="modalLabel">Add Entity</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+            
+                <div id="dynamicAddFields"></div>
+              
+              </div>
+              <div class="modal-footer">
+                <button type="button"  class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveAddBtn">Create Entity</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+          <!-- DELETE DATA COMMON MODALE -->
+         
         <div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">

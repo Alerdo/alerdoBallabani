@@ -24,3 +24,72 @@ tr {
 .myBtn {
   width: 70px;
 }
+
+
+
+
+ /* DROPDOWN FILTER BUTTON */
+
+
+
+ /* .dropdown-content {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+  position: absolute;
+  z-index: 1;
+  background-color: #f9f9f9;
+}
+.dropdown-content a {
+  color: black;
+  padding: 10px 15px;
+  text-decoration: none;
+  display: block;
+}
+.dropdown-content a:hover {
+  background-color: #f1f1f1;
+} */
+
+/* Positioning the dropdown content centered relative to the filter button */
+.dropdown-content {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+  position: absolute;
+  left: 50%; /* Center the dropdown */
+  transform: translateX(-50%); /* Shift it back half of its width */
+  z-index: 1;
+  background-color: #f9f9f9;
+  width: 150px; /* Set a fixed width */
+}
+
+/* Button color change on hover */
+#filterBtn:hover {
+  background-color: #007bff; /* Adjust the color as needed */
+}
+
+/* Dropdown item styles */
+.dropdown-content a {
+  color: black;
+  padding: 10px 15px;
+  text-decoration: none;
+  display: block;
+  border-bottom: 1px solid #e0e0e0; /* A light border to separate items */
+  text-align: left;
+}
+
+
+
+/* Hover effect for dropdown items */
+.dropdown-content a:hover {
+  background-color: #f1f1f1;
+}
+
+/* Removing bullet points from the dropdown */
+.dropdown-content {
+  list-style-type: none; /* No bullet points */
+}
+
+.btn-primary {
+  margin-right: 3px;
+}

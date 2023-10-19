@@ -62,9 +62,6 @@ $("#searchInp").on("keyup", function (e) {
 
 
 
-
-
-
   // Returns the active tab id
 function getActiveTab() {
   if ($("#personnelBtn").hasClass("active")) {
@@ -75,6 +72,7 @@ function getActiveTab() {
       return "locations";
   }
 }
+
 
 $("#refreshBtn").click(function () {
   switch (getActiveTab()) {
@@ -93,6 +91,203 @@ $("#refreshBtn").click(function () {
   }
 });
 
+
+
+ // ADD DATA LOGIC FOR EACH SECTION
+
+$("#addBtn").on("click", function () {
+  let content = ""; // variable to store the dynamic content
+  switch (getActiveTab()) {
+    case "personnel":
+    $("#modalLabel").text("Add Employee");
+
+    content = `
+        <div class="form-floating mb-3">
+        <input type="text" class="form-control" id="addPersonnelFirstName" placeholder="First name" required>
+        <label for="addPersonnelFirstName">First name</label>
+
+        </div>
+        <div class="form-floating mb-3">
+            <input type="text" class="form-control" id="addPersonnelLastName" placeholder="Last name" required>
+            <label for="addPersonnelLastName">Last name</label>
+        </div>
+        <div class="form-floating mb-3">
+            <input type="text" class="form-control" id="addPersonnelJobTitle" placeholder="Job title" required>
+            <label for="addPersonnelJobTitle">Job Title</label>
+        </div>
+        <div class="form-floating mb-3">
+            <input type="email" class="form-control" id="addPersonnelEmailAddress" placeholder="Email address" required>
+            <label for="addPersonnelEmailAddress">Email Address</label>
+        </div>
+    `;
+
+    $("#dynamicAddFields").html(content);
+
+
+
+    $("#saveAddBtn").text("Create Employee");
+    break;
+
+    case "departments":
+      $("#modalLabel").text("Add Department");
+
+      content = `
+        <div class="form-floating mb-3">
+            <input type="text" class="form-control" id="addDepartmentName" placeholder="Department Name" required>
+            <label for="addDepartmentName">Department Name</label>
+        </div>
+        <div class="form-floating mb-3">
+            <input type="text" class="form-control" id="addDepartmentLocation" placeholder="Department Location" required>
+            <label for="addDepartmentLocation">Department Location</label>
+        </div>
+      `;
+
+      $("#saveAddBtn").text("Create Department");
+      break;
+
+    case "locations":
+      $("#modalLabel").text("Add Location");
+      content = `
+        <div class="form-floating mb-3">
+            <input type="text" class="form-control" id="addLocationName" placeholder="Location Name" required>
+            <label for="addLocationName">Location Name</label>
+        </div>
+      `;
+      $("#saveAddBtn").text("Create Location");
+      break;
+  }
+  // Append the content to the modal body and show the modal
+  $("#dynamicAddFields").html(content);
+  $('#addModal').modal('show');
+});
+
+
+
+
+      //UPDATE DATA LOGIC FOR EACH SECTION 
+
+$("#editData").on("show.bs.modal", function (e) {
+  const entityId = $(e.relatedTarget).attr("data-id");
+  const context = $(e.relatedTarget).attr("data-context");
+
+  switch(context) {
+      case "employee":
+          const employee = apiResponse.find(emp => emp.id == entityId);
+          console.log(employee)
+          if (employee) {
+            
+              $("#modalTitle").text("Edit Employee");
+              $("#editPersonnelEntityID").val(employee.id);
+
+              const nameParts = employee.name.split(' '); 
+              const firstName = nameParts[0];
+              const lastName = nameParts.slice(1).join(' ');
+
+              const content = `
+                  <div class="form-floating mb-3">
+                      <input type="text" class="form-control" id="editPersonnelFirstName" placeholder="First name" required value="${firstName}">
+                      <label for="editPersonnelFirstName">First name</label>
+                  </div>
+                  <div class="form-floating mb-3">
+                      <input type="text" class="form-control" id="editPersonnelLastName" placeholder="Last name" required value="${lastName}">
+                      <label for="editPersonnelLastName">Last name</label>
+                  </div>
+                  <div class="form-floating mb-3">
+                      <input type="text" class="form-control" id="editPersonnelJobTitle" placeholder="Job title" required value="${employee.role}">
+                      <label for="editPersonnelJobTitle">Job Title</label>
+                  </div>
+                  <div class="form-floating mb-3">
+                      <input type="email" class="form-control" id="editPersonnelEmailAddress" placeholder="Email address" required value="${employee.email}">
+                      <label for="editPersonnelEmailAddress">Email Address</label>
+                  </div>
+              `;
+
+              $("#dynamicModalFields").html(content);
+
+          } else {
+              $("#modalTitle").text("Employee not found");
+          }
+          break;
+
+          case "department":
+            const department = departmentsApiResponse.find(dep => dep.id == entityId);
+            console.log(department);
+            if (department) {
+                $("#modalTitle").text("Edit Department");
+        
+                $("#editPersonnelEntityID").val(department.id);
+        
+                const content = `
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="editDepartmentName" placeholder="Department Name" required value="${department.departmentName}">
+                        <label for="editDepartmentName">Department Name</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="editDepartmentLocation" placeholder="Location" required value="${department.departmentLocation}">
+                        <label for="editDepartmentLocation">Location</label>
+                    </div>
+                `;
+        
+                $("#dynamicModalFields").html(content);
+            } else {
+                $("#modalTitle").text("Department not found");
+            }
+            break;
+
+            case "location":
+              const location = locationsApiResponse.find(loc => loc.id == entityId);
+              console.log(location);
+              if (location) {
+                  $("#modalTitle").text("Edit Location");
+          
+                  $("#editPersonnelEntityID").val(location.id);
+          
+                  const content = `
+                      <div class="form-floating mb-3">
+                          <input type="text" class="form-control" id="editLocationName" placeholder="Location Name" required value="${location.locationName}">
+                          <label for="editLocationName">Location Name</label>
+                      </div>
+                  `;
+          
+                  $("#dynamicModalFields").html(content);
+              } else {
+                  $("#modalTitle").text("Location not found");
+              }
+              break;
+          
+  }
+});
+
+// $(document).on('click', '#updateData', function() {
+//   const editFirstName = $("#editPersonnelFirstName").val();
+//   const editLastName = $("#editPersonnelLastName").val();
+//   const editJobTitle = $("#editPersonnelJobTitle").val();
+//   const editEmail = $("#editPersonnelEmailAddress").val();
+  
+
+//   console.log(editFirstName, editLastName, editJobTitle, editEmail, "hello its working");
+// });
+
+
+// $(document).on('click', '#saveAddBtn', function() {
+//   const eeditFirstName = $("#addPersonnelFirstName").val();
+//   const eeditLastName = $("#addPersonnelLastName").val();
+//   const eeditJobTitle = $("#addPersonnelJobTitle").val();
+//   const eeditEmail = $("#addPersonnelEmailAddress").val();
+  
+
+//   console.log(eeditFirstName, eeditLastName, eeditJobTitle, eeditEmail, "hello its working");
+// });
+
+
+
+
+
+
+// FILTER DATA BUTTON 
+
+
+
 $("#filterBtn").click(function () {
   switch (getActiveTab()) {
       case "personnel":
@@ -110,22 +305,72 @@ $("#filterBtn").click(function () {
   }
 });
 
-$("#addBtn").click(function () {
-  switch (getActiveTab()) {
-      case "personnel":
-          // Open add modal for personnel
-          console.log("Opening add modal for personnel...");
-          break;
-      case "departments":
-          // Open add modal for departments
-          console.log("Opening add modal for departments...");
-          break;
-      case "locations":
-          // Open add modal for locations
-          console.log("Opening add modal for locations...");
-          break;
+function updateFilterOptions() {
+  // Define what options should be available for each case
+  const options = {
+    personnel: ['Name', 'Department', 'Location', 'Email'],
+    departments: ['Department', 'Location'],
+    locations: ['Location']
+  };
+
+  // Get the current active tab
+  const activeTab = getActiveTab(); // This function should return "personnel", "departments", or "locations" based on the active tab
+
+  // Get the relevant options for the active tab
+  const relevantOptions = options[activeTab];
+
+  // Construct the new dropdown items
+  let newDropdownItems = '';
+  for (let option of relevantOptions) {
+    newDropdownItems += `<li><a class="dropdown-item" href="#" data-filter="${option.toLowerCase()}">${option}</a></li>`;
+  }
+
+  // Update the dropdown with the new items
+  $('#filterOptions').html(newDropdownItems);
+}
+
+// Call updateFilterOptions when the filter button is clicked
+
+
+$("#filterBtn").click(function () {
+  // Toggle the dropdown visibility
+  $("#filterOptions").toggle();
+  
+  // Update the dropdown content based on active tab
+  updateFilterOptions();
+});
+
+// If someone clicks outside of the dropdown, it should close
+$(document).click(function(event) {
+  if (!$(event.target).closest('#filterBtn').length && !$(event.target).closest('#filterOptions').length) {
+      $("#filterOptions").hide();
   }
 });
+
+
+
+
+
+
+// You may also want to call updateFilterOptions when the tab changes
+// Here, you should tie into your tab change event, however you handle it.
+// For example:
+// $('your-tab-selector').on('tab-change-event', updateFilterOptions);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 $("#personnelBtn").click(function () {
   // Optionally, call function to refresh personnel table when the tab is clicked
@@ -325,154 +570,5 @@ $(document).on("click", ".confirmDelete", function() {
 
 
 
-// $("#editPersonnelModal").on("show.bs.modal", function (e) {
-//   const employeeId = $(e.relatedTarget).attr("data-id");
-//   const employee = apiResponse.find(emp => emp.id == employeeId);
 
-//   if (employee) {
-//     $("#editPersonnelEmployeeID").val(employee.id);
-
-//     const nameParts = employee.name.split(' '); // Splitting by space
-//     $("#editPersonnelFirstName").val(nameParts[0]); // First part is the first name
-//     $("#editPersonnelLastName").val(nameParts.slice(1).join(' ')); // Rest of the parts are last name
-
-//     $("#editPersonnelJobTitle").val(employee.role);
-//     $("#editPersonnelEmailAddress").val(employee.email);
-
-//     // When you're ready to populate the department dropdown, you can do it here
-
-//   } else {
-//     $("#editPersonnelModal .modal-title").replaceWith("Employee not found");
-//   }
-// });
-
-// $("#editPersonnelModal").on("show.bs.modal", function (e) {
-//   const context = $(e.relatedTarget).attr("data-context");
-//   const id = $(e.relatedTarget).attr("data-id");
-
-//   switch (context) {
-//     case "department":
-//       // Load department data based on 'id'
-//       const department = departmentsApiResponse.find(dep => dep.id == id);
-//       // Handle department data and populate modal fields
-//       break;
-      
-//     case "location":
-//       // Load location data based on 'id'
-//       const location = locationsApiResponse.find(loc => loc.id == id);
-//       // Handle location data and populate modal fields
-//       break;
-      
-//     default:
-//       // Assume it's an employee context
-//       const employee = apiResponse.find(emp => emp.id == id);
-//       if (employee) {
-//         $("#editPersonnelEmployeeID").val(employee.id);
-
-//             const nameParts = employee.name.split(' '); // Splitting by space
-//             $("#editPersonnelFirstName").val(nameParts[0]); // First part is the first name
-//             $("#editPersonnelLastName").val(nameParts.slice(1).join(' ')); // Rest of the parts are last name
-        
-//             $("#editPersonnelJobTitle").val(employee.role);
-//             $("#editPersonnelEmailAddress").val(employee.email);
-//       } else {
-//         $("#editPersonnelModal .modal-title").replaceWith("Data not found");
-//       }
-//       break;
-//   }
-// });
-
-
-
-$("#editPersonnelModal").on("show.bs.modal", function (e) {
-  const entityId = $(e.relatedTarget).attr("data-id");
-  const context = $(e.relatedTarget).attr("data-context");
-
-  switch(context) {
-      case "employee":
-          const employee = apiResponse.find(emp => emp.id == entityId);
-          console.log(employee)
-          if (employee) {
-            
-              $("#modalTitle").text("Edit Employee");
-              $("#editPersonnelEntityID").val(employee.id);
-
-              const nameParts = employee.name.split(' '); 
-              const firstName = nameParts[0];
-              const lastName = nameParts.slice(1).join(' ');
-
-              const content = `
-                  <div class="form-floating mb-3">
-                      <input type="text" class="form-control" id="editPersonnelFirstName" placeholder="First name" required value="${firstName}">
-                      <label for="editPersonnelFirstName">First name</label>
-                  </div>
-                  <div class="form-floating mb-3">
-                      <input type="text" class="form-control" id="editPersonnelLastName" placeholder="Last name" required value="${lastName}">
-                      <label for="editPersonnelLastName">Last name</label>
-                  </div>
-                  <div class="form-floating mb-3">
-                      <input type="text" class="form-control" id="editPersonnelJobTitle" placeholder="Job title" required value="${employee.role}">
-                      <label for="editPersonnelJobTitle">Job Title</label>
-                  </div>
-                  <div class="form-floating mb-3">
-                      <input type="email" class="form-control" id="editPersonnelEmailAddress" placeholder="Email address" required value="${employee.email}">
-                      <label for="editPersonnelEmailAddress">Email Address</label>
-                  </div>
-              `;
-
-              $("#dynamicModalFields").html(content);
-
-          } else {
-              $("#modalTitle").text("Employee not found");
-          }
-          break;
-
-          case "department":
-            const department = departmentsApiResponse.find(dep => dep.id == entityId);
-            console.log(department);
-            if (department) {
-                $("#modalTitle").text("Edit Department");
-        
-                $("#editPersonnelEntityID").val(department.id);
-        
-                const content = `
-                    <div class="form-floating mb-3">
-                        <input type="text" class="form-control" id="editDepartmentName" placeholder="Department Name" required value="${department.departmentName}">
-                        <label for="editDepartmentName">Department Name</label>
-                    </div>
-                    <div class="form-floating mb-3">
-                        <input type="text" class="form-control" id="editDepartmentLocation" placeholder="Location" required value="${department.departmentLocation}">
-                        <label for="editDepartmentLocation">Location</label>
-                    </div>
-                `;
-        
-                $("#dynamicModalFields").html(content);
-            } else {
-                $("#modalTitle").text("Department not found");
-            }
-            break;
-
-            case "location":
-              const location = locationsApiResponse.find(loc => loc.id == entityId);
-              console.log(location);
-              if (location) {
-                  $("#modalTitle").text("Edit Location");
-          
-                  $("#editPersonnelEntityID").val(location.id);
-          
-                  const content = `
-                      <div class="form-floating mb-3">
-                          <input type="text" class="form-control" id="editLocationName" placeholder="Location Name" required value="${location.locationName}">
-                          <label for="editLocationName">Location Name</label>
-                      </div>
-                  `;
-          
-                  $("#dynamicModalFields").html(content);
-              } else {
-                  $("#modalTitle").text("Location not found");
-              }
-              break;
-          
-  }
-});
 
