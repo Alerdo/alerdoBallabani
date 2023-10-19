@@ -95,3 +95,22 @@ tr {
 }
 
 
+button#searchBtn {
+  margin-left: 6px;
+}
+
+#searchBtn:hover {
+  background-color: rgba(255, 255, 255, 0.913) !important; 
+  color: black !important;
+  border: 1px solid black !important;
+}
+
+#searchBtn:hover i {
+  color: black !important;
+}
+
+/* Click effect */
+.clickable:active {
+  transform: scale(0.95); /* This slightly scales down the button */
+  transition: transform 0.1s; /* Smooth transition effect */
+}
