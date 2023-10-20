@@ -164,7 +164,7 @@ $("#addBtn").on("click", function () {
 
 
 
-      //UPDATE DATA LOGIC FOR EACH SECTION 
+      //UPDATE DATA RENDERING  LOGIC FOR EACH SECTION 
 
 $("#editData").on("show.bs.modal", function (e) {
   const entityId = $(e.relatedTarget).attr("data-id");
@@ -172,34 +172,34 @@ $("#editData").on("show.bs.modal", function (e) {
 
   switch(context) {
       case "employee":
-          const employee = apiResponse.find(emp => emp.id == entityId);
-          console.log(employee)
+          const employee = employeesData.find(emp => emp.id == entityId);  // <-- Reference employeesData
+          console.log(employee);
           if (employee) {
-            
               $("#modalTitle").text("Edit Employee");
               $("#editPersonnelEntityID").val(employee.id);
 
-              const nameParts = employee.name.split(' '); 
-              const firstName = nameParts[0];
-              const lastName = nameParts.slice(1).join(' ');
-
               const content = `
                   <div class="form-floating mb-3">
-                      <input type="text" class="form-control" id="editPersonnelFirstName" placeholder="First name" required value="${firstName}">
+                      <input type="text" class="form-control" id="editPersonnelFirstName" placeholder="First name" required value="${employee.firstName}">
                       <label for="editPersonnelFirstName">First name</label>
                   </div>
                   <div class="form-floating mb-3">
-                      <input type="text" class="form-control" id="editPersonnelLastName" placeholder="Last name" required value="${lastName}">
+                      <input type="text" class="form-control" id="editPersonnelLastName" placeholder="Last name" required value="${employee.lastName}">
                       <label for="editPersonnelLastName">Last name</label>
                   </div>
                   <div class="form-floating mb-3">
-                      <input type="text" class="form-control" id="editPersonnelJobTitle" placeholder="Job title" required value="${employee.role}">
-                      <label for="editPersonnelJobTitle">Job Title</label>
+                      <input type="text" class="form-control" id="editPersonnelJobTitle" placeholder="Department" required value="${employee.departmentName}">
+                      <label for="editPersonnelJobTitle">Department</label>
                   </div>
+                  <div class="form-floating mb-3">
+                  <input type="text" class="form-control" id="editPersonnelLocation" placeholder="Location" required value="${employee.locationName}">
+                  <label for="editPersonnelJobTitle">Location</label>
+              </div>
                   <div class="form-floating mb-3">
                       <input type="email" class="form-control" id="editPersonnelEmailAddress" placeholder="Email address" required value="${employee.email}">
                       <label for="editPersonnelEmailAddress">Email Address</label>
                   </div>
+                 
               `;
 
               $("#dynamicModalFields").html(content);
@@ -258,30 +258,112 @@ $("#editData").on("show.bs.modal", function (e) {
   }
 });
 
-// $(document).on('click', '#updateData', function() {
-//   const editFirstName = $("#editPersonnelFirstName").val();
-//   const editLastName = $("#editPersonnelLastName").val();
-//   const editJobTitle = $("#editPersonnelJobTitle").val();
-//   const editEmail = $("#editPersonnelEmailAddress").val();
+$(document).ready(function() {
+  $("#updateData").click(function() {
+      switch (getActiveTab()) {
+          case "personnel":
+              updatePersonnel();
+             
+              break;
+
+          case "departments":
+            updateDepartment();
+            
+            break;
+          // Add more cases if needed for other tabs
+          // case "anotherTab":
+          //    anotherFunction();
+          //    break;
+         
+      }
+  });
+});
+
+
+
+//UPDATE DATA LOGIC FOR   PERSONNEL SECTION 
+function updatePersonnel() {
+  // Getting values from the input fields
+  const personnelID = $('.deletePersonnelBtn').data('id');
+  const firstName = $("#editPersonnelFirstName").val();
+  const lastName = $("#editPersonnelLastName").val();
+  const departmentName = $("#editPersonnelJobTitle").val();
+  const locationName = $("#editPersonnelLocation").val();
+  const email = $("#editPersonnelEmailAddress").val();
+
+  // Constructing the data object
+  const dataToSend = {
+      id: personnelID,
+      firstName: firstName,
+      lastName: lastName,
+      departmentName: departmentName,
+      locationName: locationName,
+      email: email
+  };
+
+  // Sending the PUT request to the backend to update the data
+// AJAX Call
+$.ajax({
+  url: '/myProjects/project2/php/updatePersonnelInfo.php', 
+  type: 'PUT',
+  contentType: 'application/json',
+  dataType: 'json',
+  data: JSON.stringify(dataToSend),
+  success: function(response) {
+      
+      if(response.error) {
+          document.getElementById("modalMessage").innerText = response.error;
+      } 
+      
+      else {
+          document.getElementById("modalMessage").innerText = response.success;
+      }
+
+
+
+      var myModal = new bootstrap.Modal(document.getElementById('responseModal'));
+      myModal.show();
+  },
+  error: function(jqXHR, textStatus, errorThrown) {
+      console.error('Error updating data:', textStatus, errorThrown, jqXHR);
+      document.getElementById("modalMessage").innerText = "An unexpected error occurred.";
+      var myModal = new bootstrap.Modal(document.getElementById('responseModal'));
+      myModal.show();
+  }
+});
+
+}
+
+
+ //Update the DEPARTMENT SECTION RECORDS 
+
+ function updateDepartment() {
+  const departmentName = $('#editDepartmentName').val();
+  const departmentLocation = $('#editDepartmentLocation').val();
+
+  const dataToSend = {
+      departmentName: departmentName,
+      locationName: departmentLocation
+  };
+
   
-
-//   console.log(editFirstName, editLastName, editJobTitle, editEmail, "hello its working");
-// });
-
-
-// $(document).on('click', '#saveAddBtn', function() {
-//   const eeditFirstName = $("#addPersonnelFirstName").val();
-//   const eeditLastName = $("#addPersonnelLastName").val();
-//   const eeditJobTitle = $("#addPersonnelJobTitle").val();
-//   const eeditEmail = $("#addPersonnelEmailAddress").val();
-  
-
-//   console.log(eeditFirstName, eeditLastName, eeditJobTitle, eeditEmail, "hello its working");
-// });
-
-
-
-
+  $.ajax({
+      url: "/myProjects/project2/php/getAllPersonnel.php",
+      type: 'POST',
+      data: JSON.stringify(dataToSend),
+      contentType: 'application/json',
+      success: function(response) {
+          if (response.success) {
+              alert(response.success);
+          } else if (response.error) {
+              alert(response.error);
+          }
+      },
+      error: function() {
+          alert('Failed to update. Please try again.');
+      }
+  });
+}
 
 
 // FILTER DATA BUTTON 
@@ -304,6 +386,7 @@ $("#filterBtn").click(function () {
           break;
   }
 });
+
 
 function updateFilterOptions() {
   // Define what options should be available for each case
@@ -401,40 +484,51 @@ $("#locationsBtn").click(function () {
 
 
 
-// Sample API response
-const apiResponse = [
-  {
-      id: 23,
-      name: "Random Tamarra",
-      role: "Support",
-      location: "Munich",
-      email: "tacem@vinaora.com"
-  }
-  // ... other employees
-];
+// ---------------Populate PERSONNEL---------------------------
 
 function populateEmployeesTable(response) {
   const $tableBody = $("#employeesTableBody");
   const $template = $(".employeeTemplate").clone().removeClass("employeeTemplate").show();
 
-  // Empty the table body
   $tableBody.empty();
 
   response.forEach(employee => {
       const $row = $template.clone();
 
-      $row.find(".employeeName").text(employee.name);
-      $row.find(".employeeRole").text(employee.role);
-      $row.find(".employeeLocation").text(employee.location);
+      $row.find(".employeeName").text(employee.firstName + ' ' + employee.lastName);
+      $row.find(".employeeDepartment").text(employee.departmentName); // Updated to use departmentName
+      $row.find(".employeeLocation").text(employee.locationName); // Updated to use locationName
       $row.find(".employeeEmail").text(employee.email);
+      
+      // Assigning the employee ID to the data-id attribute for both buttons
       $row.find(".editEmployeeBtn, .deletePersonnelBtn").attr("data-id", employee.id);
 
       $tableBody.append($row);
   });
 }
 
-// Call the function to populate the table when you receive the API response
-populateEmployeesTable(apiResponse);
+// This will store the employees data fetched from the server
+let employeesData = [];
+
+
+$.ajax({
+  url: "/myProjects/project2/php/getAllPersonnel.php",
+  type: 'GET',
+  dataType: 'text', // changed from json to text
+  success: function(data) {
+      // Clean up the data before parsing as JSON
+      const cleanedData = data.replace("Connected successfully", "").trim();
+      try {
+          employeesData = JSON.parse(cleanedData);  // <-- Store the data here
+          populateEmployeesTable(employeesData);
+      } catch (error) {
+          console.error("Error parsing the cleaned JSON data: ", error);
+      }
+  },
+  error: function(err) {
+      console.error("AJAX error: ", err);
+  }
+});
 
 
 

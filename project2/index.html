@@ -101,7 +101,7 @@
                     <thead>
                         <tr>
                             <th>Name</th>
-                            <th>Role</th>
+                            <th>Department</th>
                             <th>Location</th>
                             <th class="d-none d-md-table-cell">Email</th>
                         </tr>
@@ -109,7 +109,7 @@
                     <tbody id="employeesTableBody">
                         <tr class="employeeTemplate" style="display: none;">
                             <td class="align-middle text-nowrap employeeName"></td>
-                            <td class="align-middle text-nowrap employeeRole"></td>
+                            <td class="align-middle text-nowrap employeeDepartment"></td>
                             <td class="align-middle text-nowrap employeeLocation"></td>
                             <td class="align-middle text-nowrap d-none d-md-table-cell employeeEmail"></td>
                             <td class="text-end text-nowrap">
@@ -241,6 +241,27 @@
             </div>
           </div>
         </div>
+
+
+              <!-- MESSAGE MODALE FOR UPDATE SUCCES OR FAILURE -->
+        <div class="modal fade" id="responseModal" tabindex="-1" aria-labelledby="responseModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+              <div class="modal-content">
+                  <div class="modal-header">
+                      <h5 class="modal-title" id="responseModalLabel">Server Response</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body" id="modalMessage">
+                      <!-- The message from the server will be inserted here -->
+                  </div>
+                  <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                  </div>
+              </div>
+          </div>
+      </div>
+      
+
 
 
           <!-- DELETE DATA COMMON MODALE -->
