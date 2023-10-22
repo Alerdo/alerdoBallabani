@@ -1,74 +1,35 @@
 <?php
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
 
-	// example use from browser
-	// http://localhost/companydirectory/libs/php/getAllDepartments.php
+header('Content-Type: application/json; charset=UTF-8');
 
-	// remove next two lines for production	
-	
-	ini_set('display_errors', 'On');
-	error_reporting(E_ALL);
+include("config.php");
 
-	$executionStartTime = microtime(true);
+$conn = new mysqli($cd_host, $cd_user, $cd_password, $cd_dbname, $cd_port, $cd_socket);
 
-	include("config.php");
+if ($conn->connect_errno) {
+    echo "Connected successfully";
+    exit(json_encode(['error' => 'Database connection failed: ' . $conn->connect_error]));
+}
 
-	header('Content-Type: application/json; charset=UTF-8');
+$query = "
+SELECT d.id, d.name as departmentName, l.name as departmentLocation
+FROM department d 
+JOIN location l ON d.locationID = l.id";
 
-	$conn = new mysqli($cd_host, $cd_user, $cd_password, $cd_dbname, $cd_port, $cd_socket);
+$result = $conn->query($query);
 
-	if (mysqli_connect_errno()) {
-		
-		$output['status']['code'] = "300";
-		$output['status']['name'] = "failure";
-		$output['status']['description'] = "database unavailable";
-		$output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
-		$output['data'] = [];
+if (!$result) {
+    exit(json_encode(['error' => 'Query failed: ' . $conn->error]));
+}
 
-		mysqli_close($conn);
+$departments = [];
+while ($row = $result->fetch_assoc()) {
+    $departments[] = $row;
+}
 
-		echo json_encode($output);
+echo json_encode($departments);
 
-		exit;
-
-	}	
-
-	// SQL does not accept parameters and so is not prepared
-
-	$query = 'SELECT id, name, locationID FROM department';
-
-	$result = $conn->query($query);
-	
-	if (!$result) {
-
-		$output['status']['code'] = "400";
-		$output['status']['name'] = "executed";
-		$output['status']['description'] = "query failed";	
-		$output['data'] = [];
-
-		mysqli_close($conn);
-
-		echo json_encode($output); 
-
-		exit;
-
-	}
-   
-   	$data = [];
-
-	while ($row = mysqli_fetch_assoc($result)) {
-
-		array_push($data, $row);
-
-	}
-
-	$output['status']['code'] = "200";
-	$output['status']['name'] = "ok";
-	$output['status']['description'] = "success";
-	$output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
-	$output['data'] = $data;
-	
-	mysqli_close($conn);
-
-	echo json_encode($output); 
-
+$conn->close();
 ?>

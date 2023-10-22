@@ -93,7 +93,7 @@ $("#refreshBtn").click(function () {
 
 
 
- // ADD DATA LOGIC FOR EACH SECTION
+ // ADD DATA LOGIC FOR EACH SECTION ---ADD BUTTON--
 
 $("#addBtn").on("click", function () {
   let content = ""; // variable to store the dynamic content
@@ -164,7 +164,7 @@ $("#addBtn").on("click", function () {
 
 
 
-      //UPDATE DATA RENDERING  LOGIC FOR EACH SECTION 
+      //UPDATE  EDIT DATA RENDERING  LOGIC FOR EACH SECTION 
 
 $("#editData").on("show.bs.modal", function (e) {
   const entityId = $(e.relatedTarget).attr("data-id");
@@ -191,10 +191,7 @@ $("#editData").on("show.bs.modal", function (e) {
                       <input type="text" class="form-control" id="editPersonnelJobTitle" placeholder="Department" required value="${employee.departmentName}">
                       <label for="editPersonnelJobTitle">Department</label>
                   </div>
-                  <div class="form-floating mb-3">
-                  <input type="text" class="form-control" id="editPersonnelLocation" placeholder="Location" required value="${employee.locationName}">
-                  <label for="editPersonnelJobTitle">Location</label>
-              </div>
+            
                   <div class="form-floating mb-3">
                       <input type="email" class="form-control" id="editPersonnelEmailAddress" placeholder="Email address" required value="${employee.email}">
                       <label for="editPersonnelEmailAddress">Email Address</label>
@@ -210,8 +207,8 @@ $("#editData").on("show.bs.modal", function (e) {
           break;
 
           case "department":
-            const department = departmentsApiResponse.find(dep => dep.id == entityId);
-            console.log(department);
+            const department = departmentsData.find(dep => dep.id == entityId);
+            // console.log(department);
             if (department) {
                 $("#modalTitle").text("Edit Department");
         
@@ -235,8 +232,8 @@ $("#editData").on("show.bs.modal", function (e) {
             break;
 
             case "location":
-              const location = locationsApiResponse.find(loc => loc.id == entityId);
-              console.log(location);
+              const location = locationData.find(loc => loc.id == entityId);
+              
               if (location) {
                   $("#modalTitle").text("Edit Location");
           
@@ -244,7 +241,7 @@ $("#editData").on("show.bs.modal", function (e) {
           
                   const content = `
                       <div class="form-floating mb-3">
-                          <input type="text" class="form-control" id="editLocationName" placeholder="Location Name" required value="${location.locationName}">
+                          <input type="text" class="form-control" id="editLocationName" placeholder="Location Name" required value="${location.name}">
                           <label for="editLocationName">Location Name</label>
                       </div>
                   `;
@@ -258,6 +255,8 @@ $("#editData").on("show.bs.modal", function (e) {
   }
 });
 
+const locationTemporary =
+
 $(document).ready(function() {
   $("#updateData").click(function() {
       switch (getActiveTab()) {
@@ -268,6 +267,11 @@ $(document).ready(function() {
 
           case "departments":
             updateDepartment();
+            
+            break;
+          
+          case "locations":
+            updateLocation();
             
             break;
           // Add more cases if needed for other tabs
@@ -288,7 +292,7 @@ function updatePersonnel() {
   const firstName = $("#editPersonnelFirstName").val();
   const lastName = $("#editPersonnelLastName").val();
   const departmentName = $("#editPersonnelJobTitle").val();
-  const locationName = $("#editPersonnelLocation").val();
+  // const locationName = $("#editPersonnelLocation").val();
   const email = $("#editPersonnelEmailAddress").val();
 
   // Constructing the data object
@@ -297,7 +301,7 @@ function updatePersonnel() {
       firstName: firstName,
       lastName: lastName,
       departmentName: departmentName,
-      locationName: locationName,
+      // locationName: locationName,
       email: email
   };
 
@@ -318,9 +322,6 @@ $.ajax({
       else {
           document.getElementById("modalMessage").innerText = response.success;
       }
-
-
-
       var myModal = new bootstrap.Modal(document.getElementById('responseModal'));
       myModal.show();
   },
@@ -338,21 +339,30 @@ $.ajax({
  //Update the DEPARTMENT SECTION RECORDS 
 
  function updateDepartment() {
+  console.log("update Department is clicked")
+  
+
+  const personnelID = $('.deleteDepartmentBtn').data('id')
   const departmentName = $('#editDepartmentName').val();
+ 
   const departmentLocation = $('#editDepartmentLocation').val();
 
   const dataToSend = {
+      id: personnelID,
       departmentName: departmentName,
       locationName: departmentLocation
   };
 
+  console.log(dataToSend)
   
   $.ajax({
-      url: "/myProjects/project2/php/getAllPersonnel.php",
+      url: "/myProjects/project2/php/updateDepartments.php",
       type: 'POST',
       data: JSON.stringify(dataToSend),
       contentType: 'application/json',
       success: function(response) {
+
+        console.log(response)
           if (response.success) {
               alert(response.success);
           } else if (response.error) {
@@ -365,6 +375,41 @@ $.ajax({
   });
 }
 
+
+
+
+
+ //Update the LOCATION SECTION RECORDS 
+
+function updateLocation() {
+  const locationID = $('.deleteLocationBtn').data('id')
+  const locationName = $('#editLocationName').val();
+
+  const dataToSend = {
+     id: locationID,
+     name: locationName
+  }
+
+  $.ajax({
+    url: "/myProjects/project2/php/updateLocations.php",
+    type: 'POST',
+    data: JSON.stringify(dataToSend),
+    contentType: 'application/json',
+    success: function(response) {
+
+      console.log(response)
+        if (response.success) {
+            alert(response.success);
+        } else if (response.error) {
+            alert(response.error);
+        }
+    },
+    error: function() {
+        alert('Failed to update. Please try again.');
+    }
+});
+  
+}
 
 // FILTER DATA BUTTON 
 
@@ -538,18 +583,6 @@ $.ajax({
 
 // ------------------------POPULATE DEPARTMENTS SECTION -----------------------------------
 
-const departmentsApiResponse = [
-  {
-      id: 1,
-      departmentName: "Human resources",
-      departmentLocation: "London"
-  },
-  {
-    id: 2,
-    departmentName: "IT",
-    departmentLocation: "London"
-}
-];
 
 
 function populateDepartmentsTable(response) {
@@ -565,30 +598,46 @@ function populateDepartmentsTable(response) {
       $row.find(".departmentName").text(department.departmentName);
       $row.find(".departmentLocation").text(department.departmentLocation);
       $row.find(".editDepartmentBtn, .deleteDepartmentBtn").attr("data-id", department.id);
-
+    
       $tableBody.append($row);
+   
   });
 }
 
+let departmentsData = [];
+
+$.ajax({
+  url: "/myProjects/project2/php/getAllDepartments.php",
+  type: 'GET',
+  dataType: 'text', 
+  success: function(data) {
+    // console.log("Raw departments data:", data);  // Log raw data
+    const cleanedData = data.replace("Connected successfully", "").trim();
+    // console.log("Cleaned departments data:", cleanedData);  // Log cleaned data
+    
+    try {
+        departmentsData = JSON.parse(cleanedData); 
+        populateDepartmentsTable(departmentsData);
+    } catch (error) {
+        console.error("Error parsing the cleaned JSON data: ", error);
+    }
+  },
+  error: function(err) {
+      console.error("AJAX error in departments:", err);
+  }
+});
+
+
+
 // Call the function to populate the departments table when you receive the API response
-populateDepartmentsTable(departmentsApiResponse);
+
 
 
 
 
 
 // --------------------------POPULATE LOCATION SECTION ---------------------------
-const locationsApiResponse = [
-  {
-      id: 1,
-      locationName: "London"
-  },
-  {
-      id: 2,
-      locationName: "Paris"
-  }
-  // ... other locations
-];
+
 
 
 function populateLocationsTable(response) {
@@ -601,17 +650,37 @@ function populateLocationsTable(response) {
   response.forEach(location => {
       const $row = $template.clone();
 
-      $row.find(".locationName").text(location.locationName);
+      $row.find(".locationName").text(location.name); // changed 'locationName' to 'name'
       $row.find(".editLocationBtn, .deleteLocationBtn").attr("data-id", location.id);
 
       $tableBody.append($row);
   });
 }
 
-// Call the function to populate the locations table when you receive the API response
-populateLocationsTable(locationsApiResponse);
 
+let locationData = [];
 
+$.ajax({
+  url: "/myProjects/project2/php/getAllLocations.php",
+  type: 'GET',
+  dataType: 'text', 
+  success: function(data) {
+    if(data) {
+    console.log("Raw locations data:", data);  // Log raw data
+    const cleanedData = data.replace("Connected successfully", "").trim();
+    // console.log("Cleaned locations data:", cleanedData);  // Log cleaned data
+    try {
+        locationData = JSON.parse(cleanedData); 
+        // console.log(locationData)
+        populateLocationsTable(locationData);  // Corrected this line
+    } catch (error) {
+        console.error("Error parsing the cleaned JSON data: ", error);
+    }}
+  },
+  error: function(err) {
+      console.error("AJAX error in locations:", err);
+  }
+});
 
 
 // ------------------------DELETE MODALE-----------------------------------
@@ -631,7 +700,7 @@ $(document).on("click", ".deletePersonnelBtn", function() {
 
 $(document).on("click", ".deleteDepartmentBtn", function() {
   const itemId = $(this).attr("data-id");
-  const item = departmentsApiResponse.find(dept => dept.id == itemId);
+  const item = departmentsData.find(dept => dept.id == itemId);
 
   if (item) {
       $("#itemNameToDelete").text(item.departmentName); // Assuming you have a departmentName property
@@ -642,7 +711,7 @@ $(document).on("click", ".deleteDepartmentBtn", function() {
 // Event listener for the Location Delete button
 $(document).on("click", ".deleteLocationBtn", function() {
   const itemId = $(this).attr("data-id");
-  const item = locationsApiResponse.find(loc => loc.id == itemId);
+  const item = locationData.find(loc => loc.id == itemId);
 
   if (item) {
       $("#itemNameToDelete").text(item.locationName);

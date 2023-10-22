@@ -31,17 +31,17 @@ if (!$locationID) {
     exit(json_encode(['error' => 'Location not found.']));
 }
 
-// Update department's name and locationID
-$updateQuery = "UPDATE department SET name = ?, locationID = ? WHERE name = ?";
+// Update department's name and locationID based on department ID
+$updateQuery = "UPDATE department SET name = ?, locationID = ? WHERE id = ?";
 $updateStmt = $conn->prepare($updateQuery);
 if (!$updateStmt) {
     exit(json_encode(['error' => 'Prepare failed: ' . $conn->error]));
 }
-$updateStmt->bind_param("ssi", $data['departmentName'], $locationID, $data['departmentName']);
+$updateStmt->bind_param("sii", $data['departmentName'], $locationID, $data['id']);
 $updateStmt->execute();
 
 if ($updateStmt->affected_rows === 0) {
-    exit(json_encode(['error' => 'No rows updated.']));
+    exit(json_encode(['error' => 'No rows updated. Maybe the department with the given ID does not exist or the data remains unchanged.']));
 }
 
 $updateStmt->close();

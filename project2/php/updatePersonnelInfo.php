@@ -36,22 +36,7 @@ if (!$departmentID) {
     exit(json_encode(['error' => 'Sorry, ' . $data['departmentName'] . ' department doesn\'t exist.']));
 }
 
-$locationID = fetchID($conn, 'location', $data['locationName']);
-if (!$locationID) {
-    exit(json_encode(['error' => 'Sorry, ' . $data['locationName'] . ' location doesn\'t exist.']));
-}
-
-// Update the department's locationID based on departmentName
-$departmentUpdateQuery = "UPDATE department SET locationID = ? WHERE name = ?";
-$departmentUpdateStmt = $conn->prepare($departmentUpdateQuery);
-if (!$departmentUpdateStmt) {
-    exit(json_encode(['error' => 'Prepare failed: ' . $conn->error]));
-}
-$departmentUpdateStmt->bind_param("is", $locationID, $data['departmentName']);
-$departmentUpdateStmt->execute();
-$departmentUpdateStmt->close();
-
-// Finally, update the personnel
+// Update the personnel data
 $personnelUpdateQuery = "UPDATE personnel SET firstName = ?, lastName = ?, email = ?, departmentID = ? WHERE id = ?";
 $personnelUpdateStmt = $conn->prepare($personnelUpdateQuery);
 if (!$personnelUpdateStmt) {

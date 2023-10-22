@@ -11,21 +11,23 @@
     } 
 
     $query = "
-        SELECT 
-            personnel.id, 
-            personnel.firstName, 
-            personnel.lastName, 
-            personnel.email, 
-            department.name as departmentName,
-            location.name as locationName
-        FROM 
-            personnel
-        JOIN 
-            department ON personnel.departmentID = department.id
-        JOIN 
-            location ON department.locationID = location.id
-    ";
-    
+    SELECT 
+        personnel.id, 
+        personnel.firstName, 
+        personnel.lastName, 
+        personnel.email, 
+        department.name as departmentName,
+        location.name as locationName
+    FROM 
+        personnel
+    JOIN 
+        department ON personnel.departmentID = department.id
+    JOIN 
+        location ON department.locationID = location.id
+    ORDER BY 
+        personnel.firstName ASC
+";
+
     $result = $conn->query($query);
 
     $data = [];
