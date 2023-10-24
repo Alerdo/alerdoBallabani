@@ -80,15 +80,17 @@ $("#refreshBtn").click(function () {
       case "personnel":
           // Refresh personnel table
           console.log("Refreshing personnel table...");
-          fetchDataAndPopulate()
+          fetchDataAndPopulate();
           break;
       case "departments":
           // Refresh department table
           console.log("Refreshing department table...");
+          fetchDepartmentsDataAndPopulate();
           break;
       case "locations":
           // Refresh location table
           console.log("Refreshing location table...");
+          fetchAndPopulateLocations()
           break;
   }
 });
