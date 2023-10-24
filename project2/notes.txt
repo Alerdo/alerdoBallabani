@@ -1,0 +1,37 @@
+To sum up some of the challenges of this project. 
+Note: Copy and delete this file from the directory when you finish with the project. 
+
+
+
+-My first biggest challange was that I decided for the user to be able to update all the information on 
+personnel section (including Location). This made on the webb-app behaving unexpectally becase was creating
+new duplicate records insted of updating the actual record. 
+Reason for that was that I was updating the locationID on department table, which was an value for many 
+existing recrods. The database would be smart enough to not let me mess up all the records but create a duplicate. 
+And sometimes create a new location ID. 
+
+
+
+-Also to update the record sometimes I was using the id of the record from the delete or edit button on the html, this wasnt very smart as I was populating the 
+modale using js. So I decided to create a hidden  <input type="hidden" id="editEntityID" value="${employee.id}">
+Now I could retrive the data from the input. And the values to pupulate the modale I took it from global variables for each section.
+
+
+
+-One of the main challanges was after I had populated the sections depening on the id clicked
+I saw the need to use this functions in other parts of the code. (updateRecord, refresh, filter)
+I could use promises, async function, or call back functions(if statemnts), 
+
+For populating the data I decided to use the async await functions, so the fetchAndPopulate() would wait to retrive the data 
+and than it would populate it. 
+This way I managed to make possible the use of this functions outside the populate section logic. 
+Also the fetchAndPopulate() would accept a parameter that will decide the sorting of the data based on the parameter. 
+(use that later when you do yhe filtering logic)
+
+
+
+-Another challenge was that after I update a record in any section , the data had to be refreshed but sometime 
+the data was being refreshed before the actual update. 
+I made sure that for exmp: updateRecord() would return a promise and upon resolving the fetchAndPopulateSection() would be called. 
+
+

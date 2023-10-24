@@ -74,11 +74,13 @@ function getActiveTab() {
 }
 
 
+
 $("#refreshBtn").click(function () {
   switch (getActiveTab()) {
       case "personnel":
           // Refresh personnel table
           console.log("Refreshing personnel table...");
+          fetchDataAndPopulate()
           break;
       case "departments":
           // Refresh department table
@@ -196,6 +198,8 @@ $("#editData").on("show.bs.modal", function (e) {
                       <input type="email" class="form-control" id="editPersonnelEmailAddress" placeholder="Email address" required value="${employee.email}">
                       <label for="editPersonnelEmailAddress">Email Address</label>
                   </div>
+                  <input type="hidden" id="editEntityID" value="${employee.id}">
+                  
                  
               `;
 
@@ -223,6 +227,7 @@ $("#editData").on("show.bs.modal", function (e) {
                         <input type="text" class="form-control" id="editDepartmentLocation" placeholder="Location" required value="${department.departmentLocation}">
                         <label for="editDepartmentLocation">Location</label>
                     </div>
+                    <input type="hidden" id="editEntityID" value="${department.id}">
                 `;
         
                 $("#dynamicModalFields").html(content);
@@ -244,6 +249,7 @@ $("#editData").on("show.bs.modal", function (e) {
                           <input type="text" class="form-control" id="editLocationName" placeholder="Location Name" required value="${location.name}">
                           <label for="editLocationName">Location Name</label>
                       </div>
+                      <input type="hidden" id="editEntityID" value="${location.id}">
                   `;
           
                   $("#dynamicModalFields").html(content);
@@ -255,40 +261,110 @@ $("#editData").on("show.bs.modal", function (e) {
   }
 });
 
-const locationTemporary =
-
 $(document).ready(function() {
   $("#updateData").click(function() {
       switch (getActiveTab()) {
           case "personnel":
-              updatePersonnel();
-             
+              updatePersonnel()
+                  .then(() => {
+                      $('#editData').modal('hide');
+                      fetchDataAndPopulate(); 
+                      console.log("Personnel data updated and new data rendered.");
+                  })
+                  .catch((error) => {
+                      console.error('Error after updating personnel:', error);
+                  });
               break;
 
           case "departments":
-            updateDepartment();
-            
-            break;
-          
+              updateDepartment() //I made this function return a promise so the fetchDataAndPopulate will run only if the promise is resolved
+                  .then(() => {
+                      $('#editData').modal('hide');
+                      fetchDataAndPopulate();  // Assuming you want to re-fetch data for departments as well
+                      console.log("Department data updated and new data rendered.");
+                  })
+                  .catch((error) => {
+                      console.error('Error after updating department:', error);
+                  });
+              break;
+              
           case "locations":
-            updateLocation();
-            
-            break;
+              updateLocation()
+                  .then(() => {
+                      $('#editData').modal('hide');
+                      fetchDataAndPopulate();  // Assuming you want to re-fetch data for locations as well
+                      console.log("Location data updated and new data rendered.");
+                  })
+                  .catch((error) => {
+                      console.error('Error after updating location:', error);
+                  });
+              break;
+              
           // Add more cases if needed for other tabs
           // case "anotherTab":
-          //    anotherFunction();
+          //    anotherFunction().then(() => { ... }).catch((error) => { ... });
           //    break;
-         
       }
   });
 });
 
 
 
-//UPDATE DATA LOGIC FOR   PERSONNEL SECTION 
+// //UPDATE DATA LOGIC FOR   PERSONNEL SECTION 
+// function updatePersonnel() {
+//   // Getting values from the input fields
+//   const personnelID = $('#editEntityID').val();
+//   const firstName = $("#editPersonnelFirstName").val();
+//   const lastName = $("#editPersonnelLastName").val();
+//   const departmentName = $("#editPersonnelJobTitle").val();
+//   // const locationName = $("#editPersonnelLocation").val();
+//   const email = $("#editPersonnelEmailAddress").val();
+
+//   // Constructing the data object
+//   const dataToSend = {
+//       id: personnelID,
+//       firstName: firstName,
+//       lastName: lastName,
+//       departmentName: departmentName,
+//       // locationName: locationName,
+//       email: email
+//   };
+// console.log(dataToSend.id)
+//   // Sending the PUT request to the backend to update the data
+// // AJAX Call
+// $.ajax({
+//   url: '/myProjects/project2/php/updatePersonnelInfo.php', 
+//   type: 'PUT',
+//   contentType: 'application/json',
+//   dataType: 'json',
+//   data: JSON.stringify(dataToSend),
+//   success: function(response) {
+      
+//       if(response.error) {
+//           document.getElementById("modalMessage").innerText = response.error;
+//       } 
+      
+//       else {
+//           document.getElementById("modalMessage").innerText = response.success;
+//       }
+//       const infoModal = new bootstrap.Modal(document.getElementById('responseModal'));
+//       infoModal.show();
+//   },
+//   error: function(jqXHR, textStatus, errorThrown) {
+//       console.error('Error updating data:', textStatus, errorThrown, jqXHR);
+//       document.getElementById("modalMessage").innerText = "An unexpected error occurred.";
+//       var myModal = new bootstrap.Modal(document.getElementById('responseModal'));
+//       myModal.show();
+//   }
+// });
+
+// }
+
 function updatePersonnel() {
-  // Getting values from the input fields
-  const personnelID = $('.deletePersonnelBtn').data('id');
+  return new Promise((resolve, reject) => {
+      // ... [your previous code here]
+      // Getting values from the input fields
+  const personnelID = $('#editEntityID').val();
   const firstName = $("#editPersonnelFirstName").val();
   const lastName = $("#editPersonnelLastName").val();
   const departmentName = $("#editPersonnelJobTitle").val();
@@ -304,111 +380,191 @@ function updatePersonnel() {
       // locationName: locationName,
       email: email
   };
+console.log(dataToSend.id)
+      // AJAX Call
+      $.ajax({
+          url: '/myProjects/project2/php/updatePersonnelInfo.php', 
+          type: 'PUT',
+          contentType: 'application/json',
+          dataType: 'json',
+          data: JSON.stringify(dataToSend),
+          success: function(response) {
+              if(response.error) {
+                  document.getElementById("modalMessage").innerText = response.error;
+              } else {
+                  document.getElementById("modalMessage").innerText = response.success;
+              }
+              const infoModal = new bootstrap.Modal(document.getElementById('responseModal'));
+              infoModal.show();
 
-  // Sending the PUT request to the backend to update the data
-// AJAX Call
-$.ajax({
-  url: '/myProjects/project2/php/updatePersonnelInfo.php', 
-  type: 'PUT',
-  contentType: 'application/json',
-  dataType: 'json',
-  data: JSON.stringify(dataToSend),
-  success: function(response) {
-      
-      if(response.error) {
-          document.getElementById("modalMessage").innerText = response.error;
-      } 
-      
-      else {
-          document.getElementById("modalMessage").innerText = response.success;
-      }
-      var myModal = new bootstrap.Modal(document.getElementById('responseModal'));
-      myModal.show();
-  },
-  error: function(jqXHR, textStatus, errorThrown) {
-      console.error('Error updating data:', textStatus, errorThrown, jqXHR);
-      document.getElementById("modalMessage").innerText = "An unexpected error occurred.";
-      var myModal = new bootstrap.Modal(document.getElementById('responseModal'));
-      myModal.show();
-  }
-});
+              // Resolve the promise on success
+              resolve(response);
+          },
+          error: function(jqXHR, textStatus, errorThrown) {
+              console.error('Error updating data:', textStatus, errorThrown, jqXHR);
+              document.getElementById("modalMessage").innerText = "An unexpected error occurred.";
+              var myModal = new bootstrap.Modal(document.getElementById('responseModal'));
+              myModal.show();
 
-}
-
-
- //Update the DEPARTMENT SECTION RECORDS 
-
- function updateDepartment() {
-  console.log("update Department is clicked")
-  
-
-  const personnelID = $('.deleteDepartmentBtn').data('id')
-  const departmentName = $('#editDepartmentName').val();
- 
-  const departmentLocation = $('#editDepartmentLocation').val();
-
-  const dataToSend = {
-      id: personnelID,
-      departmentName: departmentName,
-      locationName: departmentLocation
-  };
-
-  console.log(dataToSend)
-  
-  $.ajax({
-      url: "/myProjects/project2/php/updateDepartments.php",
-      type: 'POST',
-      data: JSON.stringify(dataToSend),
-      contentType: 'application/json',
-      success: function(response) {
-
-        console.log(response)
-          if (response.success) {
-              alert(response.success);
-          } else if (response.error) {
-              alert(response.error);
+              // Reject the promise on error
+              reject(new Error(textStatus));
           }
-      },
-      error: function() {
-          alert('Failed to update. Please try again.');
-      }
+      });
   });
 }
 
 
 
+//  //Update the DEPARTMENT SECTION RECORDS 
+
+//  function updateDepartment() {
+
+//   const departmentID = $('#editEntityID').val();
+//   const departmentName = $('#editDepartmentName').val();
+ 
+//   const departmentLocation = $('#editDepartmentLocation').val();
+
+//   const dataToSend = {
+//       id: departmentID,
+//       departmentName: departmentName,
+//       locationName: departmentLocation
+//   };
+//   console.log(dataToSend.id)
 
 
- //Update the LOCATION SECTION RECORDS 
-
-function updateLocation() {
-  const locationID = $('.deleteLocationBtn').data('id')
-  const locationName = $('#editLocationName').val();
-
-  const dataToSend = {
-     id: locationID,
-     name: locationName
-  }
-
-  $.ajax({
-    url: "/myProjects/project2/php/updateLocations.php",
-    type: 'POST',
-    data: JSON.stringify(dataToSend),
-    contentType: 'application/json',
-    success: function(response) {
-
-      console.log(response)
-        if (response.success) {
-            alert(response.success);
-        } else if (response.error) {
-            alert(response.error);
-        }
-    },
-    error: function() {
-        alert('Failed to update. Please try again.');
-    }
-});
   
+//   $.ajax({
+//       url: "/myProjects/project2/php/updateDepartments.php",
+//       type: 'POST',
+//       data: JSON.stringify(dataToSend),
+//       contentType: 'application/json',
+//       success: function(response) {
+
+       
+//         if(response.error) {
+//           document.getElementById("modalMessage").innerText = response.error;
+//       } 
+      
+//       else {
+//           document.getElementById("modalMessage").innerText = response.success;
+//       }
+//       const infoModal = new bootstrap.Modal(document.getElementById('responseModal'));
+//       infoModal.show();
+//       },
+//       error: function() {
+//           alert('Failed to update. Please try again.');
+//       }
+//   });
+// }
+
+
+
+function updateDepartment() {
+  return new Promise((resolve, reject) => {
+      const departmentID = $('#editEntityID').val();
+      const departmentName = $('#editDepartmentName').val();
+      const departmentLocation = $('#editDepartmentLocation').val();
+
+      const dataToSend = {
+          id: departmentID,
+          departmentName: departmentName,
+          locationName: departmentLocation
+      };
+      console.log(dataToSend.id);
+
+      $.ajax({
+          url: "/myProjects/project2/php/updateDepartments.php",
+          type: 'POST',
+          data: JSON.stringify(dataToSend),
+          contentType: 'application/json',
+          success: function(response) {
+              if(response.error) {
+                  document.getElementById("modalMessage").innerText = response.error;
+              } else {
+                  document.getElementById("modalMessage").innerText = response.success;
+              }
+              const infoModal = new bootstrap.Modal(document.getElementById('responseModal'));
+              infoModal.show();
+
+              resolve(response); // Resolve the promise on success
+          },
+          error: function(jqXHR, textStatus) {
+              alert('Failed to update. Please try again.');
+              reject(new Error(textStatus)); // Reject the promise on error
+          }
+      });
+  });
+}
+
+
+//  //Update the LOCATION SECTION RECORDS 
+
+// function updateLocation() {
+//   const locationID = $('#editEntityID').val();
+//   const locationName = $('#editLocationName').val();
+
+//   const dataToSend = {
+//      id: locationID,
+//      name: locationName
+//   }
+//   console.log(dataToSend.id)
+//   $.ajax({
+//     url: "/myProjects/project2/php/updateLocations.php",
+//     type: 'POST',
+//     data: JSON.stringify(dataToSend),
+//     contentType: 'application/json',
+//     success: function(response) {
+
+       
+//       if(response.error) {
+//         document.getElementById("modalMessage").innerText = response.error;
+//     } 
+    
+//     else {
+//         document.getElementById("modalMessage").innerText = response.success;
+//     }
+//     const infoModal = new bootstrap.Modal(document.getElementById('responseModal'));
+//     infoModal.show();
+//     },
+//     error: function() {
+//         alert('Failed to update. Please try again.');
+//     }
+// });
+  
+// }
+function updateLocation() {
+  return new Promise((resolve, reject) => {
+      const locationID = $('#editEntityID').val();
+      const locationName = $('#editLocationName').val();
+
+      const dataToSend = {
+          id: locationID,
+          name: locationName
+      };
+      console.log(dataToSend.id);
+
+      $.ajax({
+          url: "/myProjects/project2/php/updateLocations.php",
+          type: 'POST',
+          data: JSON.stringify(dataToSend),
+          contentType: 'application/json',
+          success: function(response) {
+              if(response.error) {
+                  document.getElementById("modalMessage").innerText = response.error;
+              } else {
+                  document.getElementById("modalMessage").innerText = response.success;
+              }
+              const infoModal = new bootstrap.Modal(document.getElementById('responseModal'));
+              infoModal.show();
+
+              resolve(response); // Resolve the promise on success
+          },
+          error: function(jqXHR, textStatus) {
+              alert('Failed to update. Please try again.');
+              reject(new Error(textStatus)); // Reject the promise on error
+          }
+      });
+  });
 }
 
 // FILTER DATA BUTTON 
@@ -480,49 +636,6 @@ $(document).click(function(event) {
 
 
 
-// You may also want to call updateFilterOptions when the tab changes
-// Here, you should tie into your tab change event, however you handle it.
-// For example:
-// $('your-tab-selector').on('tab-change-event', updateFilterOptions);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-$("#personnelBtn").click(function () {
-  // Optionally, call function to refresh personnel table when the tab is clicked
-  console.log("Refreshing personnel table...");
-});
-
-$("#departmentsBtn").click(function () {
-  // Optionally, call function to refresh department table when the tab is clicked
-  console.log("Refreshing department table...");
-});
-
-$("#locationsBtn").click(function () {
-  // Optionally, call function to refresh location table when the tab is clicked
-  console.log("Refreshing location table...");
-});
-
-
- 
-
-
-  
-
-  
-
 
 
 // ---------------Start Of My Code---------------------------
@@ -530,19 +643,48 @@ $("#locationsBtn").click(function () {
 
 
 // ---------------Populate PERSONNEL---------------------------
+let employeesData = [];
 
-function populateEmployeesTable(response) {
+
+async function fetchData() {
+  try {
+      const response = await $.ajax({
+          url: "/myProjects/project2/php/getAllPersonnel.php",
+          type: 'GET',
+          dataType: 'text'
+      });
+      
+      const cleanedData = response.replace("Connected successfully", "").trim();
+      employeesData = JSON.parse(cleanedData);
+      return employeesData
+      
+  } catch (error) {
+      throw new Error("Error fetching employees data: " + error);
+  }
+}
+
+
+const $originalTemplate = $(".employeeTemplate");
+
+function populateEmployeesTable(data, sortColumn) {
+  // console.log("Data received for populating:", data);
+  const sortedData = data.sort((a, b) => {
+      if (a[sortColumn] < b[sortColumn]) return -1;
+      if (a[sortColumn] > b[sortColumn]) return 1;
+      return 0;
+  });
+
   const $tableBody = $("#employeesTableBody");
-  const $template = $(".employeeTemplate").clone().removeClass("employeeTemplate").show();
-
+  const $template = $originalTemplate.clone().removeClass("employeeTemplate").show();
   $tableBody.empty();
 
-  response.forEach(employee => {
+  if(sortedData) {
+    sortedData.forEach(employee => {
       const $row = $template.clone();
 
       $row.find(".employeeName").text(employee.firstName + ' ' + employee.lastName);
-      $row.find(".employeeDepartment").text(employee.departmentName); // Updated to use departmentName
-      $row.find(".employeeLocation").text(employee.locationName); // Updated to use locationName
+      $row.find(".employeeDepartment").text(employee.departmentName);
+      $row.find(".employeeLocation").text(employee.locationName);
       $row.find(".employeeEmail").text(employee.email);
       
       // Assigning the employee ID to the data-id attribute for both buttons
@@ -550,32 +692,22 @@ function populateEmployeesTable(response) {
 
       $tableBody.append($row);
   });
+  }
 }
 
-// This will store the employees data fetched from the server
-let employeesData = [];
-
-
-$.ajax({
-  url: "/myProjects/project2/php/getAllPersonnel.php",
-  type: 'GET',
-  dataType: 'text', // changed from json to text
-  success: function(data) {
-      // Clean up the data before parsing as JSON
-      const cleanedData = data.replace("Connected successfully", "").trim();
-      try {
-          employeesData = JSON.parse(cleanedData);  // <-- Store the data here
-          populateEmployeesTable(employeesData);
-      } catch (error) {
-          console.error("Error parsing the cleaned JSON data: ", error);
-      }
-  },
-  error: function(err) {
-      console.error("AJAX error: ", err);
+async function fetchDataAndPopulate(sortColumn = "firstName") {
+  try {
+      const data = await fetchData();
+      populateEmployeesTable(data, sortColumn);
+  } catch (error) {
+      console.error("Failed to fetch or parse data:", error);
   }
-});
-
-
+}
+// Usage examples:
+fetchDataAndPopulate();               // Default: sorts by firstName
+// fetchDataAndPopulate("departmentName"); // Sorts by department
+// fetchDataAndPopulate("locationName");   // Sorts by location
+// fetchDataAndPopulate("email");          // Sorts by email
 
 
 
@@ -583,54 +715,65 @@ $.ajax({
 
 // ------------------------POPULATE DEPARTMENTS SECTION -----------------------------------
 
+// Refactored version based on the 'Populate Personnel' structure
 
+let departmentsData = [];
 
-function populateDepartmentsTable(response) {
+async function fetchDepartmentsData() {
+    try {
+        const response = await $.ajax({
+            url: "/myProjects/project2/php/getAllDepartments.php",
+            type: 'GET',
+            dataType: 'text'
+        });
+
+        const cleanedData = response.replace("Connected successfully", "").trim();
+        departmentsData = JSON.parse(cleanedData);
+        
+        return departmentsData;
+
+    } catch (error) {
+        throw new Error("Error fetching departments data: " + error);
+    }
+}
+
+function populateDepartmentsTable(data, sortColumn = "departmentName") {
+  const sortedData = data.sort((a, b) => {
+      if (a[sortColumn] < b[sortColumn]) return -1;
+      if (a[sortColumn] > b[sortColumn]) return 1;
+      return 0;
+  });
+
   const $tableBody = $("#departmentsTableBody");
   const $template = $(".departmentTemplate").clone().removeClass("departmentTemplate").show();
 
   // Empty the table body
   $tableBody.empty();
 
-  response.forEach(department => {
-      const $row = $template.clone();
+  if (sortedData) {
+      sortedData.forEach(department => {
+          const $row = $template.clone();
 
-      $row.find(".departmentName").text(department.departmentName);
-      $row.find(".departmentLocation").text(department.departmentLocation);
-      $row.find(".editDepartmentBtn, .deleteDepartmentBtn").attr("data-id", department.id);
-    
-      $tableBody.append($row);
-   
-  });
+          $row.find(".departmentName").text(department.departmentName);
+          $row.find(".departmentLocation").text(department.departmentLocation);
+          $row.find(".editDepartmentBtn, .deleteDepartmentBtn").attr("data-id", department.id);
+
+          $tableBody.append($row);
+      });
+  }
 }
 
-let departmentsData = [];
-
-$.ajax({
-  url: "/myProjects/project2/php/getAllDepartments.php",
-  type: 'GET',
-  dataType: 'text', 
-  success: function(data) {
-    // console.log("Raw departments data:", data);  // Log raw data
-    const cleanedData = data.replace("Connected successfully", "").trim();
-    // console.log("Cleaned departments data:", cleanedData);  // Log cleaned data
-    
+async function fetchDepartmentsDataAndPopulate(sortColumn) {
     try {
-        departmentsData = JSON.parse(cleanedData); 
-        populateDepartmentsTable(departmentsData);
+        const data = await fetchDepartmentsData();
+        populateDepartmentsTable(data,sortColumn);
     } catch (error) {
-        console.error("Error parsing the cleaned JSON data: ", error);
+        console.error("Failed to fetch or parse department data:", error);
     }
-  },
-  error: function(err) {
-      console.error("AJAX error in departments:", err);
-  }
-});
+}
 
-
-
-// Call the function to populate the departments table when you receive the API response
-
+// Usage
+fetchDepartmentsDataAndPopulate(); //default is departmentName, use departmentLocation for filter  
 
 
 
@@ -638,49 +781,63 @@ $.ajax({
 
 // --------------------------POPULATE LOCATION SECTION ---------------------------
 
-
-
-function populateLocationsTable(response) {
-  const $tableBody = $("#locationsTableBody");
-  const $template = $(".locationTemplate").clone().removeClass("locationTemplate").show();
-
-  // Empty the table body
-  $tableBody.empty();
-
-  response.forEach(location => {
-      const $row = $template.clone();
-
-      $row.find(".locationName").text(location.name); // changed 'locationName' to 'name'
-      $row.find(".editLocationBtn, .deleteLocationBtn").attr("data-id", location.id);
-
-      $tableBody.append($row);
-  });
-}
-
-
 let locationData = [];
 
-$.ajax({
-  url: "/myProjects/project2/php/getAllLocations.php",
-  type: 'GET',
-  dataType: 'text', 
-  success: function(data) {
-    if(data) {
-    console.log("Raw locations data:", data);  // Log raw data
-    const cleanedData = data.replace("Connected successfully", "").trim();
-    // console.log("Cleaned locations data:", cleanedData);  // Log cleaned data
+async function fetchLocationData() {
     try {
-        locationData = JSON.parse(cleanedData); 
-        // console.log(locationData)
-        populateLocationsTable(locationData);  // Corrected this line
+        const response = await $.ajax({
+            url: "/myProjects/project2/php/getAllLocations.php",
+            type: 'GET',
+            dataType: 'text'
+        });
+
+        const cleanedData = response.replace("Connected successfully", "").trim();
+        locationData = JSON.parse(cleanedData);
+        return locationData;
+
     } catch (error) {
-        console.error("Error parsing the cleaned JSON data: ", error);
-    }}
-  },
-  error: function(err) {
-      console.error("AJAX error in locations:", err);
+        throw new Error("Error fetching location data: " + error);
+    }
+}
+
+function populateLocationsTable(data, sortColumn = null) {
+  if (sortColumn === "locations") {
+      data.sort((a, b) => {
+          if (a.name < b.name) return -1;
+          if (a.name > b.name) return 1;
+          return 0;
+      });
   }
-});
+
+  const $tableBody = $("#locationsTableBody");
+  const $template = $(".locationTemplate").clone().removeClass("locationTemplate").show();
+  $tableBody.empty();
+
+  if (data) {
+      data.forEach(location => {
+          const $row = $template.clone();
+
+          $row.find(".locationName").text(location.name);
+          $row.find(".editLocationBtn, .deleteLocationBtn").attr("data-id", location.id);
+
+          $tableBody.append($row);
+      });
+  }
+}
+
+async function fetchAndPopulateLocations(sortColumn) {
+  try {
+      const data = await fetchLocationData();
+      populateLocationsTable(data, sortColumn);
+  } catch (error) {
+      console.error("Failed to fetch or parse location data:", error);
+  }
+}
+
+// Usage
+fetchAndPopulateLocations(); // Sorts by locations alphabetically. // use "use location as parameter when you need to sort the data"
+
+
 
 
 // ------------------------DELETE MODALE-----------------------------------
@@ -726,12 +883,4 @@ $(document).on("click", ".confirmDelete", function() {
   // Or you can set a global state/data attribute indicating the current type - Personnel, Department, or Location
   $("#deleteConfirmationModal").modal("hide");
 });
-
-
-
-
-
-
-
-
 

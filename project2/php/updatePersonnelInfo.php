@@ -52,5 +52,5 @@ if ($personnelUpdateStmt->errno) {
 $personnelUpdateStmt->close();
 $conn->close();
 
-exit(json_encode(['success' => 'Record updated successfully.']));
+exit(json_encode(['success' => 'Information updated successfully.']));
 ?>

@@ -14,7 +14,20 @@ if ($conn->connect_errno) {
 
 $data = json_decode(file_get_contents("php://input"), true);
 
-// Fetch location ID based on name
+// Rule 1: Check if the departmentName already exists in any other department record
+$checkDepartmentNameQuery = "SELECT * FROM department WHERE name = ? AND id != ?";
+$checkStmt = $conn->prepare($checkDepartmentNameQuery);
+$checkStmt->bind_param("si", $data['departmentName'], $data['id']);
+$checkStmt->execute();
+$checkResult = $checkStmt->get_result();
+
+if ($checkResult->num_rows > 0) {
+    exit(json_encode(['error' => 'A department with this name already exists.']));
+}
+
+$checkStmt->close();
+
+// Rule 2: Fetch location ID based on name
 $query = "SELECT id FROM location WHERE name = ?";
 $stmt = $conn->prepare($query);
 if (!$stmt) {
@@ -41,7 +54,7 @@ $updateStmt->bind_param("sii", $data['departmentName'], $locationID, $data['id']
 $updateStmt->execute();
 
 if ($updateStmt->affected_rows === 0) {
-    exit(json_encode(['error' => 'No rows updated. Maybe the department with the given ID does not exist or the data remains unchanged.']));
+    exit(json_encode(['error' => 'No department updated. Please provide diffrent data .']));
 }
 
 $updateStmt->close();
