@@ -24,22 +24,18 @@ if (mysqli_connect_errno()) {
     exit;
 }
 
-$departmentName = $_POST['name'];
-$locationName = $_POST['location'];
+$firstName = $_POST['firstName'];
+$lastName = $_POST['lastName'];
+$departmentName = $_POST['departmentName'];
+$email = $_POST['email'];
 
-// Retrieve location ID based on the name
-$locationQuery = $conn->prepare('SELECT id FROM location WHERE name = ?');
-$locationQuery->bind_param("s", $locationName);
-$locationQuery->execute();
-$locationResult = $locationQuery->get_result();
-$locationRow = $locationResult->fetch_assoc();
-
-if (!$locationRow) {
+// Check if email format is valid
+if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
     $output = [
         'status' => [
-            'code' => "404",
-            'name' => "not found",
-            'description' => "Location doesn't exist. Please specify a valid location."
+            'code' => "400",
+            'name' => "invalid input",
+            'description' => "Please provide a correct email format."
         ],
         'data' => []
     ];
@@ -47,10 +43,30 @@ if (!$locationRow) {
     exit;
 }
 
-$locationID = $locationRow['id'];
+// Retrieve department ID from the name
+$deptQuery = $conn->prepare('SELECT id FROM department WHERE name = ?');
+$deptQuery->bind_param("s", $departmentName);
+$deptQuery->execute();
+$deptResult = $deptQuery->get_result();
+$departmentRow = $deptResult->fetch_assoc();
 
-$query = $conn->prepare('INSERT INTO department (name, locationID) VALUES(?, ?)');
-$query->bind_param("si", $departmentName, $locationID);
+if (!$departmentRow) {
+    $output = [
+        'status' => [
+            'code' => "404",
+            'name' => "not found",
+            'description' => "Department doesn't exist. Please add an existing department."
+        ],
+        'data' => ["$email  is not a valid email format."]
+    ];
+    echo json_encode($output);
+    exit;
+}
+
+$departmentID = $departmentRow['id'];
+
+$query = $conn->prepare('INSERT INTO personnel (firstName, lastName, email, departmentID) VALUES(?, ?, ?, ?)');
+$query->bind_param("sssi", $firstName, $lastName, $email, $departmentID);
 
 $query->execute();
 
@@ -75,7 +91,7 @@ $output = [
         'returnedIn' => (microtime(true) - $executionStartTime) / 1000 . " ms"
     ],
     'data' => [
-        'message' => "Department '$departmentName' was created in location '$locationName'."
+        'message' => "$firstName $lastName was created."
     ]
 ];
 

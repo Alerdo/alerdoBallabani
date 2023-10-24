@@ -1,10 +1,12 @@
 <?php
 
+// Remove next two lines for production
 ini_set('display_errors', 'On');
 error_reporting(E_ALL);
 
 $executionStartTime = microtime(true);
 
+// Include the login details
 include("config.php");
 header('Content-Type: application/json; charset=UTF-8');
 
@@ -24,22 +26,22 @@ if (mysqli_connect_errno()) {
     exit;
 }
 
-$departmentName = $_POST['name'];
-$locationName = $_POST['location'];
+// Assuming POST input for production
+$locationName = $_POST['locationName'];
 
-// Retrieve location ID based on the name
-$locationQuery = $conn->prepare('SELECT id FROM location WHERE name = ?');
-$locationQuery->bind_param("s", $locationName);
-$locationQuery->execute();
-$locationResult = $locationQuery->get_result();
-$locationRow = $locationResult->fetch_assoc();
+// Check if location already exists
+$checkQuery = $conn->prepare('SELECT name FROM location WHERE name = ?');
+$checkQuery->bind_param("s", $locationName);
+$checkQuery->execute();
+$result = $checkQuery->get_result();
 
-if (!$locationRow) {
+if ($result->num_rows > 0) {
     $output = [
         'status' => [
-            'code' => "404",
-            'name' => "not found",
-            'description' => "Location doesn't exist. Please specify a valid location."
+            'code' => "409",
+            'name' => "conflict",
+            'description' => "Location already exists. Please enter a new Location",
+            'returnedIn' => (microtime(true) - $executionStartTime) / 1000 . " ms"
         ],
         'data' => []
     ];
@@ -47,14 +49,12 @@ if (!$locationRow) {
     exit;
 }
 
-$locationID = $locationRow['id'];
-
-$query = $conn->prepare('INSERT INTO department (name, locationID) VALUES(?, ?)');
-$query->bind_param("si", $departmentName, $locationID);
+$query = $conn->prepare('INSERT INTO location (name) VALUES(?)');
+$query->bind_param("s", $locationName);
 
 $query->execute();
 
-if ($query === false) {
+if (false === $query) {
     $output = [
         'status' => [
             'code' => "400",
@@ -75,7 +75,7 @@ $output = [
         'returnedIn' => (microtime(true) - $executionStartTime) / 1000 . " ms"
     ],
     'data' => [
-        'message' => "Department '$departmentName' was created in location '$locationName'."
+        'message' => "Location '$locationName' was created."
     ]
 ];
 

@@ -14,13 +14,22 @@ if ($conn->connect_errno) {
 
 $data = json_decode(file_get_contents("php://input"), true);
 
+// Fetch old location name
+$oldNameQuery = "SELECT name FROM location WHERE id = ?";
+$oldNameStmt = $conn->prepare($oldNameQuery);
+$oldNameStmt->bind_param("i", $data['id']);
+$oldNameStmt->execute();
+$result = $oldNameStmt->get_result();
+$oldLocation = $result->fetch_assoc();
+$oldNameStmt->close();
+
+if (!$oldLocation) {
+    exit(json_encode(['error' => 'Location not found.']));
+}
+
 // Check if the location name already exists
 $checkQuery = "SELECT id FROM location WHERE name = ?";
 $checkStmt = $conn->prepare($checkQuery);
-if (!$checkStmt) {
-    exit(json_encode(['error' => 'Prepare failed: ' . $conn->error]));
-}
-
 $checkStmt->bind_param("s", $data['name']);
 $checkStmt->execute();
 $result = $checkStmt->get_result();
@@ -33,10 +42,6 @@ if ($result->num_rows > 0) {
 // Update location's name based on ID
 $updateQuery = "UPDATE location SET name = ? WHERE id = ?";
 $updateStmt = $conn->prepare($updateQuery);
-if (!$updateStmt) {
-    exit(json_encode(['error' => 'Prepare failed: ' . $conn->error]));
-}
-
 $updateStmt->bind_param("si", $data['name'], $data['id']);
 $updateStmt->execute();
 
@@ -47,5 +52,5 @@ if ($updateStmt->affected_rows === 0) {
 $updateStmt->close();
 $conn->close();
 
-exit(json_encode(['success' => 'Location updated successfully.']));
+exit(json_encode(['success' => 'Location updated successfully from ' . $oldLocation['name'] . ' to ' . $data['name'] . '.']));
 ?>

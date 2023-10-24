@@ -60,7 +60,7 @@ $("#searchInp").on("keyup", function (e) {
   }
 });
 
-
+//-----------------------REFRESH BUTTON------------------------------
 
   // Returns the active tab id
 function getActiveTab() {
@@ -97,7 +97,8 @@ $("#refreshBtn").click(function () {
 
 
 
- // ADD DATA LOGIC FOR EACH SECTION ---ADD BUTTON--
+
+//---------------------ADD+ BUTTON------------------------------===
 
 $("#addBtn").on("click", function () {
   let content = ""; // variable to store the dynamic content
@@ -116,8 +117,8 @@ $("#addBtn").on("click", function () {
             <label for="addPersonnelLastName">Last name</label>
         </div>
         <div class="form-floating mb-3">
-            <input type="text" class="form-control" id="addPersonnelJobTitle" placeholder="Job title" required>
-            <label for="addPersonnelJobTitle">Job Title</label>
+            <input type="text" class="form-control" id="addPersonnelJobTitle" placeholder="Department" required>
+            <label for="addPersonnelJobTitle">Department</label>
         </div>
         <div class="form-floating mb-3">
             <input type="email" class="form-control" id="addPersonnelEmailAddress" placeholder="Email address" required>
@@ -168,7 +169,111 @@ $("#addBtn").on("click", function () {
 
 
 
-      //UPDATE  EDIT DATA RENDERING  LOGIC FOR EACH SECTION 
+
+
+
+
+// On 'saveAddBtn' click, make an AJAX call based on the active tab
+$("#saveAddBtn").on("click", function() {
+    switch (getActiveTab()) {
+        case "personnel":
+            $.ajax({
+                url: '/myProjects/project2/php/insertPersonnel.php',
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    firstName: $("#addPersonnelFirstName").val(),
+                    lastName: $("#addPersonnelLastName").val(),
+                    departmentName: $("#addPersonnelJobTitle").val(),
+                    email: $("#addPersonnelEmailAddress").val()
+                },
+                success: function(response) {
+
+                    $('#addModal').modal('hide');
+                    fetchDataAndPopulate();
+                    const modalMessageElement = document.getElementById("modalMessage");
+                
+                    if (response.status.name === "failure") {
+                        modalMessageElement.innerText = response.status.description;
+                    } else if (response.status.name === "ok") {  // I noticed in your PHP it's "ok" not "success"
+                        modalMessageElement.innerText = response.data.message;
+                    }
+                
+                   
+                
+                    // Display the modal with the response message
+                    const infoModal = new bootstrap.Modal(document.getElementById('responseModal'));
+                    infoModal.show();
+                },
+                
+            });
+            break;
+
+        case "departments":
+            $.ajax({
+                url: '/myProjects/project2/php/insertDepartment.php',
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    name: $("#addDepartmentName").val(),
+                    location: $("#addDepartmentLocation").val()
+                },
+                success: function(response) {
+                    $('#addModal').modal('hide');
+                    fetchDepartmentsDataAndPopulate();
+                    const modalMessageElement = document.getElementById("modalMessage");
+                    
+                    if (response.status.code === "404" && response.status.name === "not found") {
+                        modalMessageElement.innerText = response.status.description;
+                    } else if (response.status.code === "400" && response.status.name === "executed") {
+                        modalMessageElement.innerText = response.status.description;
+                    } else if (response.status.code === "200" && response.status.name === "ok") {
+                        modalMessageElement.innerText = response.data.message;
+                    }
+                    
+                    // Display the modal with the response message
+                    const infoModal = new bootstrap.Modal(document.getElementById('responseModal'));
+                    infoModal.show();
+                },
+                
+                
+            });
+            break;
+
+        case "locations":
+            $.ajax({
+                url: '/myProjects/project2/php/insertLocation.php',
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    locationName: $("#addLocationName").val()
+                },
+                success: function(response) {
+                    fetchAndPopulateLocations();
+                    $('#addModal').modal('hide');
+                    const modalMessageElement = document.getElementById("modalMessage");
+                                
+                    if (response.status.name === "failure") {
+                        modalMessageElement.innerText = response.status.description;
+                    } else if (response.status.name === "conflict") {
+                        modalMessageElement.innerText = response.status.description;
+                    } else if (response.status.name === "ok") {
+                        modalMessageElement.innerText = response.data.message;
+                    }
+                
+                    // Display the modal with the response message
+                    const infoModal = new bootstrap.Modal(document.getElementById('responseModal'));
+                    infoModal.show();
+                }
+                
+                
+            });
+            break;
+    }
+});
+
+
+//---------------UPDATE OR EDIT BUTTON LOGIC----------------------------------
 
 $("#editData").on("show.bs.modal", function (e) {
   const entityId = $(e.relatedTarget).attr("data-id");
@@ -438,25 +543,6 @@ function updateLocation() {
 // FILTER DATA BUTTON 
 
 
-
-$("#filterBtn").click(function () {
-  switch (getActiveTab()) {
-      case "personnel":
-          // Filter personnel table
-          console.log("Filtering personnel table...");
-          break;
-      case "departments":
-          // Filter department table
-          console.log("Filtering department table...");
-          break;
-      case "locations":
-          // Filter location table
-          console.log("Filtering location table...");
-          break;
-  }
-});
-
-
 function updateFilterOptions() {
   // Define what options should be available for each case
   const options = {
@@ -498,6 +584,68 @@ $(document).click(function(event) {
       $("#filterOptions").hide();
   }
 });
+
+//SOULUTION FOR FILTER DATA
+
+// This will handle the event when a dropdown item is clicked
+$("#filterOptions").on("click", ".dropdown-item", function () {
+  const filterType = $(this).data("filter");
+  switch (getActiveTab()) {
+      case "personnel":
+          fetchDataAndPopulate(mapFilterOptionToParameter("personnel", filterType));
+          break;
+      case "departments":
+          fetchDepartmentsDataAndPopulate(mapFilterOptionToParameter("departments", filterType));
+          break;
+      case "locations":
+          fetchAndPopulateLocations(mapFilterOptionToParameter("locations", filterType));
+          break;
+  }
+
+  // Close the dropdown after filtering
+  $("#filterOptions").hide();
+});
+
+
+function mapFilterOptionToParameter(activeTab, filterType) {
+  const filterMap = {
+      personnel: {
+          name: "firstName",       // Assuming that 'Name' refers to the first name for simplicity. Adjust if necessary.
+          department: "departmentName",
+          location: "locationName",
+          email: "email"
+      },
+      departments: {
+          department: "departmentName",
+          location: "departmentLocation"
+      },
+      locations: {
+          location: "locations"
+      }
+  };
+
+  return filterMap[activeTab][filterType];
+}
+
+
+// $("#filterBtn").click(function () {
+//   switch (getActiveTab()) {
+//       case "personnel":
+//           // Filter personnel table
+//           console.log("Filtering personnel table...");
+//           break;
+//       case "departments":
+//           // Filter department table
+//           console.log("Filtering department table...");
+//           break;
+//       case "locations":
+//           // Filter location table
+//           console.log("Filtering location table...");
+//           break;
+//   }
+// });
+
+
 
 
 
@@ -711,46 +859,124 @@ fetchAndPopulateLocations(); // Sorts by locations alphabetically. // use "use l
 
 
 // ------------------------DELETE MODALE-----------------------------------
+// Utility functions
+function deletePersonnelById(id) {
+    // Call your API to delete the personnel by ID
+    // Here's a basic AJAX example:
+    $.ajax({
+        url: `/myProjects/project2/php/deletePersonnel.php?id=${id}`,
+        type: 'DELETE',
+        success: function(response) {
+            // Check the response status code
+            if (response.status && response.status.code == "200") {
+                // Refresh the data after successful deletion
+                fetchDataAndPopulate();
+                console.log("Successfully deleted personnel:", response.data.firstName, response.data.lastName);
+                document.getElementById("modalMessage").innerText = "Successfully deleted personnel: " + response.data.firstName + " " + response.data.lastName;
+            } else {
+                // Handle any other status codes or failure messages
+                console.error("Failed to delete personnel due to:", response.status.description);
+                document.getElementById("modalMessage").innerText = response.status.description;
+            }
+            
+            // Display the modal with the response message
+            const infoModal = new bootstrap.Modal(document.getElementById('responseModal'));
+            infoModal.show();
+        },        
+        error: function(error) {
+            console.error("Failed to delete personnel:", error);
+        }
+    });
+}
 
+function deleteDepartmentById(id) {
+    $.ajax({
+        url: `/myProjects/project2/php/deleteDepartment.php?id=${id}`,
+        type: 'DELETE',
+        success: function(response) {
+            if (response.status.name === "failure") {
+                document.getElementById("modalMessage").innerText = response.status.description;
+            } else if (response.status.name === "success") {
+                document.getElementById("modalMessage").innerText = "Successfully deleted: " + response.data.departmentName; // or locationName if you're working with locations
+            }
+            fetchDepartmentsDataAndPopulate();
+            // Display the modal with the response message
+            const infoModal = new bootstrap.Modal(document.getElementById('responseModal'));
+            infoModal.show();
+        },
+        error: function(error) {
+            console.error("Failed to delete department:", error);
+        }
+    });
+}
 
+function deleteLocationById(id) {
+    $.ajax({
+        url: `/myProjects/project2/php/deleteLocation.php?id=${id}`,
+        type: 'DELETE',
+        success: function(response) {
+            if (response.status.name === "failure") {
+                document.getElementById("modalMessage").innerText = response.status.description;
+            } else if (response.status.name === "success") {
+                document.getElementById("modalMessage").innerText = "Successfully deleted: " + response.data.locationName; // or locationName if you're working with locations
+            }
+            fetchAndPopulateLocations();
+            // Display the modal with the response message
+            const infoModal = new bootstrap.Modal(document.getElementById('responseModal'));
+            infoModal.show();
+        },
+        
+        error: function(error) {
+            console.error("Failed to delete location:", error);
+        }
+    });
+}
 
+// Event Listeners for Delete Buttons
 $(document).on("click", ".deletePersonnelBtn", function() {
-  const itemId = $(this).attr("data-id");
-  const item = apiResponse.find(emp => emp.id == itemId);
-
-  if (item) {
-      $("#itemNameToDelete").text(item.name);
-      $("#deleteConfirmationModal").modal("show");
-  }
+    const itemId = $(this).attr("data-id");
+    const item = employeesData.find(emp => emp.id == itemId);
+    if (item) {
+        $("#itemNameToDelete").text(item.firstName + ' ' + item.lastName);
+        $("#deleteConfirmationModal").modal("show");
+        $(".confirmDelete").data('type', 'personnel').data('id', itemId);
+    }
 });
-
 
 $(document).on("click", ".deleteDepartmentBtn", function() {
-  const itemId = $(this).attr("data-id");
-  const item = departmentsData.find(dept => dept.id == itemId);
-
-  if (item) {
-      $("#itemNameToDelete").text(item.departmentName); // Assuming you have a departmentName property
-      $("#deleteConfirmationModal").modal("show");
-  }
+    const itemId = $(this).attr("data-id");
+    const item = departmentsData.find(dept => dept.id == itemId);
+    if (item) {
+        $("#itemNameToDelete").text(item.departmentName);
+        $("#deleteConfirmationModal").modal("show");
+        $(".confirmDelete").data('type', 'department').data('id', itemId);
+    }
 });
 
-// Event listener for the Location Delete button
 $(document).on("click", ".deleteLocationBtn", function() {
-  const itemId = $(this).attr("data-id");
-  const item = locationData.find(loc => loc.id == itemId);
-
-  if (item) {
-      $("#itemNameToDelete").text(item.locationName);
-      $("#deleteConfirmationModal").modal("show");
-  }
+    const itemId = $(this).attr("data-id");
+    const item = locationData.find(loc => loc.id == itemId);
+    if (item) {
+        $("#itemNameToDelete").text(item.name);
+        $("#deleteConfirmationModal").modal("show");
+        $(".confirmDelete").data('type', 'location').data('id', itemId);
+    }
 });
 
-// Add logic for the delete action on clicking the "Yes, Delete" button.
+// Delete Confirmation Logic
 $(document).on("click", ".confirmDelete", function() {
-  // Here, depending on the context, delete the right item
-  // You can differentiate the context by checking the current text in `itemNameToDelete`
-  // Or you can set a global state/data attribute indicating the current type - Personnel, Department, or Location
-  $("#deleteConfirmationModal").modal("hide");
+    const itemType = $(this).data('type');
+    const itemId = $(this).data('id');
+    switch(itemType) {
+        case 'personnel':
+            deletePersonnelById(itemId);
+            break;
+        case 'department':
+            deleteDepartmentById(itemId);
+            break;
+        case 'location':
+            deleteLocationById(itemId);
+            break;
+    }
+    $("#deleteConfirmationModal").modal("hide");
 });
-

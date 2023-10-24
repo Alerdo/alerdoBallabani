@@ -38,5 +38,5 @@ I made sure that for exmp: updateRecord() would return a promise and upon resolv
 
 
 
--Other challange , I am workign on the refrsh buttons and I am calling the async functions to populate the data, however The data is not being populated. 
+-Other challange , I am workign on the refresh buttons and I am calling the async functions to populate the data, however The data is not being populated. 
 To be solved...
