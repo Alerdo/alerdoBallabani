@@ -282,7 +282,7 @@ $(document).ready(function() {
               updateDepartment() //I made this function return a promise so the fetchDataAndPopulate will run only if the promise is resolved
                   .then(() => {
                       $('#editData').modal('hide');
-                      fetchDataAndPopulate();  // Assuming you want to re-fetch data for departments as well
+                      fetchDepartmentsDataAndPopulate();  // Assuming you want to re-fetch data for departments as well
                       console.log("Department data updated and new data rendered.");
                   })
                   .catch((error) => {
@@ -294,73 +294,18 @@ $(document).ready(function() {
               updateLocation()
                   .then(() => {
                       $('#editData').modal('hide');
-                      fetchDataAndPopulate();  // Assuming you want to re-fetch data for locations as well
+                      fetchAndPopulateLocations();  // Assuming you want to re-fetch data for locations as well
                       console.log("Location data updated and new data rendered.");
                   })
                   .catch((error) => {
                       console.error('Error after updating location:', error);
                   });
               break;
-              
-          // Add more cases if needed for other tabs
-          // case "anotherTab":
-          //    anotherFunction().then(() => { ... }).catch((error) => { ... });
-          //    break;
+     
       }
   });
 });
 
-
-
-// //UPDATE DATA LOGIC FOR   PERSONNEL SECTION 
-// function updatePersonnel() {
-//   // Getting values from the input fields
-//   const personnelID = $('#editEntityID').val();
-//   const firstName = $("#editPersonnelFirstName").val();
-//   const lastName = $("#editPersonnelLastName").val();
-//   const departmentName = $("#editPersonnelJobTitle").val();
-//   // const locationName = $("#editPersonnelLocation").val();
-//   const email = $("#editPersonnelEmailAddress").val();
-
-//   // Constructing the data object
-//   const dataToSend = {
-//       id: personnelID,
-//       firstName: firstName,
-//       lastName: lastName,
-//       departmentName: departmentName,
-//       // locationName: locationName,
-//       email: email
-//   };
-// console.log(dataToSend.id)
-//   // Sending the PUT request to the backend to update the data
-// // AJAX Call
-// $.ajax({
-//   url: '/myProjects/project2/php/updatePersonnelInfo.php', 
-//   type: 'PUT',
-//   contentType: 'application/json',
-//   dataType: 'json',
-//   data: JSON.stringify(dataToSend),
-//   success: function(response) {
-      
-//       if(response.error) {
-//           document.getElementById("modalMessage").innerText = response.error;
-//       } 
-      
-//       else {
-//           document.getElementById("modalMessage").innerText = response.success;
-//       }
-//       const infoModal = new bootstrap.Modal(document.getElementById('responseModal'));
-//       infoModal.show();
-//   },
-//   error: function(jqXHR, textStatus, errorThrown) {
-//       console.error('Error updating data:', textStatus, errorThrown, jqXHR);
-//       document.getElementById("modalMessage").innerText = "An unexpected error occurred.";
-//       var myModal = new bootstrap.Modal(document.getElementById('responseModal'));
-//       myModal.show();
-//   }
-// });
-
-// }
 
 function updatePersonnel() {
   return new Promise((resolve, reject) => {
@@ -417,50 +362,6 @@ console.log(dataToSend.id)
 
 
 
-//  //Update the DEPARTMENT SECTION RECORDS 
-
-//  function updateDepartment() {
-
-//   const departmentID = $('#editEntityID').val();
-//   const departmentName = $('#editDepartmentName').val();
- 
-//   const departmentLocation = $('#editDepartmentLocation').val();
-
-//   const dataToSend = {
-//       id: departmentID,
-//       departmentName: departmentName,
-//       locationName: departmentLocation
-//   };
-//   console.log(dataToSend.id)
-
-
-  
-//   $.ajax({
-//       url: "/myProjects/project2/php/updateDepartments.php",
-//       type: 'POST',
-//       data: JSON.stringify(dataToSend),
-//       contentType: 'application/json',
-//       success: function(response) {
-
-       
-//         if(response.error) {
-//           document.getElementById("modalMessage").innerText = response.error;
-//       } 
-      
-//       else {
-//           document.getElementById("modalMessage").innerText = response.success;
-//       }
-//       const infoModal = new bootstrap.Modal(document.getElementById('responseModal'));
-//       infoModal.show();
-//       },
-//       error: function() {
-//           alert('Failed to update. Please try again.');
-//       }
-//   });
-// }
-
-
-
 function updateDepartment() {
   return new Promise((resolve, reject) => {
       const departmentID = $('#editEntityID').val();
@@ -499,41 +400,6 @@ function updateDepartment() {
 }
 
 
-//  //Update the LOCATION SECTION RECORDS 
-
-// function updateLocation() {
-//   const locationID = $('#editEntityID').val();
-//   const locationName = $('#editLocationName').val();
-
-//   const dataToSend = {
-//      id: locationID,
-//      name: locationName
-//   }
-//   console.log(dataToSend.id)
-//   $.ajax({
-//     url: "/myProjects/project2/php/updateLocations.php",
-//     type: 'POST',
-//     data: JSON.stringify(dataToSend),
-//     contentType: 'application/json',
-//     success: function(response) {
-
-       
-//       if(response.error) {
-//         document.getElementById("modalMessage").innerText = response.error;
-//     } 
-    
-//     else {
-//         document.getElementById("modalMessage").innerText = response.success;
-//     }
-//     const infoModal = new bootstrap.Modal(document.getElementById('responseModal'));
-//     infoModal.show();
-//     },
-//     error: function() {
-//         alert('Failed to update. Please try again.');
-//     }
-// });
-  
-// }
 function updateLocation() {
   return new Promise((resolve, reject) => {
       const locationID = $('#editEntityID').val();
@@ -717,9 +583,10 @@ fetchDataAndPopulate();               // Default: sorts by firstName
 
 // ------------------------POPULATE DEPARTMENTS SECTION -----------------------------------
 
-// Refactored version based on the 'Populate Personnel' structure
+
 
 let departmentsData = [];
+const $departmentTemplate = $(".departmentTemplate");
 
 async function fetchDepartmentsData() {
     try {
@@ -739,6 +606,7 @@ async function fetchDepartmentsData() {
     }
 }
 
+
 function populateDepartmentsTable(data, sortColumn = "departmentName") {
   const sortedData = data.sort((a, b) => {
       if (a[sortColumn] < b[sortColumn]) return -1;
@@ -747,9 +615,7 @@ function populateDepartmentsTable(data, sortColumn = "departmentName") {
   });
 
   const $tableBody = $("#departmentsTableBody");
-  const $template = $(".departmentTemplate").clone().removeClass("departmentTemplate").show();
-
-  // Empty the table body
+  const $template = $departmentTemplate.clone().removeClass("departmentTemplate").show();
   $tableBody.empty();
 
   if (sortedData) {
@@ -784,6 +650,8 @@ fetchDepartmentsDataAndPopulate(); //default is departmentName, use departmentLo
 // --------------------------POPULATE LOCATION SECTION ---------------------------
 
 let locationData = [];
+const $locationTemplate = $(".locationTemplate");
+
 
 async function fetchLocationData() {
     try {
@@ -812,7 +680,7 @@ function populateLocationsTable(data, sortColumn = null) {
   }
 
   const $tableBody = $("#locationsTableBody");
-  const $template = $(".locationTemplate").clone().removeClass("locationTemplate").show();
+  const $template = $locationTemplate.clone().removeClass("locationTemplate").show();
   $tableBody.empty();
 
   if (data) {
