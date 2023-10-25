@@ -38,5 +38,28 @@ I made sure that for exmp: updateRecord() would return a promise and upon resolv
 
 
 
--Other challange , I am workign on the refresh buttons and I am calling the async functions to populate the data, however The data is not being populated. 
-To be solved...
+-Other challange , I am workign on the refresh buttons and I am calling the async functions
+ to populate the data, however The data is not being populated. 
+The problem about that is on the hide   const $template = $originalTemplate.clone().removeClass("employeeTemplate").show();
+template. Becasue when I was popualting the data for the second time I was actually hiding the class.
+
+
+
+
+SEARCH BUTTON, TASKS.
+1- The record for the personnel section , is firstname and lastname(personnel table),
+departmentName(on personnel table I have just departmentID, 
+I have to check to department table to get the name),
+location name(the location name is on the department record as locationID, 
+I have to go on location table to get the location name) and email on personnel table,
+So the search should happen in one table for exmp, but the data should 
+show joining the record between 3 tables. 
+
+
+2-There is data already shown for each section , 
+Now when I search on personnel,
+the searched result should overwrite the data on the section
+and when I change to department , the department data should show, If I move back to personnel,
+the personnel inital data should show(not the search result). 
+
+Find a way to display the data in the same manner each section initally displays. 

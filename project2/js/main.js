@@ -1,25 +1,20 @@
-// The performSearch function that will be executed when the search button is clicked
+// The performSearch function that will be executed when the search button is clicked or upon typing
 function performSearch() {
-  // Get the value of the search input
-  let query = $('#searchInp').val().toLowerCase();
-
-  // Check which tab is active
-  if ($('#personnelBtn').hasClass('active')) {
-      // Perform the search for the personnel table
-      console.log("Searching personnel");
-      searchTable(query, "#employeesTableBody");
+    // Get the value of the search input
+    let query = $('#searchInp').val().toLowerCase();
+  
+    // Check which tab is active and perform search accordingly
+    if ($('#personnelBtn').hasClass('active')) {
+        console.log("Searching personnel");
+        searchTable(query, "#employeesTableBody");
+    } else if ($('#departmentsBtn').hasClass('active')) {
+        console.log("Searching departments");
+        searchTable(query, "#departmentsTableBody");
+    } else if ($('#locationsBtn').hasClass('active')) {
+        console.log("Searching locations");
+        searchTable(query, "#locationsTableBody");
+    }
   }
-  else if ($('#departmentsBtn').hasClass('active')) {
-      // Perform the search for the department table
-      console.log("Searching departments");
-      searchTable(query, "#departmentsTableBody");
-  }
-  else if ($('#locationsBtn').hasClass('active')) {
-      // Perform the search for the location table
-      console.log("Searching locations");
-      searchTable(query, "#locationsTableBody");
-  }
-}
 
 // The searchTable function to perform the actual search in the table
 function searchTable(query, tableBodySelector) {
@@ -57,6 +52,25 @@ $('button[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
 $("#searchInp").on("keyup", function (e) {
   if (e.key === 'Enter' || e.keyCode === 13) {
       performSearch();
+  }
+});
+
+let debounceTimeout;
+$('#searchInp').on('input', function() {
+  clearTimeout(debounceTimeout); // Clear any previously set timeout
+  debounceTimeout = setTimeout(performSearch, 300); // Wait for 300ms before executing the search
+});
+
+// Event to detect tab changes and update the search input's placeholder accordingly
+$('button[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
+  var target = $(e.target).attr("data-bs-target"); // activated tab
+
+  if (target === '#personnel-tab-pane') {
+      $('#searchInp').attr('placeholder', 'Search personnel...');
+  } else if (target === '#departments-tab-pane') {
+      $('#searchInp').attr('placeholder', 'Search departments...');
+  } else if (target === '#locations-tab-pane') {
+      $('#searchInp').attr('placeholder', 'Search locations...');
   }
 });
 
