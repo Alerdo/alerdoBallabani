@@ -112,7 +112,7 @@ $("#refreshBtn").click(function () {
 
 
 
-//---------------------ADD+ BUTTON------------------------------===
+//---------------------ADD+ BUTTON MODALE ------------------------------===
 
 $("#addBtn").on("click", function () {
   let content = ""; // variable to store the dynamic content
@@ -287,7 +287,7 @@ $("#saveAddBtn").on("click", function() {
 });
 
 
-//---------------UPDATE OR EDIT BUTTON LOGIC----------------------------------
+//---------------UPDATE OR EDIT BUTTON MODALE DISPLAY LOGIC----------------------------------
 
 $("#editData").on("show.bs.modal", function (e) {
   const entityId = $(e.relatedTarget).attr("data-id");
@@ -507,6 +507,7 @@ function updateDepartment() {
               }
               const infoModal = new bootstrap.Modal(document.getElementById('responseModal'));
               infoModal.show();
+
 
               resolve(response); // Resolve the promise on success
           },

@@ -63,3 +63,16 @@ and when I change to department , the department data should show, If I move bac
 the personnel inital data should show(not the search result). 
 
 Find a way to display the data in the same manner each section initally displays. 
+
+
+
+SETING UP THE DATABASE ON FAST-HOST
+-1 Creating the dump.sql
+mysqldump -h localhost -P 3306 -u companyDirector -p companydirectory > dump.sql
+
+-2 Transfer the dump.sql to fast-HOST
+
+-3 se a tool like phpMyAdmin (for MySQL) or pgAdmin (for PostgreSQL) 
+provided by Fasthost to import the SQL dump into the hosted database.
+Import dump file, and populate the databse.
+Change config.php file and add new details
