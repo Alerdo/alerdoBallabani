@@ -51,7 +51,7 @@ if (!$department) {
 }
 
 // Check for dependencies
-$checkSql = "SELECT COUNT(*) as count FROM personnel WHERE departmentID=?";
+$checkSql = "SELECT COUNT(id) as count FROM personnel WHERE departmentID=?";
 
 $checkStmt = $conn->prepare($checkSql);
 $checkStmt->bind_param('i', $id);

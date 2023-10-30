@@ -7,6 +7,8 @@
 // $cd_dbname = "companydirectory";
 // $cd_user = "companyDirector";
 // $cd_password = "Haxhiballabani11";
+
+//FastHost db connection
 $cd_host = "213.171.200.32"; // Server IP Address
 $cd_port = 3306;             // Default port for MySQL, keep it ,  Fasthost specifies otherwise
 $cd_socket = "";             // You can leave this as it is

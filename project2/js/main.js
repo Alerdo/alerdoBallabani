@@ -113,73 +113,21 @@ $("#refreshBtn").click(function () {
 
 
 //---------------------ADD+ BUTTON MODALE ------------------------------===
-
 $("#addBtn").on("click", function () {
-  let content = ""; // variable to store the dynamic content
-  switch (getActiveTab()) {
-    case "personnel":
-    $("#modalLabel").text("Add Employee");
-
-    content = `
-        <div class="form-floating mb-3">
-        <input type="text" class="form-control" id="addPersonnelFirstName" placeholder="First name" required>
-        <label for="addPersonnelFirstName">First name</label>
-
-        </div>
-        <div class="form-floating mb-3">
-            <input type="text" class="form-control" id="addPersonnelLastName" placeholder="Last name" required>
-            <label for="addPersonnelLastName">Last name</label>
-        </div>
-        <div class="form-floating mb-3">
-            <input type="text" class="form-control" id="addPersonnelJobTitle" placeholder="Department" required>
-            <label for="addPersonnelJobTitle">Department</label>
-        </div>
-        <div class="form-floating mb-3">
-            <input type="email" class="form-control" id="addPersonnelEmailAddress" placeholder="Email address" required>
-            <label for="addPersonnelEmailAddress">Email Address</label>
-        </div>
-    `;
-
-    $("#dynamicAddFields").html(content);
-
-
-
-    $("#saveAddBtn").text("Create Employee");
-    break;
-
-    case "departments":
-      $("#modalLabel").text("Add Department");
-
-      content = `
-        <div class="form-floating mb-3">
-            <input type="text" class="form-control" id="addDepartmentName" placeholder="Department Name" required>
-            <label for="addDepartmentName">Department Name</label>
-        </div>
-        <div class="form-floating mb-3">
-            <input type="text" class="form-control" id="addDepartmentLocation" placeholder="Department Location" required>
-            <label for="addDepartmentLocation">Department Location</label>
-        </div>
-      `;
-
-      $("#saveAddBtn").text("Create Department");
-      break;
-
-    case "locations":
-      $("#modalLabel").text("Add Location");
-      content = `
-        <div class="form-floating mb-3">
-            <input type="text" class="form-control" id="addLocationName" placeholder="Location Name" required>
-            <label for="addLocationName">Location Name</label>
-        </div>
-      `;
-      $("#saveAddBtn").text("Create Location");
-      break;
-  }
-  // Append the content to the modal body and show the modal
-  $("#dynamicAddFields").html(content);
-  $('#addModal').modal('show');
-});
-
+    switch (getActiveTab()) {
+      case "personnel":
+        $("#addPersonnelModal").modal('show');
+        break;
+  
+      case "departments":
+        $("#addDepartmentModal").modal('show');
+        break;
+  
+      case "locations":
+        $("#addLocationModal").modal('show');
+        break;
+    }
+  });
 
 
 
@@ -294,94 +242,96 @@ $("#editData").on("show.bs.modal", function (e) {
   const context = $(e.relatedTarget).attr("data-context");
 
   switch(context) {
-      case "employee":
-          const employee = employeesData.find(emp => emp.id == entityId);  // <-- Reference employeesData
-          console.log(employee);
-          if (employee) {
-              $("#modalTitle").text("Edit Employee");
-              $("#editPersonnelEntityID").val(employee.id);
+    //   case "employee":
+    //       const employee = employeesData.find(emp => emp.id == entityId);  // <-- Reference employeesData
+    //       console.log(employee);
+    //       if (employee) {
+    //           $("#modalTitle").text("Edit Employee");
+    //           $("#editPersonnelEntityID").val(employee.id);
 
-              const content = `
-                  <div class="form-floating mb-3">
-                      <input type="text" class="form-control" id="editPersonnelFirstName" placeholder="First name" required value="${employee.firstName}">
-                      <label for="editPersonnelFirstName">First name</label>
-                  </div>
-                  <div class="form-floating mb-3">
-                      <input type="text" class="form-control" id="editPersonnelLastName" placeholder="Last name" required value="${employee.lastName}">
-                      <label for="editPersonnelLastName">Last name</label>
-                  </div>
-                  <div class="form-floating mb-3">
-                      <input type="text" class="form-control" id="editPersonnelJobTitle" placeholder="Department" required value="${employee.departmentName}">
-                      <label for="editPersonnelJobTitle">Department</label>
-                  </div>
+    //           const content = `
+    //               <div class="form-floating mb-3">
+    //                   <input type="text" class="form-control" id="editPersonnelFirstName" placeholder="First name" required value="${employee.firstName}">
+    //                   <label for="editPersonnelFirstName">First name</label>
+    //               </div>
+    //               <div class="form-floating mb-3">
+    //                   <input type="text" class="form-control" id="editPersonnelLastName" placeholder="Last name" required value="${employee.lastName}">
+    //                   <label for="editPersonnelLastName">Last name</label>
+    //               </div>
+    //               <div class="form-floating mb-3">
+    //                   <input type="text" class="form-control" id="editPersonnelJobTitle" placeholder="Department" required value="${employee.departmentName}">
+    //                   <label for="editPersonnelJobTitle">Department</label>
+    //               </div>
             
-                  <div class="form-floating mb-3">
-                      <input type="email" class="form-control" id="editPersonnelEmailAddress" placeholder="Email address" required value="${employee.email}">
-                      <label for="editPersonnelEmailAddress">Email Address</label>
-                  </div>
-                  <input type="hidden" id="editEntityID" value="${employee.id}">
+    //               <div class="form-floating mb-3">
+    //                   <input type="email" class="form-control" id="editPersonnelEmailAddress" placeholder="Email address" required value="${employee.email}">
+    //                   <label for="editPersonnelEmailAddress">Email Address</label>
+    //               </div>
+    //               <input type="hidden" id="editEntityID" value="${employee.id}">
                   
                  
-              `;
+    //           `;
 
-              $("#dynamicModalFields").html(content);
+    //           $("#dynamicModalFields").html(content);
 
-          } else {
-              $("#modalTitle").text("Employee not found");
-          }
-          break;
+    //       } else {
+    //           $("#modalTitle").text("Employee not found");
+    //       }
+    //       break;
 
-          case "department":
-            const department = departmentsData.find(dep => dep.id == entityId);
-            // console.log(department);
-            if (department) {
-                $("#modalTitle").text("Edit Department");
+        //   case "department":
+        //     const department = departmentsData.find(dep => dep.id == entityId);
+        //     // console.log(department);
+        //     if (department) {
+        //         $("#modalTitle").text("Edit Department");
         
-                $("#editPersonnelEntityID").val(department.id);
+        //         $("#editPersonnelEntityID").val(department.id);
         
-                const content = `
-                    <div class="form-floating mb-3">
-                        <input type="text" class="form-control" id="editDepartmentName" placeholder="Department Name" required value="${department.departmentName}">
-                        <label for="editDepartmentName">Department Name</label>
-                    </div>
-                    <div class="form-floating mb-3">
-                        <input type="text" class="form-control" id="editDepartmentLocation" placeholder="Location" required value="${department.departmentLocation}">
-                        <label for="editDepartmentLocation">Location</label>
-                    </div>
-                    <input type="hidden" id="editEntityID" value="${department.id}">
-                `;
+        //         const content = `
+        //             <div class="form-floating mb-3">
+        //                 <input type="text" class="form-control" id="editDepartmentName" placeholder="Department Name" required value="${department.departmentName}">
+        //                 <label for="editDepartmentName">Department Name</label>
+        //             </div>
+        //             <div class="form-floating mb-3">
+        //                 <input type="text" class="form-control" id="editDepartmentLocation" placeholder="Location" required value="${department.departmentLocation}">
+        //                 <label for="editDepartmentLocation">Location</label>
+        //             </div>
+        //             <input type="hidden" id="editEntityID" value="${department.id}">
+        //         `;
         
-                $("#dynamicModalFields").html(content);
-            } else {
-                $("#modalTitle").text("Department not found");
-            }
-            break;
+        //         $("#dynamicModalFields").html(content);
+        //     } else {
+        //         $("#modalTitle").text("Department not found");
+        //     }
+        //     break;
 
-            case "location":
-              const location = locationData.find(loc => loc.id == entityId);
+        //     case "location":
+        //       const location = locationData.find(loc => loc.id == entityId);
               
-              if (location) {
-                  $("#modalTitle").text("Edit Location");
+        //       if (location) {
+        //           $("#modalTitle").text("Edit Location");
           
-                  $("#editPersonnelEntityID").val(location.id);
+        //           $("#editPersonnelEntityID").val(location.id);
           
-                  const content = `
-                      <div class="form-floating mb-3">
-                          <input type="text" class="form-control" id="editLocationName" placeholder="Location Name" required value="${location.name}">
-                          <label for="editLocationName">Location Name</label>
-                      </div>
-                      <input type="hidden" id="editEntityID" value="${location.id}">
-                  `;
+        //           const content = `
+        //               <div class="form-floating mb-3">
+        //                   <input type="text" class="form-control" id="editLocationName" placeholder="Location Name" required value="${location.name}">
+        //                   <label for="editLocationName">Location Name</label>
+        //               </div>
+        //               <input type="hidden" id="editEntityID" value="${location.id}">
+        //           `;
           
-                  $("#dynamicModalFields").html(content);
-              } else {
-                  $("#modalTitle").text("Location not found");
-              }
-              break;
+        //           $("#dynamicModalFields").html(content);
+        //       } else {
+        //           $("#modalTitle").text("Location not found");
+        //       }
+        //       break;
           
   }
 });
 
+
+//Logic to render the updated result back on the screen
 $(document).ready(function() {
   $("#updateData").click(function() {
       switch (getActiveTab()) {
@@ -428,8 +378,7 @@ $(document).ready(function() {
 
 function updatePersonnel() {
   return new Promise((resolve, reject) => {
-      // ... [your previous code here]
-      // Getting values from the input fields
+    
   const personnelID = $('#editEntityID').val();
   const firstName = $("#editPersonnelFirstName").val();
   const lastName = $("#editPersonnelLastName").val();
@@ -455,6 +404,7 @@ console.log(dataToSend.id)
           dataType: 'json',
           data: JSON.stringify(dataToSend),
           success: function(response) {
+        
               if(response.error) {
                   document.getElementById("modalMessage").innerText = response.error;
               } else {
@@ -994,4 +944,136 @@ $(document).on("click", ".confirmDelete", function() {
             break;
     }
     $("#deleteConfirmationModal").modal("hide");
+});
+
+
+
+
+///EDIT PERSONNEL POPULATE MODALE 
+$("#editPersonnelModal").on("show.bs.modal", function (e) {
+    
+    $.ajax({
+      url:
+        "/myProjects/project2/php/getPersonnelByID.php",
+      type: "POST",
+      dataType: "json",
+      data: {
+        id: $(e.relatedTarget).attr("data-id") // Retrieves the data-id attribute from the calling button
+      },
+      success: function (result) {
+        var resultCode = result.status.code;
+  
+        if (resultCode == 200) {
+          // Update the hidden input with the employee id so that
+          // it can be referenced when the form is submitted
+  
+          $("#editPersonnelEmployeeID").val(result.data.personnel[0].id);
+  
+          $("#editPersonnelFirstName").val(result.data.personnel[0].firstName);
+          $("#editPersonnelLastName").val(result.data.personnel[0].lastName);
+          $("#editPersonnelJobTitle").val(result.data.personnel[0].jobTitle);
+          $("#editPersonnelEmailAddress").val(result.data.personnel[0].email);
+  
+          $("#editPersonnelDepartment").html("");
+  
+          $.each(result.data.department, function () {
+            $("#editPersonnelDepartment").append(
+              $("<option>", {
+                value: this.id,
+                text: this.name
+              })
+            );
+          });
+  
+          $("#editPersonnelDepartment").val(result.data.personnel[0].departmentID);
+          
+        } else {
+          $("#editPersonnelModal .modal-title").replaceWith(
+            "Error retrieving data"
+          );
+        }
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        $("#editPersonnelModal .modal-title").replaceWith(
+          "Error retrieving data"
+        );
+      }
+    });
+  });
+  
+
+
+
+  //EDIT DEPARTMENT POPULATE MODAL
+  $("#editDepartmentModal").on("show.bs.modal", function (e) {
+    
+    $.ajax({
+      url: "/myProjects/project2/php/getDepartmentByID.php",
+      type: "POST",
+      dataType: "json",
+      data: {
+        id: $(e.relatedTarget).attr("data-id")
+      },
+      success: function (result) {
+        var resultCode = result.status.code;
+
+        if (resultCode == 200) {
+          $("#editDepartmentID").val(result.data.department[0].id);
+          $("#editDepartmentName").val(result.data.department[0].name);
+
+          // Populate the location dropdown
+          $("#editDepartmentLocationDropdown").html("");
+
+          $.each(result.data.locations, function () {
+            $("#editDepartmentLocationDropdown").append(
+              $("<option>", {
+                value: this.id,
+                text: this.name
+              })
+            );
+          });
+
+          // Set the selected value for location dropdown
+          $("#editDepartmentLocationDropdown").val(result.data.department[0].locationID);
+          
+        } else {
+          $("#editDepartmentModal .modal-title").replaceWith(
+            "Error retrieving data"
+          );
+        }
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        $("#editDepartmentModal .modal-title").replaceWith(
+          "Error retrieving data"
+        );
+      }
+    });
+});
+
+
+
+
+//EDIT LOCATION POPULATE MODAL
+$("#editLocationModal").on("show.bs.modal", function (e) {
+    
+    $.ajax({
+        url: "/myProjects/project2/php/getLocationByID.php",
+        type: "POST",
+        dataType: "json",
+        data: {
+            id: $(e.relatedTarget).attr("data-id") // Retrieves the data-id attribute from the calling button
+        },
+        success: function (result) {
+            var resultCode = result.status.code;
+
+            if (resultCode == 200) {
+                $("#editLocationName").val(result.data.location[0].name);
+            } else {
+                $("#editLocationModal .modal-title").replaceWith("Error retrieving data");
+            }
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+            $("#editLocationModal .modal-title").replaceWith("Error retrieving data");
+        }
+    });
 });

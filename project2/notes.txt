@@ -76,3 +76,5 @@ mysqldump -h localhost -P 3306 -u companyDirector -p companydirectory > dump.sql
 provided by Fasthost to import the SQL dump into the hosted database.
 Import dump file, and populate the databse.
 Change config.php file and add new details
+
+.Solution for this was: I created a new db on Fasthost and from the phpMyAdmin I created the recrods from scratch/
