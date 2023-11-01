@@ -78,3 +78,17 @@ Import dump file, and populate the databse.
 Change config.php file and add new details
 
 .Solution for this was: I created a new db on Fasthost and from the phpMyAdmin I created the recrods from scratch/
+
+
+
+CHANGES MADE TO THE PROJECT UPON THE REVIEW: 
+
+Added on("keyup"...) for the search input,
+Removed the search button. 
+Removed unnecessary header.
+Filter instead of ordering. 
+I have used  .on("submit"...) for adding and updating entries, forms with the "required" attribute for the inputs that require a value. 
+Used .on("show.bs.modal..)   event for opening modales (add modales also).
+Created modales for edit adding and filtering on html instead of rendring html from js. 
+Consisted positioning of modales and appearance. 
+Check for dependecies first and notify dependencies. 

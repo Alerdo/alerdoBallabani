@@ -309,7 +309,7 @@ $("#editPersonnelModal").on("show.bs.modal", function (e) {
                     var isSelected = (this.id == defaultDeptID) ? true : false;
                     $("#editPersonnelDepartment").append(
                         $("<option>", {
-                            value: this.id, // use id for value
+                            value: this.name, // use id for value
                             text: this.name,
                             selected: isSelected // this will set the default value
                         })
@@ -1105,7 +1105,7 @@ $(document).on("click", ".deleteDepartmentBtn", function() {
     const itemId = $(this).attr("data-id");
     
     $.ajax({
-        url: "/myprojects/project2/php/checkDepartmentUse.php",
+        url: "/myProjects/project2/php/checkDepartmentUse.php",
         type: "POST",
         dataType: "json",
         data: {
