@@ -90,6 +90,7 @@ $output = [
         'description' => "success",
         'returnedIn' => (microtime(true) - $executionStartTime) / 1000 . " ms"
     ],
+    'user' =>"$firstName $lastName" ,
     'data' => [
         'message' => "$firstName $lastName was created."
     ]

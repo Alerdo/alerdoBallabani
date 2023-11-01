@@ -74,6 +74,8 @@ $output = [
         'description' => "success",
         'returnedIn' => (microtime(true) - $executionStartTime) / 1000 . " ms"
     ],
+    'department' => "$departmentName",
+    'location' => "$locationName",
     'data' => [
         'message' => "Department '$departmentName' was created in location '$locationName'."
     ]

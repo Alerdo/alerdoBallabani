@@ -13,63 +13,31 @@ if (mysqli_connect_errno()) {
     $output['status']['name'] = "failure";
     $output['status']['description'] = "database unavailable";
     $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
-    $output['data'] = [];
-
     echo json_encode($output);
     exit;
 }
 
-if(!isset($_GET['id']) || empty($_GET['id']) || !is_numeric($_GET['id'])) {
+if(!isset($_POST['id']) || empty($_POST['id']) || !is_numeric($_POST['id'])) {
     $output['status']['code'] = "400";
     $output['status']['name'] = "failure";
     $output['status']['description'] = "Invalid ID provided";
     $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
-
     echo json_encode($output);
     exit;
 }
 
-$id = $_GET['id'];
+$id = $_POST['id'];
 
-// Fetch department name first
-$nameSql = "SELECT name FROM department WHERE id=?";
-$nameStmt = $conn->prepare($nameSql);
-$nameStmt->bind_param('i', $id);
-$nameStmt->execute();
-$nameResult = $nameStmt->get_result();
-$department = $nameResult->fetch_assoc();
-$nameStmt->close();
+// Fetch department name before deliting
+$sql = "SELECT name FROM department WHERE id=?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param('i', $id);
+$stmt->execute();
+$stmt->store_result();
+$stmt->bind_result($departmentName);
+$stmt->fetch();
 
-if (!$department) {
-    $output['status']['code'] = "400";
-    $output['status']['name'] = "failure";
-    $output['status']['description'] = "Department not found";
-    $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
-
-    echo json_encode($output);
-    exit;
-}
-
-// Check for dependencies
-$checkSql = "SELECT COUNT(id) as count FROM personnel WHERE departmentID=?";
-
-$checkStmt = $conn->prepare($checkSql);
-$checkStmt->bind_param('i', $id);
-$checkStmt->execute();
-$result = $checkStmt->get_result();
-$row = $result->fetch_assoc();
-$checkStmt->close();
-
-if ($row['count'] > 0) {
-    $output['status']['code'] = "400";
-    $output['status']['name'] = "failure";
-    $output['status']['description'] = "Cannot delete department as it has dependencies.";
-    $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
-
-    echo json_encode($output);
-    exit;
-}
-
+// Now delete the departmentt
 $sql = "DELETE FROM department WHERE id=?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param('i', $id);
@@ -77,9 +45,9 @@ $stmt->bind_param('i', $id);
 if ($stmt->execute()) {
     $output['status']['code'] = "200";
     $output['status']['name'] = "success";
-    $output['status']['description'] = "Successfully deleted department: " . $department['name'];
+    $output['status']['description'] = "Successfully deleted department";
+    $output['data']['departmentName'] = $departmentName;  // Return department name
     $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
-    $output['data']['departmentName'] = $department['name'];
 } else {
     $output['status']['code'] = "400";
     $output['status']['name'] = "failure";

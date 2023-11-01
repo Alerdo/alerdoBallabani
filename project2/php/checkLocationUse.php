@@ -28,35 +28,20 @@ if(!isset($_POST['id']) || empty($_POST['id']) || !is_numeric($_POST['id'])) {
 
 $id = $_POST['id'];
 
-// Fetch location name before deleting
-$sql = "SELECT name FROM location WHERE id=?";
+$sql = "SELECT l.name AS locationName, COUNT(d.id) as departmentCount FROM location l LEFT JOIN department d ON (d.locationID = l.id) WHERE l.id=?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param('i', $id);
 $stmt->execute();
-$stmt->store_result();
-$stmt->bind_result($locationName);
-$stmt->fetch();
-
-// Now delete the location
-$sql = "DELETE FROM location WHERE id=?";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param('i', $id);
-
-if ($stmt->execute()) {
-    $output['status']['code'] = "200";
-    $output['status']['name'] = "success";
-    $output['status']['description'] = "Successfully deleted location";
-    $output['data']['locationName'] = $locationName;
-    $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
-} else {
-    $output['status']['code'] = "400";
-    $output['status']['name'] = "failure";
-    $output['status']['description'] = "Error deleting location";
-    $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
-}
-
+$result = $stmt->get_result();
+$data = $result->fetch_assoc();
 $stmt->close();
 $conn->close();
+
+$output['status']['code'] = "200";
+$output['status']['name'] = "success";
+$output['status']['description'] = "Success";
+$output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
+$output['data'] = [$data];
 
 echo json_encode($output);
 

@@ -52,5 +52,9 @@ if ($updateStmt->affected_rows === 0) {
 $updateStmt->close();
 $conn->close();
 
-exit(json_encode(['success' => 'Location updated successfully from ' . $oldLocation['name'] . ' to ' . $data['name'] . '.']));
+exit(json_encode([
+    'success' => 'Location updated successfully.',
+    'oldLocation' => $oldLocation['name'],
+    'newLocation' => $data['name']
+]));
 ?>

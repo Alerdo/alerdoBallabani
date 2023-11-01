@@ -14,7 +14,16 @@ if ($conn->connect_errno) {
 
 $data = json_decode(file_get_contents("php://input"), true);
 
-// Rule 1: Check if the departmentName already exists in any other department record
+// Fetch the current department name
+$fetchOldNameQuery = "SELECT name FROM department WHERE id = ?";
+$fetchStmt = $conn->prepare($fetchOldNameQuery);
+$fetchStmt->bind_param("i", $data['id']);
+$fetchStmt->execute();
+$fetchResult = $fetchStmt->get_result();
+$oldDepartmentName = $fetchResult->fetch_assoc()['name'] ?? null;
+$fetchStmt->close();
+
+// Rule 1: Check if the new departmentName already exists in any other department record
 $checkDepartmentNameQuery = "SELECT * FROM department WHERE name = ? AND id != ?";
 $checkStmt = $conn->prepare($checkDepartmentNameQuery);
 $checkStmt->bind_param("si", $data['departmentName'], $data['id']);
@@ -54,11 +63,11 @@ $updateStmt->bind_param("sii", $data['departmentName'], $locationID, $data['id']
 $updateStmt->execute();
 
 if ($updateStmt->affected_rows === 0) {
-    exit(json_encode(['error' => 'No department updated. Please provide diffrent data .']));
+    exit(json_encode(['error' => 'No department updated. Please provide different data.']));
 }
 
 $updateStmt->close();
 $conn->close();
 
-exit(json_encode(['success' => 'Department updated successfully.']));
+exit(json_encode(['success' => 'Department updated successfully.', 'oldName' => $oldDepartmentName, 'newName' => $data['departmentName']]));
 ?>

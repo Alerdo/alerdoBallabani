@@ -31,6 +31,10 @@ function fetchID($conn, $table, $name) {
     return $row['id'] ?? null;
 }
 
+if (empty($data['departmentName'])) {
+    exit(json_encode(['error' => 'Please select a department.']));
+}
+
 $departmentID = fetchID($conn, 'department', $data['departmentName']);
 if (!$departmentID) {
     exit(json_encode(['error' => 'Sorry, ' . $data['departmentName'] . ' department doesn\'t exist.']));
@@ -52,5 +56,9 @@ if ($personnelUpdateStmt->errno) {
 $personnelUpdateStmt->close();
 $conn->close();
 
-exit(json_encode(['success' => 'Information updated successfully.']));
+exit(json_encode([
+    'success' => 'Information updated successfully.',
+    'name' => $data['firstName'],
+    'lastname' => $data['lastName']
+]));
 ?>
